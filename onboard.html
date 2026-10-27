@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Creator Onboarding | Twwinz.com</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(32, 31, 31, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(173, 198, 255, 0.12);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #ADC6FF 0%, #4B8EFF 100%);
+        }
+        .font-headline {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#131313] text-[#e5e2e1] selection:bg-blue-500 selection:text-white">
+    <!-- Navbar -->
+    <nav class="border-b border-white/5 bg-[#131313]/80 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold tracking-tight text-blue-400 font-headline">Twwinz.com</a>
+            <div class="flex items-center gap-4 text-sm">
+                <a href="dashboard.html" class="text-slate-400 hover:text-white transition-colors">Demo Dashboard</a>
+                <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium tracking-wide uppercase mb-3">
+                <span class="material-symbols-outlined text-sm">bolt</span> Automated Setup via GoHighLevel & Cloudflare D1
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight font-headline text-white mb-4">
+                Launch Your Official AI Twin
+            </h1>
+            <p class="text-slate-400 text-base max-w-xl mx-auto">
+                Give your fans a 24/7 digital representative grounded in your unindexed tour dates, VIP perks, and authentic personality.
+            </p>
+        </div>
+
+        <!-- Multi-Step Card -->
+        <div class="glass-card rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+            <!-- Progress Bar -->
+            <div class="grid grid-cols-3 gap-3 mb-8">
+                <div class="h-1.5 rounded-full bg-blue-500 transition-all duration-300" id="step-bar-1"></div>
+                <div class="h-1.5 rounded-full bg-slate-700 transition-all duration-300" id="step-bar-2"></div>
+                <div class="h-1.5 rounded-full bg-slate-700 transition-all duration-300" id="step-bar-3"></div>
+            </div>
+
+            <form id="onboard-form" onsubmit="return false;">
+                <!-- STEP 1: Basic Identity -->
+                <div id="step-1" class="space-y-6">
+                    <div class="border-b border-white/5 pb-4 mb-6">
+                        <h2 class="text-xl font-bold text-white font-headline flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 text-sm flex items-center justify-center font-bold">1</span>
+                            Creator Identity
+                        </h2>
+                        <p class="text-sm text-slate-400 mt-1">Tell us who you are and how your fans know you.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Your Name / Public Moniker *</label>
+                            <input type="text" id="creator-name" required placeholder="e.g. Jaxson Reed" 
+                                class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Contact Email *</label>
+                            <input type="email" id="creator-email" required placeholder="e.g. jaxson@creator.com" 
+                                class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Headline / Role</label>
+                        <input type="text" id="creator-headline" placeholder="e.g. Lead Singer of Electric Horizon & Sci-Fi Voice Actor" 
+                            class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Avatar / Photo URL</label>
+                        <input type="url" id="creator-avatar" placeholder="https://..." value="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
+                            class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <button type="button" onclick="goToStep(2)" class="primary-gradient text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+                            Next: Website Integration <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Website Setup & Style Scraping -->
+                <div id="step-2" class="space-y-6 hidden">
+                    <div class="border-b border-white/5 pb-4 mb-6">
+                        <h2 class="text-xl font-bold text-white font-headline flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 text-sm flex items-center justify-center font-bold">2</span>
+                            Website & Branding Integration
+                        </h2>
+                        <p class="text-sm text-slate-400 mt-1">Connect your existing site or let us spin one up automatically on GoHighLevel.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                        <label class="cursor-pointer border border-blue-500 bg-blue-500/5 rounded-xl p-5 block transition-all relative" id="opt-existing-label">
+                            <input type="radio" name="website_type" value="existing" checked onchange="handleWebsiteTypeChange()" class="hidden" />
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-white text-base">I have a website</span>
+                                <span class="material-symbols-outlined text-blue-400">check_circle</span>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                We automatically scrape your colors and fonts so your GHL chat widget looks like it was custom built for your site.
+                            </p>
+                        </label>
+
+                        <label class="cursor-pointer border border-white/10 bg-[#171717] hover:border-slate-600 rounded-xl p-5 block transition-all relative" id="opt-ghl-label">
+                            <input type="radio" name="website_type" value="ghl_hosted" onchange="handleWebsiteTypeChange()" class="hidden" />
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-white text-base">Build me a site</span>
+                                <span class="material-symbols-outlined text-slate-500">web</span>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                We provision a high-converting GoHighLevel creator site snapshot with chat widget pre-installed.
+                            </p>
+                        </label>
+                    </div>
+
+                    <!-- Existing Website Input & Live Widget Blend Simulator -->
+                    <div id="existing-website-container" class="space-y-6">
+                        <div class="bg-[#171717] border border-white/10 rounded-2xl p-5 space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                                    Your Current Website URL
+                                </label>
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <div class="relative flex-1">
+                                        <span class="material-symbols-outlined absolute left-3.5 top-3.5 text-slate-500 text-sm">language</span>
+                                        <input type="text" id="website-url" placeholder="e.g. taylorswift.com or https://yourbrand.com" 
+                                            class="w-full bg-[#121212] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-mono transition-colors"
+                                            onkeydown="if(event.key === 'Enter') { event.preventDefault(); scrapeStylesNow(); }" />
+                                    </div>
+                                    <button type="button" onclick="scrapeStylesNow()" id="btn-scrape" 
+                                        class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 border border-blue-400/30 transition-all shadow-lg shadow-blue-500/20 active:scale-95 whitespace-nowrap">
+                                        <span class="material-symbols-outlined text-sm">palette</span>
+                                        <span>Analyze Brand & Blend Widget</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quick Preset Samples for instant demo -->
+                            <div class="flex items-center gap-2 flex-wrap pt-1">
+                                <span class="text-[11px] text-slate-400">Quick Test:</span>
+                                <button type="button" onclick="setPresetUrl('taylorswift.com')" class="text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-lg border border-white/5 transition-colors">
+                                    🎵 Taylor Swift (Crimson & Coral)
+                                </button>
+                                <button type="button" onclick="setPresetUrl('news.ycombinator.com')" class="text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-lg border border-white/5 transition-colors">
+                                    🔶 Hacker News (Orange & Tech)
+                                </button>
+                                <button type="button" onclick="setPresetUrl('vercel.com')" class="text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-lg border border-white/5 transition-colors">
+                                    ▲ Vercel (Minimalist Clean)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Brand Extraction Diagnostics & Color Controls -->
+                        <div id="brand-preview" class="border border-white/10 rounded-2xl p-5 bg-[#171717] space-y-4">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
+                                <div class="flex items-center gap-2.5">
+                                    <img id="scraped-favicon" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-5 h-5 rounded-md object-contain bg-white/10 p-0.5" alt="Favicon" />
+                                    <div>
+                                        <div class="text-xs font-bold text-white flex items-center gap-2" id="scraped-site-title">
+                                            Creator Website
+                                        </div>
+                                        <div class="text-[10px] text-slate-400" id="scraped-site-url">https://yourwebsite.com</div>
+                                    </div>
+                                </div>
+                                <span id="brand-status" class="text-xs text-emerald-400 flex items-center gap-1.5 font-medium bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Ready to Blend
+                                </span>
+                            </div>
+
+                            <!-- Extracted Swatches with Interactive Color Pickers -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="bg-[#111111] p-3 rounded-xl border border-white/5 relative group">
+                                    <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Primary Color</div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="relative">
+                                            <input type="color" id="picker-primary" onchange="handleManualColorChange('primary', this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                                            <div id="preview-primary-swatch" class="w-7 h-7 rounded-lg bg-blue-500 border border-white/20 shadow-inner cursor-pointer hover:scale-105 transition-transform" title="Click to tweak color"></div>
+                                        </div>
+                                        <span id="preview-primary-hex" class="text-xs font-mono font-semibold text-white">#3b82f6</span>
+                                    </div>
+                                    <div class="text-[9px] text-slate-500 mt-1">Launcher, buttons, fan bubble</div>
+                                </div>
+
+                                <div class="bg-[#111111] p-3 rounded-xl border border-white/5 relative group">
+                                    <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Accent Color</div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="relative">
+                                            <input type="color" id="picker-accent" onchange="handleManualColorChange('accent', this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                                            <div id="preview-accent-swatch" class="w-7 h-7 rounded-lg bg-amber-500 border border-white/20 shadow-inner cursor-pointer hover:scale-105 transition-transform" title="Click to tweak color"></div>
+                                        </div>
+                                        <span id="preview-accent-hex" class="text-xs font-mono font-semibold text-white">#f59e0b</span>
+                                    </div>
+                                    <div class="text-[9px] text-slate-500 mt-1">Grounded badges, online dot</div>
+                                </div>
+
+                                <div class="bg-[#111111] p-3 rounded-xl border border-white/5">
+                                    <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Heading Font</div>
+                                    <span id="preview-heading-font" class="text-xs font-bold text-white truncate block">Space Grotesk</span>
+                                    <div class="text-[9px] text-slate-500 mt-1">Header, title, greeting</div>
+                                </div>
+
+                                <div class="bg-[#111111] p-3 rounded-xl border border-white/5">
+                                    <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Body Font</div>
+                                    <span id="preview-body-font" class="text-xs text-slate-300 truncate block">Inter</span>
+                                    <div class="text-[9px] text-slate-500 mt-1">Twin responses, questions</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LIVE BLENDED WIDGET SIMULATOR -->
+                        <div class="border border-white/10 rounded-2xl overflow-hidden bg-[#0d1117] shadow-2xl">
+                            <div class="bg-[#161b22] px-4 py-2.5 border-b border-white/10 flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+                                    </div>
+                                    <span class="font-semibold text-slate-300 text-xs ml-2 flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined text-xs text-emerald-400">lock</span>
+                                        <span id="sim-url-bar">https://yourwebsite.com</span>
+                                    </span>
+                                </div>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                                    Live Website Blend Simulator
+                                </span>
+                            </div>
+
+                            <!-- Simulated Website Backdrop with Docked Widget -->
+                            <div id="simulated-website-body" class="p-6 transition-colors duration-500 relative min-h-[520px] flex flex-col justify-between" style="background-color: #0f172a;">
+                                <!-- Simulated Website Header & Hero Mock -->
+                                <div class="space-y-4 max-w-lg opacity-85">
+                                    <div class="flex items-center gap-2 text-xs font-bold text-white" id="sim-site-name">
+                                        <span class="w-3 h-3 rounded-sm bg-blue-500 inline-block"></span>
+                                        <span>CREATOR OFFICIAL SITE</span>
+                                    </div>
+                                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" id="sim-hero-heading" style="font-family: 'Space Grotesk', sans-serif;">
+                                        Official Tour Dates & Exclusive Fan Hub
+                                    </h3>
+                                    <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                                        Welcome to the official portal. Notice how the chat widget in the corner dynamically harmonizes with your site's aesthetic.
+                                    </p>
+                                </div>
+
+                                <!-- The Customized Chat Widget Floating on the Site -->
+                                <div id="live-widget-card" class="mt-6 self-end w-full max-w-sm rounded-2xl overflow-hidden border border-white/15 shadow-2xl transition-all duration-300" style="background-color: #111827;">
+                                    <!-- Widget Header -->
+                                    <div id="live-widget-header" class="p-4 text-white flex items-center justify-between border-b border-white/10 transition-colors" style="background: linear-gradient(135deg, #3b82f6 0%, #111827 100%);">
+                                        <div class="flex items-center gap-3">
+                                            <div class="relative">
+                                                <img id="live-widget-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md" alt="Avatar" />
+                                                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-slate-900"></span>
+                                            </div>
+                                            <div>
+                                                <div id="live-widget-title" class="font-bold text-sm leading-tight text-white" style="font-family: 'Space Grotesk', sans-serif;">
+                                                    Official AI Twin
+                                                </div>
+                                                <div class="text-[11px] text-blue-200 flex items-center gap-1 mt-0.5">
+                                                    <span>Direct Fan Line</span> • <span class="text-emerald-300 font-medium">Online</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-white/60 hover:text-white text-base cursor-pointer">minimize</span>
+                                            <span class="material-symbols-outlined text-white/60 hover:text-white text-base cursor-pointer">close</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Widget Messages Box -->
+                                    <div id="live-widget-messages" class="p-4 space-y-3 text-xs max-h-[220px] overflow-y-auto" style="background-color: #0f172a; font-family: 'Inter', sans-serif;">
+                                        <!-- Twin Welcome -->
+                                        <div class="flex gap-2 items-start">
+                                            <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed" id="live-widget-welcome-msg">
+                                                Hey there! I am the official digital representative. Ask me anything about tour dates, VIP perks, or behind-the-scenes projects!
+                                            </div>
+                                        </div>
+
+                                        <!-- Fan Question Bubble -->
+                                        <div class="flex justify-end">
+                                            <div id="live-widget-fan-bubble" class="text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%] leading-relaxed transition-colors shadow-sm" style="background-color: #3b82f6;">
+                                                Are there any VIP passes left for the Vancouver tour date?
+                                            </div>
+                                        </div>
+
+                                        <!-- Grounded Twin Reply -->
+                                        <div class="flex gap-2 items-start">
+                                            <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed">
+                                                <span>Yes! 3 VIP meet-and-greet passes remain for Vancouver on Nov 12th. Use secret code <strong>TWINZVIP</strong> at checkout.</span>
+                                                <div id="live-widget-source-tag" class="mt-2 text-[10px] font-semibold flex items-center gap-1 transition-colors" style="color: #f59e0b;">
+                                                    <span class="material-symbols-outlined text-xs">verified</span>
+                                                    <span>Grounded via Verified Tour Schedule</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Widget Interactive Test Inputs -->
+                                    <div class="p-3 border-t border-white/10 bg-[#111827] flex gap-2 items-center">
+                                        <input type="text" id="live-test-input" placeholder="Type a test fan question..." 
+                                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none transition-colors"
+                                            onkeydown="if(event.key === 'Enter') sendLiveTestMessage()" />
+                                        <button type="button" onclick="sendLiveTestMessage()" id="live-widget-send-btn" 
+                                            class="text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center justify-center transition-colors shadow-md" style="background-color: #3b82f6;">
+                                            <span class="material-symbols-outlined text-xs">send</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Quick Interactive Prompt Chips -->
+                                    <div class="px-3 pb-3 bg-[#111827] flex items-center gap-1.5 flex-wrap">
+                                        <span class="text-[10px] text-slate-500">Test prompts:</span>
+                                        <button type="button" onclick="triggerTestPrompt('What are your next concert dates?')" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 px-2 py-0.5 rounded border border-white/5 transition-colors">
+                                            Concert Dates
+                                        </button>
+                                        <button type="button" onclick="triggerTestPrompt('Do you have any secret merch discount codes?')" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 px-2 py-0.5 rounded border border-white/5 transition-colors">
+                                            Merch Code
+                                        </button>
+                                        <button type="button" onclick="resetLiveWidgetChat()" class="text-[10px] text-slate-500 hover:text-slate-300 ml-auto transition-colors">
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Confirmation message -->
+                        <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex gap-3 items-center">
+                            <span class="material-symbols-outlined text-emerald-400 text-base">check_circle</span>
+                            <div class="text-xs text-slate-300">
+                                <strong class="text-white">Seamless Blend Confirmed:</strong> These extracted brand colors and typography will automatically be applied to both your GoHighLevel native chat widget and the embeddable script.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" onclick="goToStep(1)" class="text-slate-400 hover:text-white font-medium px-4 py-3 text-sm flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-sm">arrow_back</span> Back
+                        </button>
+                        <button type="button" onclick="goToStep(3)" class="primary-gradient text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+                            Next: Persona Voice <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Persona & RAG Guidelines -->
+                <div id="step-3" class="space-y-6 hidden">
+                    <div class="border-b border-white/5 pb-4 mb-6">
+                        <h2 class="text-xl font-bold text-white font-headline flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 text-sm flex items-center justify-center font-bold">3</span>
+                            Persona Guidelines & Tone
+                        </h2>
+                        <p class="text-sm text-slate-400 mt-1">Define how your AI Twin represents you when interacting with fans.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Voice & Tone Instructions</label>
+                        <textarea id="creator-persona" rows="4" 
+                            class="w-full bg-[#171717] border border-white/10 rounded-xl p-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm leading-relaxed"
+                            placeholder="Speak warmly and conversationally with genuine enthusiasm for indie art. Keep responses under 3 sentences unless asked for tour dates. Always mention upcoming verified appearances or Cameo booking link when relevant. Never make up unconfirmed film sequels."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Welcome Greeting Message</label>
+                        <input type="text" id="creator-welcome" 
+                            class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm"
+                            value="Hey there! I am the official digital representative. Ask me anything about upcoming tour dates, VIP perks, or behind-the-scenes projects!" />
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex gap-3 items-start">
+                        <span class="material-symbols-outlined text-blue-400 text-lg mt-0.5">verified</span>
+                        <div class="text-xs text-slate-300 leading-relaxed">
+                            <strong class="text-white">Next in your dashboard:</strong> You will be able to input private tour dates, unindexed discount codes, booking rates, and upload PDFs into your D1 database to ground your twin's knowledge.
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" onclick="goToStep(2)" class="text-slate-400 hover:text-white font-medium px-4 py-3 text-sm flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-sm">arrow_back</span> Back
+                        </button>
+                        <button type="button" onclick="submitOnboarding()" id="btn-submit" class="primary-gradient text-slate-950 font-bold px-8 py-3.5 rounded-xl text-sm flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-blue-500/20">
+                            <span class="material-symbols-outlined text-sm">rocket_launch</span>
+                            <span>Provision AI Twin & Go to Dashboard</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        let currentStep = 1;
+        let detectedColors = { primary: '#3b82f6', accent: '#f59e0b', background: '#0f172a', surface: '#111827', text: '#ffffff' };
+        let detectedFonts = { heading: 'Space Grotesk', body: 'Inter' };
+        let scrapedFavicon = null;
+
+        function goToStep(step) {
+            if (step === 2) {
+                const name = document.getElementById('creator-name').value.trim();
+                const email = document.getElementById('creator-email').value.trim();
+                if (!name || !email) {
+                    alert('Please enter your name and contact email.');
+                    return;
+                }
+                // Sync name to live preview
+                const widgetTitle = document.getElementById('live-widget-title');
+                if (widgetTitle) widgetTitle.textContent = `${name}'s AI Twin`;
+                const avatarInput = document.getElementById('creator-avatar').value.trim();
+                if (avatarInput) {
+                    const widgetAvatar = document.getElementById('live-widget-avatar');
+                    if (widgetAvatar) widgetAvatar.src = avatarInput;
+                }
+            }
+
+            currentStep = step;
+            document.getElementById('step-1').classList.toggle('hidden', step !== 1);
+            document.getElementById('step-2').classList.toggle('hidden', step !== 2);
+            document.getElementById('step-3').classList.toggle('hidden', step !== 3);
+
+            // Update step bar indicators
+            document.getElementById('step-bar-1').className = `h-1.5 rounded-full ${step >= 1 ? 'bg-blue-500' : 'bg-slate-700'} transition-all`;
+            document.getElementById('step-bar-2').className = `h-1.5 rounded-full ${step >= 2 ? 'bg-blue-500' : 'bg-slate-700'} transition-all`;
+            document.getElementById('step-bar-3').className = `h-1.5 rounded-full ${step >= 3 ? 'bg-blue-500' : 'bg-slate-700'} transition-all`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleWebsiteTypeChange() {
+            const types = document.getElementsByName('website_type');
+            let selected = 'existing';
+            for (const t of types) {
+                if (t.checked) selected = t.value;
+            }
+
+            const existingContainer = document.getElementById('existing-website-container');
+            const optExisting = document.getElementById('opt-existing-label');
+            const optGHL = document.getElementById('opt-ghl-label');
+
+            if (selected === 'existing') {
+                existingContainer.classList.remove('hidden');
+                optExisting.className = 'cursor-pointer border border-blue-500 bg-blue-500/5 rounded-xl p-5 block transition-all relative';
+                optGHL.className = 'cursor-pointer border border-white/10 bg-[#171717] hover:border-slate-600 rounded-xl p-5 block transition-all relative';
+            } else {
+                existingContainer.classList.add('hidden');
+                optGHL.className = 'cursor-pointer border border-blue-500 bg-blue-500/5 rounded-xl p-5 block transition-all relative';
+                optExisting.className = 'cursor-pointer border border-white/10 bg-[#171717] hover:border-slate-600 rounded-xl p-5 block transition-all relative';
+            }
+        }
+
+        function loadGoogleFont(fontName) {
+            if (!fontName || ['system-ui', 'sans-serif', 'serif', 'inter'].includes(fontName.toLowerCase())) return;
+            const fontId = `gfont-preview-${fontName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+            if (document.getElementById(fontId)) return;
+            const link = document.createElement('link');
+            link.id = fontId;
+            link.rel = 'stylesheet';
+            link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName).replace(/%20/g, '+')}:wght@400;600;700&display=swap`;
+            document.head.appendChild(link);
+        }
+
+        function setPresetUrl(url) {
+            document.getElementById('website-url').value = url;
+            scrapeStylesNow();
+        }
+
+        function handleManualColorChange(colorType, val) {
+            if (colorType === 'primary') {
+                detectedColors.primary = val;
+                document.getElementById('preview-primary-hex').textContent = val;
+                document.getElementById('preview-primary-swatch').style.backgroundColor = val;
+            } else if (colorType === 'accent') {
+                detectedColors.accent = val;
+                document.getElementById('preview-accent-hex').textContent = val;
+                document.getElementById('preview-accent-swatch').style.backgroundColor = val;
+            }
+            applyLiveWidgetTheme();
+        }
+
+        function applyLiveWidgetTheme() {
+            const primary = detectedColors.primary || '#3b82f6';
+            const accent = detectedColors.accent || '#f59e0b';
+            const bg = detectedColors.background || '#0f172a';
+            const surface = detectedColors.surface || '#111827';
+            const headingFont = detectedFonts.heading || 'Space Grotesk';
+            const bodyFont = detectedFonts.body || 'Inter';
+
+            // Load Google fonts dynamically
+            loadGoogleFont(headingFont);
+            loadGoogleFont(bodyFont);
+
+            // Update live widget card styling
+            const widgetCard = document.getElementById('live-widget-card');
+            if (widgetCard) widgetCard.style.backgroundColor = surface;
+
+            const widgetHeader = document.getElementById('live-widget-header');
+            if (widgetHeader) {
+                widgetHeader.style.background = `linear-gradient(135deg, ${primary} 0%, #111827 100%)`;
+                widgetHeader.style.fontFamily = `'${headingFont}', sans-serif`;
+            }
+
+            const widgetTitle = document.getElementById('live-widget-title');
+            if (widgetTitle) widgetTitle.style.fontFamily = `'${headingFont}', sans-serif`;
+
+            const heroHeading = document.getElementById('sim-hero-heading');
+            if (heroHeading) heroHeading.style.fontFamily = `'${headingFont}', sans-serif`;
+
+            const messagesBox = document.getElementById('live-widget-messages');
+            if (messagesBox) {
+                messagesBox.style.backgroundColor = bg;
+                messagesBox.style.fontFamily = `'${bodyFont}', sans-serif`;
+            }
+
+            const fanBubble = document.getElementById('live-widget-fan-bubble');
+            if (fanBubble) fanBubble.style.backgroundColor = primary;
+
+            const sendBtn = document.getElementById('live-widget-send-btn');
+            if (sendBtn) sendBtn.style.backgroundColor = primary;
+
+            const sourceTag = document.getElementById('live-widget-source-tag');
+            if (sourceTag) sourceTag.style.color = accent;
+
+            const simBackdrop = document.getElementById('simulated-website-body');
+            if (simBackdrop) simBackdrop.style.backgroundColor = bg;
+        }
+
+        async function scrapeStylesNow() {
+            const urlInput = document.getElementById('website-url').value.trim();
+            if (!urlInput) {
+                alert('Please enter a website URL to analyze.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-scrape');
+            const statusEl = document.getElementById('brand-status');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">sync</span> Analyzing Brand...`;
+            statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Scraping colors & fonts...`;
+
+            try {
+                const res = await fetch('/api/utils/scrape-styles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput })
+                });
+                const data = await res.json();
+
+                if (data && data.colors) {
+                    detectedColors = data.colors;
+                    detectedFonts = data.fonts;
+                    if (data.favicon) scrapedFavicon = data.favicon;
+
+                    // Update UI Labels & Controls
+                    document.getElementById('preview-primary-swatch').style.backgroundColor = detectedColors.primary;
+                    document.getElementById('preview-primary-hex').textContent = detectedColors.primary;
+                    document.getElementById('picker-primary').value = detectedColors.primary;
+
+                    document.getElementById('preview-accent-swatch').style.backgroundColor = detectedColors.accent;
+                    document.getElementById('preview-accent-hex').textContent = detectedColors.accent;
+                    document.getElementById('picker-accent').value = detectedColors.accent;
+
+                    document.getElementById('preview-heading-font').textContent = detectedFonts.heading;
+                    document.getElementById('preview-body-font').textContent = detectedFonts.body;
+
+                    if (data.title) {
+                        document.getElementById('scraped-site-title').textContent = data.title;
+                        document.getElementById('sim-site-name').innerHTML = `
+                            <span class="w-3 h-3 rounded-sm inline-block" style="background-color: ${detectedColors.primary}"></span>
+                            <span>${escapeHtml(data.title.toUpperCase())}</span>
+                        `;
+                    }
+                    if (data.url) {
+                        document.getElementById('scraped-site-url').textContent = data.url;
+                        document.getElementById('sim-url-bar').textContent = data.url;
+                    }
+                    if (data.favicon) {
+                        document.getElementById('scraped-favicon').src = data.favicon;
+                        // If creator avatar isn't explicitly set, use the website's favicon
+                        const avatarInput = document.getElementById('creator-avatar');
+                        if (!avatarInput.value.trim()) {
+                            document.getElementById('live-widget-avatar').src = data.favicon;
+                        }
+                    }
+
+                    // Apply the new theme to the live widget simulator
+                    applyLiveWidgetTheme();
+
+                    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Blended & Synced`;
+                }
+            } catch (err) {
+                console.warn(err);
+                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> Using Defaults`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">palette</span><span>Analyze Brand & Blend Widget</span>`;
+            }
+        }
+
+        function sendLiveTestMessage() {
+            const input = document.getElementById('live-test-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            input.value = '';
+            appendLiveMessage('fan', query);
+
+            // Simulate twin grounded response
+            setTimeout(() => {
+                const creatorName = document.getElementById('creator-name').value.trim() || 'the creator';
+                const answers = [
+                    `Thanks for asking! As ${creatorName}'s official digital representative, verified schedule dates and access codes are confirmed directly through memory.`,
+                    `Great question! All official VIP tour packages include early soundcheck access and verified digital credentials.`,
+                    `Checked verified knowledge: Behind-the-scenes content and exclusive rehearsal recordings drop every Thursday!`
+                ];
+                const reply = answers[Math.floor(Math.random() * answers.length)];
+                appendLiveMessage('twin', reply, 'Verified Knowledge Item #24');
+            }, 500);
+        }
+
+        function triggerTestPrompt(promptText) {
+            document.getElementById('live-test-input').value = promptText;
+            sendLiveTestMessage();
+        }
+
+        function appendLiveMessage(sender, text, source = null) {
+            const messagesBox = document.getElementById('live-widget-messages');
+            const primary = detectedColors.primary || '#3b82f6';
+            const accent = detectedColors.accent || '#f59e0b';
+
+            if (sender === 'fan') {
+                const fanDiv = document.createElement('div');
+                fanDiv.className = 'flex justify-end';
+                fanDiv.innerHTML = `
+                    <div class="text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%] leading-relaxed transition-colors shadow-sm" style="background-color: ${primary};">
+                        ${escapeHtml(text)}
+                    </div>
+                `;
+                messagesBox.appendChild(fanDiv);
+            } else {
+                const twinDiv = document.createElement('div');
+                twinDiv.className = 'flex gap-2 items-start';
+                twinDiv.innerHTML = `
+                    <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed">
+                        <span>${escapeHtml(text)}</span>
+                        ${source ? `
+                            <div class="mt-2 text-[10px] font-semibold flex items-center gap-1 transition-colors" style="color: ${accent};">
+                                <span class="material-symbols-outlined text-xs">verified</span>
+                                <span>Grounded via ${escapeHtml(source)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                messagesBox.appendChild(twinDiv);
+            }
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        function resetLiveWidgetChat() {
+            const messagesBox = document.getElementById('live-widget-messages');
+            const primary = detectedColors.primary || '#3b82f6';
+            const accent = detectedColors.accent || '#f59e0b';
+            messagesBox.innerHTML = `
+                <div class="flex gap-2 items-start">
+                    <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed" id="live-widget-welcome-msg">
+                        Hey there! I am the official digital representative. Ask me anything about tour dates, VIP perks, or behind-the-scenes projects!
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <div id="live-widget-fan-bubble" class="text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%] leading-relaxed transition-colors shadow-sm" style="background-color: ${primary};">
+                        Are there any VIP passes left for the Vancouver tour date?
+                    </div>
+                </div>
+                <div class="flex gap-2 items-start">
+                    <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed">
+                        <span>Yes! 3 VIP meet-and-greet passes remain for Vancouver on Nov 12th. Use secret code <strong>TWINZVIP</strong> at checkout.</span>
+                        <div id="live-widget-source-tag" class="mt-2 text-[10px] font-semibold flex items-center gap-1 transition-colors" style="color: ${accent};">
+                            <span class="material-symbols-outlined text-xs">verified</span>
+                            <span>Grounded via Verified Tour Schedule</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        async function submitOnboarding() {
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">refresh</span> Provisioning via GHL & D1...`;
+
+            const websiteType = document.querySelector('input[name="website_type"]:checked').value;
+            const payload = {
+                name: document.getElementById('creator-name').value.trim(),
+                email: document.getElementById('creator-email').value.trim(),
+                headline: document.getElementById('creator-headline').value.trim(),
+                avatarUrl: document.getElementById('creator-avatar').value.trim() || scrapedFavicon || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+                websiteType: websiteType,
+                websiteUrl: websiteType === 'existing' ? document.getElementById('website-url').value.trim() : null,
+                personaPrompt: document.getElementById('creator-persona').value.trim(),
+                welcomeMessage: document.getElementById('creator-welcome').value.trim(),
+                brandColors: detectedColors,
+                brandFonts: detectedFonts
+            };
+
+            try {
+                const res = await fetch('/api/creators/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (res.ok && data.creator) {
+                    // Redirect to dashboard with the new creator ID
+                    window.location.href = `dashboard.html?id=${encodeURIComponent(data.creator.id)}`;
+                } else {
+                    alert('Error creating account: ' + (data.error || 'Unknown error'));
+                    btn.disabled = false;
+                    btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Provision AI Twin & Go to Dashboard</span>`;
+                }
+            } catch (err) {
+                alert('Connection error: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Provision AI Twin & Go to Dashboard</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

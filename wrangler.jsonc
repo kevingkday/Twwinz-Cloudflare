@@ -1,9 +1,31 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "faninteraction-new",
+  "main": "src/worker.js",
   "compatibility_date": "2026-03-23",
   "assets": {
     "directory": "."
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "twwinz-db",
+      "database_id": "04f745ca-b55a-450b-824a-bad05f2d3957"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "vectorize": [
+    {
+      "binding": "VECTORIZE",
+      "index_name": "twwinz-vectors"
+    }
+  ],
+  "vars": {
+    "GHL_COMPANY_ID": "ycxGZPk2GALkmii5NPkO",
+    "GHL_DEFAULT_COUNTRY": "CA",
+    "GHL_DEFAULT_TIMEZONE": "America/Vancouver"
   },
   "observability": {
     "enabled": true

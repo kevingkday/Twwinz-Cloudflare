@@ -1,0 +1,19 @@
+{
+  "name": "faninteraction-new",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "wrangler dev --port 8787 --persist-to ../.wrangler-state",
+    "db:init": "wrangler d1 execute twwinz-db --local --file=./schema.sql --persist-to ../.wrangler-state",
+    "db:seed": "wrangler d1 execute twwinz-db --local --file=./seed.sql --persist-to ../.wrangler-state",
+    "db:query": "wrangler d1 execute twwinz-db --local --persist-to ../.wrangler-state --command"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "wrangler": "^4.86.0"
+  }
+}

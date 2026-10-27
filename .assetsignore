@@ -3,3 +3,7 @@ node_modules
 .github
 package.json
 package-lock.json
+src
+schema.sql
+seed.sql
+.wrangler
