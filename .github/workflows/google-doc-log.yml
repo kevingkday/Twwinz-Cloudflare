@@ -1,0 +1,116 @@
+name: Update Google Doc commit log
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: google-doc-commit-log
+  cancel-in-progress: false
+
+jobs:
+  update-doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Download repository history
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Google authentication library
+        run: pip install google-auth requests
+
+      - name: Append missing commits
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
+        run: |
+          python <<'PY'
+          import json
+          import os
+          import subprocess
+
+          from google.oauth2 import service_account
+          from google.auth.transport.requests import AuthorizedSession
+
+          credentials = service_account.Credentials.from_service_account_info(
+              json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]),
+              scopes=["https://www.googleapis.com/auth/documents"],
+          )
+          session = AuthorizedSession(credentials)
+          doc_id = os.environ["GOOGLE_DOC_ID"].strip()
+          endpoint = f"https://docs.googleapis.com/v1/documents/{doc_id}"
+
+          response = session.get(endpoint, timeout=60)
+          response.raise_for_status()
+          document = response.json()
+
+          def collect_text(value):
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      if key == "textRun":
+                          yield item.get("content", "")
+                      else:
+                          yield from collect_text(item)
+              elif isinstance(value, list):
+                  for item in value:
+                      yield from collect_text(item)
+
+          existing_text = "".join(collect_text(document))
+          repository = os.environ["GITHUB_REPOSITORY"]
+
+          commits = subprocess.check_output(
+              ["git", "rev-list", "--reverse", "HEAD"],
+              text=True,
+          ).splitlines()
+
+          entries = []
+          for sha in commits:
+              url = f"https://github.com/{repository}/commit/{sha}"
+              if url in existing_text:
+                  continue
+
+              details = subprocess.check_output(
+                  ["git", "show", "-s", "--format=%aI%n%an%n%B", sha],
+                  text=True,
+              )
+              date, author, message = details.split("\n", 2)
+              entries.append(
+                  f"{date[:10]} | {author}\n"
+                  f"{message.strip()}\n"
+                  f"{url}\n\n"
+              )
+
+          if not entries:
+              print("Document is already up to date.")
+          else:
+              response = session.post(
+                  endpoint + ":batchUpdate",
+                  json={
+                      "writeControl": {
+                          "requiredRevisionId": document["revisionId"]
+                      },
+                      "requests": [{
+                          "insertText": {
+                              "endOfSegmentLocation": {},
+                              "text": "\n" + "".join(entries),
+                          }
+                      }],
+                  },
+                  timeout=60,
+              )
+              response.raise_for_status()
+              print(f"Added {len(entries)} commits to the document.")
+          PY
