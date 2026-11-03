@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Creator Twin Control Center | Twwinz.com</title>
+    <title>Content & Live RAG Test | Twwinz.com</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
     <style>
         body {
@@ -33,16 +33,26 @@
 <body class="min-h-screen bg-[#111111] text-[#e5e2e1]">
     <!-- Top Navigation Bar -->
     <nav class="border-b border-white/5 bg-[#141414]/90 backdrop-blur-xl sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-3.5 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-6 py-3.5 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-6">
                 <a href="index.html" class="text-xl font-bold tracking-tight text-blue-400 font-headline">Twwinz.com</a>
-                <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-white/5 font-mono">Creator Portal</span>
+                <!-- Portal Page Switcher -->
+                <div class="flex items-center gap-1 bg-[#1b1b1b] p-1 rounded-xl border border-white/5">
+                    <a href="dashboard.html" id="nav-link-content" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-500 text-white flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">auto_stories</span>
+                        <span>Content &amp; Test</span>
+                    </a>
+                    <a href="settings.html" id="nav-link-settings" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">tune</span>
+                        <span>Widget, Persona &amp; Voice</span>
+                    </a>
+                </div>
             </div>
-            <div class="flex items-center gap-3 sm:gap-4">
+            <div class="flex items-center gap-3">
                 <select id="creator-select" onchange="switchCreator(this.value)" class="bg-[#1e1e1e] border border-white/10 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
                     <option value="clb_jaxson_reed">Jaxson Reed (Demo)</option>
                 </select>
-                <a href="onboard.html" class="primary-gradient text-slate-950 font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 hover:opacity-90 transition-all">
+                <a href="onboard.html" class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1 transition-all">
                     <span class="material-symbols-outlined text-sm">add</span> New Twin
                 </a>
                 <div id="dashboard-auth-box">
@@ -60,268 +70,168 @@
         </div>
     </nav>
 
-    <!-- Header Banner -->
-    <header class="border-b border-white/5 bg-gradient-to-b from-[#181818] to-[#111111] py-8 px-6">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex items-center gap-5">
+    <!-- Simplified Artist Header -->
+    <header class="border-b border-white/5 bg-gradient-to-b from-[#181818] to-[#111111] py-6 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
                 <img id="creator-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
-                     class="w-16 h-16 rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg" alt="Avatar" />
+                     class="w-14 h-14 rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg" alt="Avatar" />
                 <div>
                     <div class="flex items-center gap-3">
-                        <h1 id="creator-name-header" class="text-2xl sm:text-3xl font-bold text-white font-headline">Jaxson Reed</h1>
+                        <h1 id="creator-name-header" class="text-2xl font-bold text-white font-headline">Jaxson Reed</h1>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active Twin
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Memory Online
                         </span>
                     </div>
-                    <p id="creator-headline-header" class="text-slate-400 text-sm mt-1">Star of "Nebula Runners" & Lead Guitarist for Electric Horizon</p>
+                    <p id="creator-headline-header" class="text-slate-400 text-xs sm:text-sm mt-0.5">Add updates on the left and test how your AI Twin answers fans on the right.</p>
                 </div>
             </div>
-
-            <!-- GHL Status Badges -->
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="glass-card px-4 py-2.5 rounded-xl text-xs flex items-center gap-2">
-                    <span class="text-slate-400">GHL Sub-Account:</span>
-                    <span id="ghl-loc-badge" class="font-mono text-blue-400 font-semibold">loc_ghl_demo_8829</span>
-                </div>
-                <div class="glass-card px-4 py-2.5 rounded-xl text-xs flex items-center gap-2">
-                    <span class="text-slate-400">Database:</span>
-                    <span class="text-emerald-400 font-medium flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Cloudflare D1
-                    </span>
-                </div>
-            </div>
+            <a href="settings.html" id="header-settings-btn" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-200 transition-all self-start sm:self-auto">
+                <span class="material-symbols-outlined text-sm text-blue-400">tune</span>
+                <span>Widget, Persona &amp; Voice Controls</span>
+                <span class="material-symbols-outlined text-sm text-slate-400">arrow_forward</span>
+            </a>
         </div>
     </header>
 
-    <!-- Main Workspace Grid -->
+    <!-- Main 2-Column Workspace: Left = RAG Input, Right = RAG Output Test -->
     <main class="max-w-7xl mx-auto px-6 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- LEFT COLUMN: Knowledge Base & RAG Management (7 cols) -->
+            <!-- LEFT COLUMN: 1. ADD & MANAGE CONTENT (RAG INPUT) (7 cols) -->
             <div class="lg:col-span-7 space-y-6">
                 
-                <!-- Quick Action Bar -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-4 rounded-xl">
-                    <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0" id="filter-tabs">
-                        <button onclick="filterCategory('all')" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-500 text-white" data-cat="all">All (6)</button>
-                        <button onclick="filterCategory('schedule')" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="schedule">Tour / Appearances</button>
-                        <button onclick="filterCategory('offer')" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="offer">Offers & VIP</button>
-                        <button onclick="filterCategory('faq')" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="faq">FAQs & Gear</button>
+                <!-- Inline Quick-Add Card: Super Simple for Artists -->
+                <div class="glass-card rounded-2xl p-6 border border-blue-500/20 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-blue-500 text-slate-950 font-bold text-xs flex items-center justify-center">1</span>
+                            <h2 class="text-base font-bold text-white font-headline">Add Knowledge to Your AI Twin</h2>
+                        </div>
+                        <span class="text-[11px] text-blue-400 font-medium">Instant D1 + Vector Sync</span>
                     </div>
-                    <button onclick="openAddModal()" class="primary-gradient text-slate-950 font-bold px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 hover:opacity-90 active:scale-95 transition-all whitespace-nowrap">
-                        <span class="material-symbols-outlined text-sm">add_circle</span> Add Grounded Fact
-                    </button>
-                </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Drop in tour dates, secret promo codes, new merch drops, or personal facts. Your AI Twin will immediately use this to answer fans accurately.
+                    </p>
 
-                <!-- Grounding Notice -->
-                <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex gap-3 text-xs leading-relaxed text-slate-300">
-                    <span class="material-symbols-outlined text-blue-400 text-lg flex-shrink-0 mt-0.5">lock</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Category</label>
+                            <select id="quick-category" class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
+                                <option value="schedule">📅 Tour / Event</option>
+                                <option value="offer">🎟️ Offer / VIP Code</option>
+                                <option value="faq">💡 FAQ / Gear / Info</option>
+                                <option value="bio">👤 Bio / Story</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Topic / Title *</label>
+                            <input type="text" id="quick-title" placeholder="e.g. Chicago Show VIP Meet & Greet" 
+                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
+                        </div>
+                    </div>
+
                     <div>
-                        <strong class="text-white">Zero Hallucination RAG Grounding:</strong> The items below are unindexed facts stored in your Cloudflare D1 database. Frontier models do not know these details until a fan asks, at which point our system injects this verified context directly into the prompt.
+                        <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">What should your Twin know? *</label>
+                        <textarea id="quick-content" rows="3" placeholder="e.g. We are playing House of Blues in Chicago on Nov 18 at 8 PM. Fans can use code CHICAGOVIP for 20% off backstage passes."
+                            class="w-full bg-[#181818] border border-white/10 rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
                     </div>
-                </div>
 
-                <!-- Knowledge Items Feed -->
-                <div id="knowledge-items-container" class="space-y-3">
-                    <div class="text-center py-12 text-slate-500 text-sm">Loading knowledge items from D1...</div>
-                </div>
-
-                <!-- Persona Tone Settings Card -->
-                <div class="glass-card p-6 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
-                        <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
-                            <span class="material-symbols-outlined text-blue-400 text-lg">psychology</span>
-                            Persona & Voice Tone Rules
-                        </h2>
-                        <button onclick="savePersonaRules()" id="btn-save-persona" class="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">
-                            Save Rules
+                    <div class="flex items-center justify-between pt-1">
+                        <span id="quick-save-status" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ Added to your Twin's memory!</span>
+                        <button onclick="submitQuickFact()" id="btn-quick-submit" class="primary-gradient text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-blue-500/10">
+                            <span class="material-symbols-outlined text-sm">add_circle</span>
+                            <span>Save to Twin Memory</span>
                         </button>
                     </div>
-                    <p class="text-xs text-slate-400">
-                        Instruct your AI Twin on phrasing, humor, signature sign-offs, and boundary topics.
-                    </p>
-                    <textarea id="persona-prompt-input" rows="3" 
-                        class="w-full bg-[#181818] border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+                </div>
+
+                <!-- Saved Knowledge Base List -->
+                <div class="space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+                        <h3 class="text-sm font-bold text-white font-headline flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-400 text-base">database</span>
+                            Active Facts in Memory (<span id="fact-count">0</span>)
+                        </h3>
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="filter-tabs">
+                            <button onclick="filterCategory('all')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-blue-500 text-white" data-cat="all">All</button>
+                            <button onclick="filterCategory('schedule')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="schedule">Tour</button>
+                            <button onclick="filterCategory('offer')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="offer">Offers</button>
+                            <button onclick="filterCategory('faq')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="faq">FAQs</button>
+                            <button onclick="filterCategory('bio')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="bio">Bio</button>
+                        </div>
+                    </div>
+
+                    <div id="knowledge-items-container" class="space-y-3">
+                        <div class="text-center py-12 text-slate-500 text-sm">Loading knowledge items from D1...</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: Live Interactive Sandbox & Embed Code (5 cols) -->
-            <div class="lg:col-span-5 space-y-6">
-                
-                <!-- Interactive RAG Chat Sandbox -->
-                <div class="glass-card rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col h-[520px]">
+            <!-- RIGHT COLUMN: 2. TEST YOUR TWIN (RAG OUTPUT TEST) (5 cols) -->
+            <div class="lg:col-span-5 lg:sticky lg:top-20">
+                <div class="glass-card rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col h-[620px]">
                     <!-- Sandbox Header -->
                     <div class="p-4 bg-gradient-to-r from-blue-900/40 to-slate-900 border-b border-white/10 flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-xs font-bold text-white uppercase tracking-wider">Live Grounded Twin Sandbox</span>
+                            <span class="w-6 h-6 rounded-full bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center">2</span>
+                            <div>
+                                <div class="text-xs font-bold text-white uppercase tracking-wider">Test Your AI Twin</div>
+                                <div class="text-[11px] text-slate-400">Ask a question to verify how your Twin responds</div>
+                            </div>
                         </div>
-                        <button onclick="clearSandboxChat()" class="text-[11px] text-slate-400 hover:text-white transition-colors">
-                            Reset
+                        <button onclick="clearSandboxChat()" class="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                            Reset Chat
                         </button>
                     </div>
 
                     <!-- Sandbox Messages Box -->
                     <div id="sandbox-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#0d0d0d] text-xs">
-                        <div class="bg-[#1a1a1a] p-3 rounded-xl border border-white/5 text-slate-200">
-                            👋 <strong>Test Me!</strong> Ask about tour appearances in Chicago, VIP discount codes, or guitar gear to verify that my D1 RAG memory responds accurately.
+                        <div class="bg-[#1a1a1a] p-3.5 rounded-xl border border-white/5 text-slate-200 leading-relaxed">
+                            👋 <strong>Try it out!</strong> Add a new fact on the left (like an upcoming show or promo code), then ask me about it right here to see the grounded response and source badge.
                         </div>
                     </div>
 
                     <!-- Sandbox Input Box -->
-                    <div class="p-3 bg-[#161616] border-t border-white/10 flex gap-2 items-center">
-                        <input type="text" id="sandbox-input" placeholder="Ask: 'Where can I see you in Chicago?'" 
-                            class="flex-1 bg-[#222222] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" 
+                    <div class="p-3.5 bg-[#161616] border-t border-white/10 flex gap-2 items-center">
+                        <input type="text" id="sandbox-input" placeholder="Ask your Twin anything..." 
+                            class="flex-1 bg-[#222222] border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" 
                             onkeydown="if(event.key==='Enter') sendSandboxMessage()" />
-                        <button onclick="sendSandboxMessage()" id="btn-sandbox-send" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center">
-                            Send
+                        <button onclick="sendSandboxMessage()" id="btn-sandbox-send" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-3 rounded-xl text-xs transition-colors flex items-center justify-center">
+                            Ask
                         </button>
                     </div>
                 </div>
-
-                <!-- Embed Code & Widget Theming Card -->
-                <div class="glass-card p-6 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
-                        <h2 class="text-sm font-bold text-white font-headline flex items-center gap-2">
-                            <span class="material-symbols-outlined text-blue-400 text-base">code</span>
-                            Website Embed Code
-                        </h2>
-                        <span class="text-[11px] text-slate-400">1-Line Script</span>
-                    </div>
-
-                    <!-- Widget Type Selector -->
-                    <div class="flex gap-2 p-1 bg-[#161616] rounded-xl border border-white/5 text-xs">
-                        <button onclick="selectWidgetType('twwinz')" id="btn-tab-twwinz" class="flex-1 py-1.5 px-3 rounded-lg font-semibold bg-blue-500 text-white transition-all text-center">
-                            Twwinz Twin Widget
-                        </button>
-                        <button onclick="selectWidgetType('ghl')" id="btn-tab-ghl" class="flex-1 py-1.5 px-3 rounded-lg font-semibold text-slate-400 hover:text-white transition-all text-center">
-                            GHL Native Widget
-                        </button>
-                    </div>
-
-                    <p id="embed-help-text" class="text-xs text-slate-400 leading-relaxed">
-                        Paste this snippet right before the closing <code class="text-blue-300">&lt;/body&gt;</code> tag on WordPress, Shopify, Squarespace, or Webflow.
-                    </p>
-
-                    <div class="relative">
-                        <pre id="embed-code-block" class="bg-[#0f0f0f] border border-white/10 rounded-xl p-3.5 text-[11px] font-mono text-blue-300 overflow-x-auto select-all leading-relaxed whitespace-pre-wrap"></pre>
-                        <button onclick="copyEmbedCode()" id="btn-copy-embed" class="absolute top-2.5 right-2.5 bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-lg px-2.5 py-1 text-[11px] font-medium flex items-center gap-1 transition-colors">
-                            <span class="material-symbols-outlined text-xs">content_copy</span> Copy
-                        </button>
-                    </div>
-
-                    <!-- Scraped Brand Styling Swatches -->
-                    <div class="border-t border-white/5 pt-3">
-                        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Synced Brand Palette</div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-1.5 text-xs text-slate-300">
-                                <div id="palette-primary" class="w-4 h-4 rounded-full bg-blue-500 border border-white/20"></div>
-                                <span>Primary</span>
-                            </div>
-                            <div class="flex items-center gap-1.5 text-xs text-slate-300">
-                                <div id="palette-accent" class="w-4 h-4 rounded-full bg-amber-500 border border-white/20"></div>
-                                <span>Accent</span>
-                            </div>
-                            <div class="text-xs text-slate-400 ml-auto" id="palette-font">
-                                Font: <span class="text-white font-medium">Space Grotesk</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
         </div>
     </main>
-
-    <!-- Modal: Add Grounded Fact -->
-    <div id="add-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="glass-card rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-white/10">
-            <div class="flex items-center justify-between border-b border-white/5 pb-3">
-                <h3 class="text-lg font-bold text-white font-headline flex items-center gap-2">
-                    <span class="material-symbols-outlined text-blue-400">note_add</span>
-                    Add Grounded Fact to RAG
-                </h3>
-                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
-            </div>
-
-            <div class="space-y-4 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-300 uppercase tracking-wider mb-1">Fact Category</label>
-                    <select id="modal-category" class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-blue-500">
-                        <option value="schedule">📅 Tour / Appearance / Event</option>
-                        <option value="offer">🎟️ Exclusive Offer / VIP / Merch Code</option>
-                        <option value="faq">💡 FAQ / Behind-the-Scenes Detail</option>
-                        <option value="bio">👤 Biography & Background</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-300 uppercase tracking-wider mb-1">Headline / Title *</label>
-                    <input type="text" id="modal-title" placeholder="e.g. San Diego Comic Con Panel 2026" 
-                        class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-blue-500" />
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-300 uppercase tracking-wider mb-1">Verified Fact Details * (Unindexed)</label>
-                    <textarea id="modal-content" rows="4" placeholder="e.g. Jaxson will be on the main stage on Saturday at 4 PM. VIP wristband holders get 10 minutes private green room access. Ticket code is SDCCVIP."
-                        class="w-full bg-[#181818] border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-300 uppercase tracking-wider mb-1">Structured Metadata (Optional JSON)</label>
-                    <input type="text" id="modal-metadata" placeholder='{"date": "2026-11-20", "location": "San Diego", "promo_code": "SDCCVIP"}' 
-                        class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2 text-white font-mono text-[11px] focus:outline-none focus:border-blue-500" />
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-3 pt-3 border-t border-white/5">
-                <button onclick="closeAddModal()" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white transition-colors text-xs">Cancel</button>
-                <button onclick="submitNewFact()" id="btn-modal-submit" class="primary-gradient text-slate-950 font-bold px-5 py-2 rounded-xl text-xs hover:opacity-90 active:scale-95 transition-all">
-                    Save to D1
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Active Floating Widget for Real-Time Demo -->
-    <script src="widget.js" data-creator="jaxson-reed" data-primary-color="#3b82f6" data-accent-color="#f59e0b" defer></script>
 
     <script>
         let currentCreatorId = 'clb_jaxson_reed';
         let currentCreator = null;
         let knowledgeItems = [];
         let activeCategoryFilter = 'all';
-        let currentSnippets = { twwinz: '', ghl: '' };
-        let activeWidgetTab = 'twwinz';
 
-        function selectWidgetType(type) {
-            activeWidgetTab = type;
-            const btnTwwinz = document.getElementById('btn-tab-twwinz');
-            const btnGhl = document.getElementById('btn-tab-ghl');
-            const codeBlock = document.getElementById('embed-code-block');
-            const helpText = document.getElementById('embed-help-text');
-
-            if (type === 'twwinz') {
-                if (btnTwwinz) btnTwwinz.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold bg-blue-500 text-white transition-all text-center';
-                if (btnGhl) btnGhl.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold text-slate-400 hover:text-white transition-all text-center';
-                if (codeBlock) codeBlock.textContent = currentSnippets.twwinz || '// Loading snippet...';
-                if (helpText) helpText.innerHTML = 'Paste this snippet right before the closing <code class="text-blue-300">&lt;/body&gt;</code> tag on WordPress, Shopify, Squarespace, or Webflow.';
-            } else {
-                if (btnGhl) btnGhl.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold bg-blue-500 text-white transition-all text-center';
-                if (btnTwwinz) btnTwwinz.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold text-slate-400 hover:text-white transition-all text-center';
-                if (codeBlock) codeBlock.textContent = currentSnippets.ghl || '// Loading GHL widget...';
-                if (helpText) helpText.innerHTML = 'Official LeadConnector script for GoHighLevel. Paste before <code class="text-blue-300">&lt;/body&gt;</code> on any webpage.';
-            }
-        }
-
-        // Read query parameter if redirected from onboarding
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('id')) {
             currentCreatorId = urlParams.get('id');
         }
 
+        function syncLinksWithCreatorId() {
+            const settingsUrl = `settings.html?id=${encodeURIComponent(currentCreatorId)}`;
+            const contentUrl = `dashboard.html?id=${encodeURIComponent(currentCreatorId)}`;
+            const navSettings = document.getElementById('nav-link-settings');
+            const headerSettings = document.getElementById('header-settings-btn');
+            const navContent = document.getElementById('nav-link-content');
+            if (navSettings) navSettings.href = settingsUrl;
+            if (headerSettings) headerSettings.href = settingsUrl;
+            if (navContent) navContent.href = contentUrl;
+        }
+
         async function initDashboard() {
             await checkDashboardAuth();
+            syncLinksWithCreatorId();
             await loadCreatorsList();
             await loadCreatorDetails(currentCreatorId);
             await loadKnowledgeItems();
@@ -364,7 +274,7 @@
                     creators.forEach(c => {
                         const opt = document.createElement('option');
                         opt.value = c.id;
-                        opt.textContent = `${c.name} (${c.website_type === 'ghl_hosted' ? 'GHL Site' : 'Custom Site'})`;
+                        opt.textContent = c.name;
                         if (c.id === currentCreatorId) opt.selected = true;
                         select.appendChild(opt);
                     });
@@ -376,42 +286,23 @@
 
         async function loadCreatorDetails(id) {
             try {
-                const res = await fetch(`/api/creators?id=${id}`);
+                const res = await fetch(`/api/creators?id=${encodeURIComponent(id)}`);
                 if (res.ok) {
                     currentCreator = await res.json();
                     currentCreatorId = currentCreator.id;
-                    
+                    syncLinksWithCreatorId();
+
                     document.getElementById('creator-name-header').textContent = currentCreator.name;
-                    document.getElementById('creator-headline-header').textContent = currentCreator.headline || 'Official AI Twin';
                     if (currentCreator.avatar_url) {
                         document.getElementById('creator-avatar-img').src = currentCreator.avatar_url;
                     }
-                    document.getElementById('ghl-loc-badge').textContent = currentCreator.ghl_location_id || 'loc_ghl_demo';
-                    document.getElementById('persona-prompt-input').value = currentCreator.persona_prompt || '';
 
-                    // Styling swatches
-                    const colors = typeof currentCreator.brand_colors === 'string' ? JSON.parse(currentCreator.brand_colors || '{}') : (currentCreator.brand_colors || {});
-                    const fonts = typeof currentCreator.brand_fonts === 'string' ? JSON.parse(currentCreator.brand_fonts || '{}') : (currentCreator.brand_fonts || {});
-
+                    const colors = typeof currentCreator.brand_colors === 'string'
+                        ? JSON.parse(currentCreator.brand_colors || '{}')
+                        : (currentCreator.brand_colors || {});
                     if (colors.primary) {
-                        document.getElementById('palette-primary').style.backgroundColor = colors.primary;
                         const sandboxBtn = document.getElementById('btn-sandbox-send');
                         if (sandboxBtn) sandboxBtn.style.backgroundColor = colors.primary;
-                    }
-                    if (colors.accent) {
-                        document.getElementById('palette-accent').style.backgroundColor = colors.accent;
-                    }
-                    if (fonts.heading) {
-                        document.getElementById('palette-font').innerHTML = `Font: <span class="text-white font-medium">${fonts.heading}</span>`;
-                    }
-
-                    // Load Embed code
-                    const embedRes = await fetch(`/api/creators/${currentCreatorId}/embed`);
-                    if (embedRes.ok) {
-                        const embedData = await embedRes.json();
-                        currentSnippets.twwinz = embedData.embedCode;
-                        currentSnippets.ghl = embedData.ghlNativeEmbed || '';
-                        selectWidgetType(activeWidgetTab);
                     }
                 }
             } catch (err) {
@@ -422,7 +313,7 @@
         async function loadKnowledgeItems() {
             const container = document.getElementById('knowledge-items-container');
             try {
-                const res = await fetch(`/api/creators/${currentCreatorId}/knowledge`);
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/knowledge`);
                 if (res.ok) {
                     knowledgeItems = await res.json();
                     renderKnowledgeList();
@@ -434,6 +325,9 @@
 
         function renderKnowledgeList() {
             const container = document.getElementById('knowledge-items-container');
+            const countEl = document.getElementById('fact-count');
+            if (countEl) countEl.textContent = knowledgeItems.length;
+
             const filtered = activeCategoryFilter === 'all' 
                 ? knowledgeItems 
                 : knowledgeItems.filter(k => k.category === activeCategoryFilter);
@@ -441,8 +335,8 @@
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="glass-card rounded-2xl p-8 text-center text-slate-400 space-y-2">
-                        <span class="material-symbols-outlined text-3xl text-slate-600">database</span>
-                        <div class="text-xs">No facts in this category yet. Click <strong>Add Grounded Fact</strong> above to input unindexed schedules or offers!</div>
+                        <span class="material-symbols-outlined text-3xl text-slate-600">note_add</span>
+                        <div class="text-xs">No facts in this category yet. Use the form above to add your first item!</div>
                     </div>
                 `;
                 return;
@@ -450,24 +344,14 @@
 
             container.innerHTML = filtered.map(item => {
                 const tagClass = `tag-${item.category}`;
-                let metaBadge = '';
-                if (item.metadata) {
-                    try {
-                        const m = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
-                        const entries = Object.entries(m).slice(0, 2);
-                        metaBadge = entries.map(([k, v]) => `<span class="bg-black/30 px-2 py-0.5 rounded text-[10px] text-slate-300 font-mono">${k}: ${v}</span>`).join(' ');
-                    } catch (_) {}
-                }
-
                 return `
-                    <div class="glass-card rounded-xl p-4 transition-all hover:border-slate-600 flex flex-col sm:flex-row justify-between items-start gap-4" id="item-${item.id}">
+                    <div class="glass-card rounded-xl p-4 transition-all hover:border-slate-600 flex justify-between items-start gap-4" id="item-${item.id}">
                         <div class="space-y-1.5 flex-1">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${tagClass}">${item.category}</span>
-                                <h3 class="text-xs font-bold text-white">${escapeHtml(item.title)}</h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${tagClass}">${escapeHtml(item.category)}</span>
+                                <h4 class="text-xs font-bold text-white">${escapeHtml(item.title)}</h4>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(item.content)}</p>
-                            ${metaBadge ? `<div class="pt-1 flex items-center gap-2 flex-wrap">${metaBadge}</div>` : ''}
                         </div>
                         <button onclick="deleteKnowledgeItem('${item.id}')" class="text-slate-500 hover:text-red-400 transition-colors p-1" title="Delete Fact">
                             <span class="material-symbols-outlined text-sm">delete</span>
@@ -481,15 +365,62 @@
             activeCategoryFilter = cat;
             document.querySelectorAll('.cat-filter-btn').forEach(btn => {
                 const isMatch = btn.getAttribute('data-cat') === cat;
-                btn.className = `cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold ${isMatch ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`;
+                btn.className = `cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold ${isMatch ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`;
             });
             renderKnowledgeList();
         }
 
-        async function deleteKnowledgeItem(itemId) {
-            if (!confirm('Are you sure you want to remove this grounded fact?')) return;
+        async function submitQuickFact() {
+            const titleInput = document.getElementById('quick-title');
+            const contentInput = document.getElementById('quick-content');
+            const categoryInput = document.getElementById('quick-category');
+            const statusEl = document.getElementById('quick-save-status');
+
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            const category = categoryInput.value;
+
+            if (!title || !content) {
+                alert('Please enter both a Topic/Title and what your Twin should know.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-quick-submit');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">refresh</span><span>Saving...</span>`;
+
             try {
-                const res = await fetch(`/api/creators/${currentCreatorId}/knowledge/${itemId}`, { method: 'DELETE' });
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/knowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category, title, content, priority: 10 })
+                });
+
+                if (res.ok) {
+                    const newItem = await res.json();
+                    knowledgeItems.unshift(newItem);
+                    renderKnowledgeList();
+                    titleInput.value = '';
+                    contentInput.value = '';
+                    if (statusEl) {
+                        statusEl.classList.remove('opacity-0');
+                        setTimeout(() => statusEl.classList.add('opacity-0'), 3000);
+                    }
+                } else {
+                    alert('Error saving fact.');
+                }
+            } catch (err) {
+                alert('Error saving fact: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">add_circle</span><span>Save to Twin Memory</span>`;
+            }
+        }
+
+        async function deleteKnowledgeItem(itemId) {
+            if (!confirm('Remove this fact from your AI Twin?')) return;
+            try {
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/knowledge/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
                 if (res.ok) {
                     knowledgeItems = knowledgeItems.filter(k => k.id !== itemId);
                     renderKnowledgeList();
@@ -499,88 +430,6 @@
             }
         }
 
-        function openAddModal() {
-            document.getElementById('add-modal').classList.remove('hidden');
-            document.getElementById('modal-title').focus();
-        }
-
-        function closeAddModal() {
-            document.getElementById('add-modal').classList.add('hidden');
-        }
-
-        async function submitNewFact() {
-            const title = document.getElementById('modal-title').value.trim();
-            const content = document.getElementById('modal-content').value.trim();
-            const category = document.getElementById('modal-category').value;
-            const metaRaw = document.getElementById('modal-metadata').value.trim();
-
-            if (!title || !content) {
-                alert('Please provide a title and verified fact details.');
-                return;
-            }
-
-            let metadata = null;
-            if (metaRaw) {
-                try {
-                    metadata = JSON.parse(metaRaw);
-                } catch (e) {
-                    alert('Metadata must be valid JSON or empty.');
-                    return;
-                }
-            }
-
-            const btn = document.getElementById('btn-modal-submit');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
-
-            try {
-                const res = await fetch(`/api/creators/${currentCreatorId}/knowledge`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ category, title, content, metadata, priority: 10 })
-                });
-
-                if (res.ok) {
-                    const newItem = await res.json();
-                    knowledgeItems.unshift(newItem);
-                    renderKnowledgeList();
-                    closeAddModal();
-                    document.getElementById('modal-title').value = '';
-                    document.getElementById('modal-content').value = '';
-                    document.getElementById('modal-metadata').value = '';
-                } else {
-                    alert('Error saving fact.');
-                }
-            } catch (err) {
-                alert('Error saving fact: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Save to D1';
-            }
-        }
-
-        async function savePersonaRules() {
-            const prompt = document.getElementById('persona-prompt-input').value.trim();
-            const btn = document.getElementById('btn-save-persona');
-            btn.textContent = 'Saving...';
-
-            try {
-                const res = await fetch(`/api/creators/${currentCreatorId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ persona_prompt: prompt })
-                });
-                if (res.ok) {
-                    btn.textContent = 'Saved!';
-                    setTimeout(() => { btn.textContent = 'Save Rules'; }, 2000);
-                }
-            } catch (err) {
-                alert('Error: ' + err.message);
-                btn.textContent = 'Save Rules';
-            }
-        }
-
-        // Sandbox Chat
         async function sendSandboxMessage() {
             const input = document.getElementById('sandbox-input');
             const query = input.value.trim();
@@ -589,22 +438,20 @@
             input.value = '';
             const messagesBox = document.getElementById('sandbox-messages');
 
-            // Append user msg
             messagesBox.innerHTML += `
                 <div class="flex justify-end">
-                    <div class="bg-blue-600 text-white px-3.5 py-2 rounded-xl rounded-br-xs max-w-[85%]">
+                    <div class="bg-blue-600 text-white px-3.5 py-2.5 rounded-xl rounded-br-xs max-w-[85%]">
                         ${escapeHtml(query)}
                     </div>
                 </div>
             `;
             messagesBox.scrollTop = messagesBox.scrollHeight;
 
-            // Typing indicator
             const typingId = `typing-${Date.now()}`;
             messagesBox.innerHTML += `
                 <div class="flex justify-start" id="${typingId}">
                     <div class="bg-[#1e1e1e] text-slate-400 px-3.5 py-2 rounded-xl rounded-bl-xs text-[11px] animate-pulse">
-                        Querying D1 RAG knowledge...
+                        Checking Twin memory...
                     </div>
                 </div>
             `;
@@ -626,7 +473,7 @@
                 let sourcesHtml = '';
                 if (data.ragSources && data.ragSources.length > 0) {
                     sourcesHtml = `<div class="mt-2 text-[10px] text-amber-400/90 font-mono flex items-center gap-1 border-t border-white/5 pt-1.5">
-                        <span class="material-symbols-outlined text-[12px]">verified</span> Grounded via: ${data.ragSources.map(s => s.title).join(', ')}
+                        <span class="material-symbols-outlined text-[12px]">verified</span> Grounded via: ${data.ragSources.map(s => escapeHtml(s.title)).join(', ')}
                     </div>`;
                 }
 
@@ -647,25 +494,18 @@
 
         function clearSandboxChat() {
             document.getElementById('sandbox-messages').innerHTML = `
-                <div class="bg-[#1a1a1a] p-3 rounded-xl border border-white/5 text-slate-200 text-xs">
-                    👋 <strong>Sandbox Reset.</strong> Ask a question about upcoming tour dates, VIP perks, or behind-the-scenes facts to test dynamic RAG grounding!
+                <div class="bg-[#1a1a1a] p-3.5 rounded-xl border border-white/5 text-slate-200 text-xs leading-relaxed">
+                    👋 <strong>Chat Reset.</strong> Ask a question about your tour dates, VIP perks, or facts on the left to test your Twin!
                 </div>
             `;
         }
 
-        function copyEmbedCode() {
-            const text = document.getElementById('embed-code-block').textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById('btn-copy-embed');
-                btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span> Copied!`;
-                setTimeout(() => {
-                    btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span> Copy`;
-                }, 2000);
-            });
-        }
-
         function switchCreator(newId) {
             currentCreatorId = newId;
+            const url = new URL(window.location.href);
+            url.searchParams.set('id', newId);
+            window.history.replaceState({}, '', url);
+            syncLinksWithCreatorId();
             loadCreatorDetails(newId);
             loadKnowledgeItems();
         }

@@ -191,7 +191,7 @@ async function handleApiRoute(url, request, env) {
     let targetPath = '/onboard.html?auth=google';
     if (requestedRedirect && requestedRedirect.startsWith('/')) {
       targetPath = requestedRedirect;
-      if (existingCreator && targetPath.startsWith('/dashboard.html') && !targetPath.includes('id=')) {
+      if (existingCreator && (targetPath.startsWith('/dashboard.html') || targetPath.startsWith('/settings.html')) && !targetPath.includes('id=')) {
         targetPath += (targetPath.includes('?') ? '&' : '?') + `id=${encodeURIComponent(existingCreator.id)}`;
       }
     } else if (existingCreator) {

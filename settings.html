@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Widget, Persona &amp; Voice Controls | Twwinz.com</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #111111;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(28, 27, 27, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #ADC6FF 0%, #4B8EFF 100%);
+        }
+        .font-headline {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#111111] text-[#e5e2e1]">
+    <!-- Top Navigation Bar -->
+    <nav class="border-b border-white/5 bg-[#141414]/90 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-3.5 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-6">
+                <a href="index.html" class="text-xl font-bold tracking-tight text-blue-400 font-headline">Twwinz.com</a>
+                <!-- Portal Page Switcher -->
+                <div class="flex items-center gap-1 bg-[#1b1b1b] p-1 rounded-xl border border-white/5">
+                    <a href="dashboard.html" id="nav-link-content" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">auto_stories</span>
+                        <span>Content &amp; Test</span>
+                    </a>
+                    <a href="settings.html" id="nav-link-settings" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-500 text-white flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">tune</span>
+                        <span>Widget, Persona &amp; Voice</span>
+                    </a>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <select id="creator-select" onchange="switchCreator(this.value)" class="bg-[#1e1e1e] border border-white/10 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
+                    <option value="clb_jaxson_reed">Jaxson Reed (Demo)</option>
+                </select>
+                <a href="onboard.html" class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1 transition-all">
+                    <span class="material-symbols-outlined text-sm">add</span> New Twin
+                </a>
+                <div id="dashboard-auth-box">
+                    <a href="/api/auth/google?redirect=/settings.html" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-3.5 py-2 rounded-lg text-xs font-medium transition-all">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
+                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                            <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+                            <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
+                        </svg>
+                        <span>Sign in with Google</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Banner -->
+    <header class="border-b border-white/5 bg-gradient-to-b from-[#181818] to-[#111111] py-6 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <img id="creator-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
+                     class="w-14 h-14 rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg" alt="Avatar" />
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h1 id="creator-name-header" class="text-2xl font-bold text-white font-headline">Jaxson Reed</h1>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">
+                            Twin Configuration
+                        </span>
+                    </div>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Configure your AI Twin's personality, voice behavior, brand styling, and website embed script.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="dashboard.html" id="back-to-content-btn" class="inline-flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-xs font-semibold text-slate-200 transition-all">
+                    <span class="material-symbols-outlined text-sm text-blue-400">arrow_back</span>
+                    <span>Back to Content &amp; Live Test</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Controls Grid -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- LEFT COLUMN: Persona, Voice & Identity Controls (7 cols) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- 1. Persona & Voice Tone Rules Card -->
+                <div class="glass-card p-6 rounded-2xl space-y-5">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                        <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">psychology</span>
+                            Persona &amp; Voice Tone Rules
+                        </h2>
+                        <span id="save-persona-badge" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ Saved</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Personality &amp; Speaking Guidelines</label>
+                        <p class="text-xs text-slate-400 mb-2">
+                            Instruct your AI Twin on phrasing, humor, signature sign-offs, and boundary topics.
+                        </p>
+                        <textarea id="persona-prompt-input" rows="4" 
+                            class="w-full bg-[#181818] border border-white/10 rounded-xl p-3.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Opening Welcome Message</label>
+                        <p class="text-xs text-slate-400 mb-2">
+                            The first greeting fans see when they open your chat widget.
+                        </p>
+                        <textarea id="welcome-message-input" rows="2" 
+                            class="w-full bg-[#181818] border border-white/10 rounded-xl p-3.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Public Headline / Subtitle</label>
+                            <input type="text" id="headline-input" placeholder="e.g. Official AI Twin"
+                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Avatar Image URL</label>
+                            <input type="url" id="avatar-url-input" placeholder="https://..."
+                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button onclick="savePersonaRules()" id="btn-save-persona" class="primary-gradient text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all">
+                            <span class="material-symbols-outlined text-sm">save</span>
+                            <span>Save Persona &amp; Profile</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Voice Cloning & Audio Interaction Controls -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                        <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">graphic_eq</span>
+                            Voice Interaction &amp; Audio Controls
+                        </h2>
+                        <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Voice Engine</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Configure how your AI Twin speaks during voice calls and audio widget responses.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-[#181818] border border-white/10 rounded-xl p-4 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-bold text-white">Voice Responses in Widget</div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">Allow fans to hear spoken replies</div>
+                            </div>
+                            <input type="checkbox" checked class="w-4 h-4 rounded text-blue-500 bg-black border-white/20 focus:ring-0" />
+                        </div>
+                        <div class="bg-[#181818] border border-white/10 rounded-xl p-4 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-bold text-white">Strict Grounded Mode</div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">Never guess unverified dates or prices</div>
+                            </div>
+                            <input type="checkbox" checked class="w-4 h-4 rounded text-blue-500 bg-black border-white/20 focus:ring-0" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Website Embed Code, Brand Styling & System Connections (5 cols) -->
+            <div class="lg:col-span-5 space-y-6">
+
+                <!-- 3. Website Embed Code Card -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                        <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">code</span>
+                            Website Embed Code
+                        </h2>
+                        <span class="text-[11px] text-slate-400">1-Line Script</span>
+                    </div>
+
+                    <!-- Widget Type Selector -->
+                    <div class="flex gap-2 p-1 bg-[#161616] rounded-xl border border-white/5 text-xs">
+                        <button onclick="selectWidgetType('twwinz')" id="btn-tab-twwinz" class="flex-1 py-1.5 px-3 rounded-lg font-semibold bg-blue-500 text-white transition-all text-center">
+                            Twwinz Twin Widget
+                        </button>
+                        <button onclick="selectWidgetType('ghl')" id="btn-tab-ghl" class="flex-1 py-1.5 px-3 rounded-lg font-semibold text-slate-400 hover:text-white transition-all text-center">
+                            GHL Native Widget
+                        </button>
+                    </div>
+
+                    <p id="embed-help-text" class="text-xs text-slate-400 leading-relaxed">
+                        Paste this snippet right before the closing <code class="text-blue-300">&lt;/body&gt;</code> tag on WordPress, Shopify, Squarespace, or Webflow.
+                    </p>
+
+                    <div class="relative">
+                        <pre id="embed-code-block" class="bg-[#0f0f0f] border border-white/10 rounded-xl p-3.5 text-[11px] font-mono text-blue-300 overflow-x-auto select-all leading-relaxed whitespace-pre-wrap"></pre>
+                        <button onclick="copyEmbedCode()" id="btn-copy-embed" class="absolute top-2.5 right-2.5 bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-lg px-2.5 py-1 text-[11px] font-medium flex items-center gap-1 transition-colors">
+                            <span class="material-symbols-outlined text-xs">content_copy</span> Copy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Brand Aesthetics & Widget Theme -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                        <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">palette</span>
+                            Widget Theme &amp; Brand Palette
+                        </h2>
+                        <span id="save-theme-badge" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ Theme Updated</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-[#181818] border border-white/10 rounded-xl p-3 flex items-center gap-3">
+                            <input type="color" id="color-primary-picker" value="#3b82f6" class="w-8 h-8 rounded cursor-pointer bg-transparent border-0" />
+                            <div>
+                                <div class="text-xs font-semibold text-white">Primary Color</div>
+                                <div id="color-primary-hex" class="text-[11px] font-mono text-slate-400">#3b82f6</div>
+                            </div>
+                        </div>
+                        <div class="bg-[#181818] border border-white/10 rounded-xl p-3 flex items-center gap-3">
+                            <input type="color" id="color-accent-picker" value="#f59e0b" class="w-8 h-8 rounded cursor-pointer bg-transparent border-0" />
+                            <div>
+                                <div class="text-xs font-semibold text-white">Accent Color</div>
+                                <div id="color-accent-hex" class="text-[11px] font-mono text-slate-400">#f59e0b</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-slate-400 pt-1">
+                        <div id="palette-font">Heading Font: <span class="text-white font-medium">Space Grotesk</span></div>
+                        <button onclick="saveThemeColors()" id="btn-save-theme" class="bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all">
+                            Save Theme Colors
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. System & CRM Connection Details -->
+                <div class="glass-card p-5 rounded-2xl space-y-3 text-xs">
+                    <div class="text-xs font-bold text-white uppercase tracking-wider">System &amp; CRM Bindings</div>
+                    <div class="flex items-center justify-between py-1.5 border-b border-white/5">
+                        <span class="text-slate-400">GoHighLevel Sub-Account:</span>
+                        <span id="ghl-loc-badge" class="font-mono text-blue-400 font-semibold">loc_ghl_demo_8829</span>
+                    </div>
+                    <div class="flex items-center justify-between py-1.5">
+                        <span class="text-slate-400">Memory Engine:</span>
+                        <span class="text-emerald-400 font-medium flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Cloudflare D1 + Vectorize
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Active Floating Widget Preview -->
+    <script src="widget.js" data-creator="jaxson-reed" data-primary-color="#3b82f6" data-accent-color="#f59e0b" defer></script>
+
+    <script>
+        let currentCreatorId = 'clb_jaxson_reed';
+        let currentCreator = null;
+        let currentSnippets = { twwinz: '', ghl: '' };
+        let activeWidgetTab = 'twwinz';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('id')) {
+            currentCreatorId = urlParams.get('id');
+        }
+
+        function syncLinksWithCreatorId() {
+            const settingsUrl = `settings.html?id=${encodeURIComponent(currentCreatorId)}`;
+            const contentUrl = `dashboard.html?id=${encodeURIComponent(currentCreatorId)}`;
+            const navSettings = document.getElementById('nav-link-settings');
+            const navContent = document.getElementById('nav-link-content');
+            const backBtn = document.getElementById('back-to-content-btn');
+            if (navSettings) navSettings.href = settingsUrl;
+            if (navContent) navContent.href = contentUrl;
+            if (backBtn) backBtn.href = contentUrl;
+        }
+
+        document.getElementById('color-primary-picker').addEventListener('input', (e) => {
+            document.getElementById('color-primary-hex').textContent = e.target.value;
+        });
+        document.getElementById('color-accent-picker').addEventListener('input', (e) => {
+            document.getElementById('color-accent-hex').textContent = e.target.value;
+        });
+
+        function selectWidgetType(type) {
+            activeWidgetTab = type;
+            const btnTwwinz = document.getElementById('btn-tab-twwinz');
+            const btnGhl = document.getElementById('btn-tab-ghl');
+            const codeBlock = document.getElementById('embed-code-block');
+            const helpText = document.getElementById('embed-help-text');
+
+            if (type === 'twwinz') {
+                btnTwwinz.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold bg-blue-500 text-white transition-all text-center';
+                btnGhl.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold text-slate-400 hover:text-white transition-all text-center';
+                codeBlock.textContent = currentSnippets.twwinz || '// Loading snippet...';
+                helpText.innerHTML = 'Paste this snippet right before the closing <code class="text-blue-300">&lt;/body&gt;</code> tag on WordPress, Shopify, Squarespace, or Webflow.';
+            } else {
+                btnGhl.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold bg-blue-500 text-white transition-all text-center';
+                btnTwwinz.className = 'flex-1 py-1.5 px-3 rounded-lg font-semibold text-slate-400 hover:text-white transition-all text-center';
+                codeBlock.textContent = currentSnippets.ghl || '// Loading GHL widget...';
+                helpText.innerHTML = 'Official LeadConnector script for GoHighLevel. Paste before <code class="text-blue-300">&lt;/body&gt;</code> on any webpage.';
+            }
+        }
+
+        async function initSettingsPage() {
+            await checkDashboardAuth();
+            syncLinksWithCreatorId();
+            await loadCreatorsList();
+            await loadCreatorDetails(currentCreatorId);
+        }
+
+        async function checkDashboardAuth() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.authenticated || !data.user) return;
+
+                const user = data.user;
+                const authBox = document.getElementById('dashboard-auth-box');
+                if (authBox) {
+                    authBox.innerHTML = `
+                        <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs">
+                            ${user.picture ? `<img src="${escapeHtml(user.picture)}" class="w-5 h-5 rounded-full object-cover" alt="" />` : ''}
+                            <span class="text-slate-200 font-medium hidden sm:inline">${escapeHtml(user.name || user.email)}</span>
+                            <a href="/api/auth/logout" class="text-slate-400 hover:text-red-400 transition-colors ml-1" title="Sign Out">Sign Out</a>
+                        </div>
+                    `;
+                }
+
+                if (data.creator && !urlParams.get('id')) {
+                    currentCreatorId = data.creator.id;
+                }
+            } catch (e) {
+                console.warn('Settings auth check skipped:', e);
+            }
+        }
+
+        async function loadCreatorsList() {
+            try {
+                const res = await fetch('/api/creators');
+                if (res.ok) {
+                    const creators = await res.json();
+                    const select = document.getElementById('creator-select');
+                    select.innerHTML = '';
+                    creators.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.textContent = c.name;
+                        if (c.id === currentCreatorId) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+
+        async function loadCreatorDetails(id) {
+            try {
+                const res = await fetch(`/api/creators?id=${encodeURIComponent(id)}`);
+                if (res.ok) {
+                    currentCreator = await res.json();
+                    currentCreatorId = currentCreator.id;
+                    syncLinksWithCreatorId();
+
+                    document.getElementById('creator-name-header').textContent = currentCreator.name;
+                    if (currentCreator.avatar_url) {
+                        document.getElementById('creator-avatar-img').src = currentCreator.avatar_url;
+                        document.getElementById('avatar-url-input').value = currentCreator.avatar_url;
+                    }
+                    document.getElementById('headline-input').value = currentCreator.headline || '';
+                    document.getElementById('persona-prompt-input').value = currentCreator.persona_prompt || '';
+                    document.getElementById('welcome-message-input').value = currentCreator.welcome_message || '';
+                    document.getElementById('ghl-loc-badge').textContent = currentCreator.ghl_location_id || 'loc_ghl_demo';
+
+                    const colors = typeof currentCreator.brand_colors === 'string'
+                        ? JSON.parse(currentCreator.brand_colors || '{}')
+                        : (currentCreator.brand_colors || {});
+                    const fonts = typeof currentCreator.brand_fonts === 'string'
+                        ? JSON.parse(currentCreator.brand_fonts || '{}')
+                        : (currentCreator.brand_fonts || {});
+
+                    if (colors.primary) {
+                        document.getElementById('color-primary-picker').value = colors.primary;
+                        document.getElementById('color-primary-hex').textContent = colors.primary;
+                    }
+                    if (colors.accent) {
+                        document.getElementById('color-accent-picker').value = colors.accent;
+                        document.getElementById('color-accent-hex').textContent = colors.accent;
+                    }
+                    if (fonts.heading) {
+                        document.getElementById('palette-font').innerHTML = `Heading Font: <span class="text-white font-medium">${escapeHtml(fonts.heading)}</span>`;
+                    }
+
+                    const embedRes = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/embed`);
+                    if (embedRes.ok) {
+                        const embedData = await embedRes.json();
+                        currentSnippets.twwinz = embedData.embedCode;
+                        currentSnippets.ghl = embedData.ghlNativeEmbed || '';
+                        selectWidgetType(activeWidgetTab);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function savePersonaRules() {
+            const prompt = document.getElementById('persona-prompt-input').value.trim();
+            const welcome = document.getElementById('welcome-message-input').value.trim();
+            const headline = document.getElementById('headline-input').value.trim();
+            const avatarUrl = document.getElementById('avatar-url-input').value.trim();
+            const btn = document.getElementById('btn-save-persona');
+            const badge = document.getElementById('save-persona-badge');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">refresh</span><span>Saving...</span>`;
+
+            try {
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        persona_prompt: prompt,
+                        welcome_message: welcome,
+                        headline: headline,
+                        avatar_url: avatarUrl
+                    })
+                });
+                if (res.ok) {
+                    if (avatarUrl) document.getElementById('creator-avatar-img').src = avatarUrl;
+                    badge.classList.remove('opacity-0');
+                    setTimeout(() => badge.classList.add('opacity-0'), 2500);
+                }
+            } catch (err) {
+                alert('Error saving settings: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">save</span><span>Save Persona &amp; Profile</span>`;
+            }
+        }
+
+        async function saveThemeColors() {
+            const primary = document.getElementById('color-primary-picker').value;
+            const accent = document.getElementById('color-accent-picker').value;
+            const badge = document.getElementById('save-theme-badge');
+            const existingColors = currentCreator && currentCreator.brand_colors
+                ? (typeof currentCreator.brand_colors === 'string' ? JSON.parse(currentCreator.brand_colors || '{}') : currentCreator.brand_colors)
+                : {};
+
+            const updatedColors = { ...existingColors, primary, accent };
+
+            try {
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ brand_colors: updatedColors })
+                });
+                if (res.ok) {
+                    badge.classList.remove('opacity-0');
+                    setTimeout(() => badge.classList.add('opacity-0'), 2500);
+                    await loadCreatorDetails(currentCreatorId);
+                }
+            } catch (err) {
+                alert('Error updating theme: ' + err.message);
+            }
+        }
+
+        function copyEmbedCode() {
+            const text = document.getElementById('embed-code-block').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('btn-copy-embed');
+                btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span> Copied!`;
+                setTimeout(() => {
+                    btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span> Copy`;
+                }, 2000);
+            });
+        }
+
+        function switchCreator(newId) {
+            currentCreatorId = newId;
+            const url = new URL(window.location.href);
+            url.searchParams.set('id', newId);
+            window.history.replaceState({}, '', url);
+            syncLinksWithCreatorId();
+            loadCreatorDetails(newId);
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        initSettingsPage();
+    </script>
+</body>
+</html>
