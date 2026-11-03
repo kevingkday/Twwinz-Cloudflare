@@ -7,3 +7,9 @@ src
 schema.sql
 seed.sql
 .wrangler
+.dev.vars
+.env*
+wrangler.jsonc
+.gitignore
+.assetsignore
+README.md

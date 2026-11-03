@@ -34,6 +34,17 @@
             <div class="flex items-center gap-4 text-sm">
                 <a href="dashboard.html" class="text-slate-400 hover:text-white transition-colors">Demo Dashboard</a>
                 <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+                <div id="nav-auth-container">
+                    <a href="/api/auth/google?redirect=/onboard.html" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
+                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                            <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+                            <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
+                        </svg>
+                        <span>Sign in with Google</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -70,6 +81,33 @@
                             Creator Identity
                         </h2>
                         <p class="text-sm text-slate-400 mt-1">Tell us who you are and how your fans know you.</p>
+                    </div>
+
+                    <!-- Google Quick Sign-In Banner -->
+                    <div id="google-auth-box" class="bg-[#171717] border border-white/10 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                                    <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                                    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                                    <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+                                    <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-white">Fast-Track with Google</div>
+                                <div class="text-xs text-slate-400">Connect your Google account to auto-fill your profile & link your Creator Dashboard.</div>
+                            </div>
+                        </div>
+                        <a href="/api/auth/google?redirect=/onboard.html" class="w-full sm:w-auto justify-center bg-white text-slate-900 hover:bg-slate-100 font-semibold px-4 py-2.5 rounded-xl text-xs inline-flex items-center gap-2 transition-all shadow-sm whitespace-nowrap">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24">
+                                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                                <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+                                <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
+                            </svg>
+                            <span>Continue with Google</span>
+                        </a>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -748,6 +786,68 @@
                 btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Provision AI Twin & Go to Dashboard</span>`;
             }
         }
+
+        async function checkGoogleSession() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.authenticated || !data.user) return;
+
+                const user = data.user;
+                const nameInput = document.getElementById('creator-name');
+                const emailInput = document.getElementById('creator-email');
+                const avatarInput = document.getElementById('creator-avatar');
+
+                if (user.name && !nameInput.value) nameInput.value = user.name;
+                if (user.email && !emailInput.value) emailInput.value = user.email;
+                if (user.picture) avatarInput.value = user.picture;
+
+                const navAuth = document.getElementById('nav-auth-container');
+                if (navAuth) {
+                    navAuth.innerHTML = `
+                        <div class="inline-flex items-center gap-2.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs">
+                            ${user.picture ? `<img src="${escapeHtml(user.picture)}" class="w-5 h-5 rounded-full object-cover" alt="" />` : ''}
+                            <span class="text-slate-200 font-medium">${escapeHtml(user.name || user.email)}</span>
+                            <a href="/api/auth/logout" class="text-slate-400 hover:text-red-400 transition-colors ml-1" title="Sign Out">Sign Out</a>
+                        </div>
+                    `;
+                }
+
+                const authBox = document.getElementById('google-auth-box');
+                if (authBox) {
+                    authBox.className = 'bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4';
+                    authBox.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            ${user.picture ? `<img src="${escapeHtml(user.picture)}" class="w-10 h-10 rounded-full border border-emerald-400/40 object-cover" alt="" />` : `<span class="material-symbols-outlined text-emerald-400">verified_user</span>`}
+                            <div>
+                                <div class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                    Signed in with Google
+                                    <span class="material-symbols-outlined text-emerald-400 text-sm">verified</span>
+                                </div>
+                                <div class="text-xs text-slate-300">Connected as <strong>${escapeHtml(user.email)}</strong></div>
+                            </div>
+                        </div>
+                        ${data.creator ? `
+                            <a href="dashboard.html?id=${encodeURIComponent(data.creator.id)}" class="primary-gradient text-slate-950 font-bold px-4 py-2 rounded-xl text-xs inline-flex items-center gap-1.5 whitespace-nowrap">
+                                <span>Open Your Dashboard</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        ` : `
+                            <span class="text-xs text-emerald-400 font-medium">Profile Auto-Filled ✓</span>
+                        `}
+                    `;
+                }
+
+                if (typeof updateLivePreview === 'function') {
+                    updateLivePreview();
+                }
+            } catch (e) {
+                console.warn('Auth check skipped:', e);
+            }
+        }
+
+        checkGoogleSession();
     </script>
 </body>
 </html>

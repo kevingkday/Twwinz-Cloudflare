@@ -86,3 +86,16 @@ CREATE TABLE IF NOT EXISTS system_settings (
     value TEXT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS auth_sessions (
+    token TEXT PRIMARY KEY,
+    google_id TEXT NOT NULL,
+    email TEXT NOT NULL,
+    name TEXT,
+    picture TEXT,
+    creator_id TEXT,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_email ON auth_sessions(email);

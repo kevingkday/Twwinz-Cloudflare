@@ -71,8 +71,200 @@ async function handleApiRoute(url, request, env) {
       status: 'healthy',
       database: dbCheck?.alive === 1 ? 'connected' : 'unavailable',
       hasAgencyKey: !!env.GHL_AGENCY_API_KEY,
+      hasGoogleOAuth: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
       companyId: env.GHL_COMPANY_ID || null,
       timestamp: new Date().toISOString()
+    });
+  }
+
+  // 0. Google OAuth 2.0 Authentication Routes
+  if (path === '/api/auth/google' && method === 'GET') {
+    if (!env.GOOGLE_CLIENT_ID) {
+      return jsonResponse({ error: 'GOOGLE_CLIENT_ID is not configured on this Worker' }, 500);
+    }
+
+    const redirectAfter = url.searchParams.get('redirect') || '';
+    const nonce = crypto.randomUUID();
+    const statePayload = btoa(JSON.stringify({ nonce, redirect: redirectAfter }));
+    const redirectUri = env.GOOGLE_REDIRECT_URI || `${url.origin}/api/auth/google/callback`;
+
+    const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    googleAuthUrl.searchParams.set('client_id', env.GOOGLE_CLIENT_ID);
+    googleAuthUrl.searchParams.set('redirect_uri', redirectUri);
+    googleAuthUrl.searchParams.set('response_type', 'code');
+    googleAuthUrl.searchParams.set('scope', 'openid email profile');
+    googleAuthUrl.searchParams.set('access_type', 'online');
+    googleAuthUrl.searchParams.set('prompt', 'select_account');
+    googleAuthUrl.searchParams.set('state', statePayload);
+
+    const isSecure = url.protocol === 'https:';
+    const cookieFlags = `Path=/; HttpOnly; SameSite=Lax; Max-Age=600${isSecure ? '; Secure' : ''}`;
+
+    return new Response(null, {
+      status: 302,
+      headers: {
+        'Location': googleAuthUrl.toString(),
+        'Set-Cookie': `twwinz_oauth_state=${ nonce }; ${ cookieFlags }`
+      }
+    });
+  }
+
+  if (path === '/api/auth/google/callback' && method === 'GET') {
+    const code = url.searchParams.get('code');
+    const stateParam = url.searchParams.get('state');
+    const oauthError = url.searchParams.get('error');
+
+    if (oauthError || !code) {
+      return Response.redirect(`${url.origin}/onboard.html?auth_error=${encodeURIComponent(oauthError || 'missing_code')}`, 302);
+    }
+
+    if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
+      return jsonResponse({ error: 'Google OAuth credentials are not configured on this Worker' }, 500);
+    }
+
+    let requestedRedirect = '';
+    if (stateParam) {
+      try {
+        const parsedState = JSON.parse(atob(stateParam));
+        const cookies = parseCookies(request.headers.get('Cookie') || '');
+        if (cookies.twwinz_oauth_state && parsedState.nonce !== cookies.twwinz_oauth_state) {
+          return Response.redirect(`${url.origin}/onboard.html?auth_error=invalid_state`, 302);
+        }
+        requestedRedirect = parsedState.redirect || '';
+      } catch (_) {}
+    }
+
+    const redirectUri = env.GOOGLE_REDIRECT_URI || `${url.origin}/api/auth/google/callback`;
+
+    // Exchange authorization code for tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: env.GOOGLE_CLIENT_ID,
+        client_secret: env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code'
+      }).toString()
+    });
+
+    const tokenData = await tokenRes.json();
+    if (!tokenRes.ok || !tokenData.access_token) {
+      console.error('[Google OAuth Token Error]', tokenData);
+      return Response.redirect(`${url.origin}/onboard.html?auth_error=token_exchange_failed`, 302);
+    }
+
+    // Fetch Google user profile
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
+    });
+    const userInfo = await userRes.json();
+    if (!userRes.ok || !userInfo.email) {
+      return Response.redirect(`${url.origin}/onboard.html?auth_error=userinfo_failed`, 302);
+    }
+
+    await ensureAuthTables(db);
+
+    // Check if creator already exists for this Google email
+    const existingCreator = await db.prepare('SELECT * FROM creators WHERE LOWER(email) = LOWER(?) ORDER BY created_at DESC LIMIT 1')
+      .bind(userInfo.email)
+      .first();
+
+    const sessionToken = `sess_${crypto.randomUUID().replace(/-/g, '')}`;
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    await db.prepare(`
+      INSERT INTO auth_sessions (token, google_id, email, name, picture, creator_id, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      sessionToken,
+      userInfo.sub || '',
+      userInfo.email,
+      userInfo.name || userInfo.email.split('@')[0],
+      userInfo.picture || null,
+      existingCreator ? existingCreator.id : null,
+      expiresAt
+    ).run();
+
+    // Determine destination URL
+    let targetPath = '/onboard.html?auth=google';
+    if (requestedRedirect && requestedRedirect.startsWith('/')) {
+      targetPath = requestedRedirect;
+      if (existingCreator && targetPath.startsWith('/dashboard.html') && !targetPath.includes('id=')) {
+        targetPath += (targetPath.includes('?') ? '&' : '?') + `id=${encodeURIComponent(existingCreator.id)}`;
+      }
+    } else if (existingCreator) {
+      targetPath = `/dashboard.html?id=${encodeURIComponent(existingCreator.id)}`;
+    }
+
+    const isSecure = url.protocol === 'https:';
+    const sessionCookie = `twwinz_session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${30 * 24 * 60 * 60}${isSecure ? '; Secure' : ''}`;
+    const clearStateCookie = `twwinz_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${isSecure ? '; Secure' : ''}`;
+
+    const headers = new Headers();
+    headers.set('Location', `${url.origin}${targetPath}`);
+    headers.append('Set-Cookie', sessionCookie);
+    headers.append('Set-Cookie', clearStateCookie);
+
+    return new Response(null, { status: 302, headers });
+  }
+
+  if (path === '/api/auth/me' && method === 'GET') {
+    await ensureAuthTables(db);
+    const session = await getAuthenticatedSession(request, db);
+    if (!session) {
+      return jsonResponse({ authenticated: false, user: null, creator: null });
+    }
+
+    let creator = null;
+    if (session.creator_id) {
+      creator = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(session.creator_id).first();
+    }
+    if (!creator && session.email) {
+      creator = await db.prepare('SELECT * FROM creators WHERE LOWER(email) = LOWER(?) ORDER BY created_at DESC LIMIT 1')
+        .bind(session.email)
+        .first();
+    }
+
+    return jsonResponse({
+      authenticated: true,
+      user: {
+        googleId: session.google_id,
+        email: session.email,
+        name: session.name,
+        picture: session.picture
+      },
+      creator: creator || null
+    });
+  }
+
+  if (path === '/api/auth/logout' && (method === 'POST' || method === 'GET')) {
+    await ensureAuthTables(db);
+    const cookies = parseCookies(request.headers.get('Cookie') || '');
+    if (cookies.twwinz_session) {
+      await db.prepare('DELETE FROM auth_sessions WHERE token = ?').bind(cookies.twwinz_session).run();
+    }
+
+    const isSecure = url.protocol === 'https:';
+    const clearCookie = `twwinz_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${isSecure ? '; Secure' : ''}`;
+
+    if (method === 'GET') {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': `${url.origin}/index.html`,
+          'Set-Cookie': clearCookie
+        }
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': clearCookie
+      }
     });
   }
 
@@ -180,6 +372,17 @@ async function handleApiRoute(url, request, env) {
       INSERT INTO knowledge_fts (id, creator_id, title, content)
       VALUES (?, ?, 'Official Welcome & Overview', ?)
     `).bind(initialKnowledgeId, creatorId, `Welcome to ${name}'s official AI Twin.`).run();
+
+    // Link current Google OAuth session to the newly created creator if logged in
+    try {
+      await ensureAuthTables(db);
+      const cookies = parseCookies(request.headers.get('Cookie') || '');
+      if (cookies.twwinz_session) {
+        await db.prepare('UPDATE auth_sessions SET creator_id = ? WHERE token = ?')
+          .bind(creatorId, cookies.twwinz_session)
+          .run();
+      }
+    } catch (_) {}
 
     const createdCreator = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(creatorId).first();
     const embedSnippet = ghlService.generateEmbedSnippet(createdCreator, url.origin);
@@ -434,4 +637,55 @@ function jsonResponse(data, status = 200) {
     status,
     headers: { 'Content-Type': 'application/json' }
   });
+}
+
+async function ensureAuthTables(db) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS auth_sessions (
+      token TEXT PRIMARY KEY,
+      google_id TEXT NOT NULL,
+      email TEXT NOT NULL,
+      name TEXT,
+      picture TEXT,
+      creator_id TEXT,
+      expires_at DATETIME NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+}
+
+function parseCookies(cookieHeader) {
+  const cookies = {};
+  if (!cookieHeader) return cookies;
+  cookieHeader.split(';').forEach(part => {
+    const idx = part.indexOf('=');
+    if (idx > -1) {
+      const key = part.substring(0, idx).trim();
+      const val = part.substring(idx + 1).trim();
+      cookies[key] = decodeURIComponent(val);
+    }
+  });
+  return cookies;
+}
+
+async function getAuthenticatedSession(request, db) {
+  const cookies = parseCookies(request.headers.get('Cookie') || '');
+  let token = cookies.twwinz_session;
+  if (!token) {
+    const authHeader = request.headers.get('Authorization') || '';
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.slice(7).trim();
+    }
+  }
+  if (!token) return null;
+
+  const session = await db.prepare('SELECT * FROM auth_sessions WHERE token = ?').bind(token).first();
+  if (!session) return null;
+
+  if (session.expires_at && new Date(session.expires_at) < new Date()) {
+    await db.prepare('DELETE FROM auth_sessions WHERE token = ?').bind(token).run();
+    return null;
+  }
+
+  return session;
 }

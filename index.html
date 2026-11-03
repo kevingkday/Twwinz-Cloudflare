@@ -130,8 +130,19 @@
                 <a class="text-slate-400 hover:text-white transition-colors" href="#why-twwinz">Why Twwinz</a>
                 <a class="text-slate-400 hover:text-white transition-colors" href="dashboard.html">Creator Dashboard</a>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3 sm:gap-4">
                 <a href="https://assets.cdn.filesafe.space/9TKh7JGFQXrmzx2AB0HI/media/69c208543b3a5825f8195434.pdf" target="_blank" class="hidden lg:block px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">Investor Deck</a>
+                <div id="home-auth-container">
+                    <a href="/api/auth/google" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-4 py-2.5 rounded-md text-xs font-semibold transition-all">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24">
+                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                            <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+                            <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
+                        </svg>
+                        <span>Sign In</span>
+                    </a>
+                </div>
                 <a href="onboard.html"
                     class="primary-gradient text-on-primary px-6 py-2.5 rounded-md font-bold text-sm tracking-tight active:scale-95 transition-transform inline-flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
                     <span class="material-symbols-outlined text-sm">rocket_launch</span> Launch Twin
@@ -638,6 +649,26 @@
 
     <!-- Twwinz Interactive AI Twin Floating Widget -->
     <script src="widget.js" data-creator="jaxson-reed" data-primary-color="#3b82f6" data-accent-color="#f59e0b" defer></script>
+    <script>
+        (async function() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.authenticated || !data.user) return;
+                const box = document.getElementById('home-auth-container');
+                if (box) {
+                    const dashUrl = data.creator ? `dashboard.html?id=${encodeURIComponent(data.creator.id)}` : 'dashboard.html';
+                    box.innerHTML = `
+                        <a href="${dashUrl}" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-3.5 py-2 rounded-md text-xs font-semibold transition-all">
+                            ${data.user.picture ? `<img src="${data.user.picture}" class="w-4 h-4 rounded-full object-cover" alt="" />` : ''}
+                            <span>${data.user.name || data.user.email}</span>
+                        </a>
+                    `;
+                }
+            } catch (_) {}
+        })();
+    </script>
 </body>
 
 </html>
