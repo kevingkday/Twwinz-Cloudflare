@@ -316,13 +316,45 @@ async function handleApiRoute(url, request, env) {
     });
   }
 
-  // 2. Creator Signup & Automated GHL Provisioning
+  // 2. Creator Signup & Automated GHL Provisioning (Enforces 1 Digital Twin per account/email)
   if (path === '/api/creators/signup' && method === 'POST') {
     const body = await request.json();
     const { name, email, websiteType, websiteUrl, personaPrompt, avatarUrl, headline } = body;
 
     if (!name || !email) {
       return jsonResponse({ error: 'Name and email are required' }, 400);
+    }
+
+    // Check if this user/email already has a Digital Twin
+    const existingCreator = await db.prepare('SELECT * FROM creators WHERE LOWER(email) = LOWER(?) ORDER BY created_at DESC LIMIT 1')
+      .bind(email)
+      .first();
+
+    if (existingCreator) {
+      await db.prepare(`
+        UPDATE creators
+        SET name = ?, headline = COALESCE(?, headline), avatar_url = COALESCE(?, avatar_url), updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).bind(name, headline || null, avatarUrl || null, existingCreator.id).run();
+
+      try {
+        await ensureAuthTables(db);
+        const cookies = parseCookies(request.headers.get('Cookie') || '');
+        if (cookies.twwinz_session) {
+          await db.prepare('UPDATE auth_sessions SET creator_id = ? WHERE token = ?')
+            .bind(existingCreator.id, cookies.twwinz_session)
+            .run();
+        }
+      } catch (_) {}
+
+      const updatedExisting = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(existingCreator.id).first();
+      const embedSnippet = ghlService.generateEmbedSnippet(updatedExisting, url.origin);
+      return jsonResponse({
+        success: true,
+        existing: true,
+        creator: updatedExisting,
+        embedSnippet
+      }, 200);
     }
 
     // Slug generation

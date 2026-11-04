@@ -45,12 +45,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <select id="creator-select" onchange="switchCreator(this.value)" class="bg-[#1e1e1e] border border-white/10 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
-                    <option value="clb_jaxson_reed">Jaxson Reed (Demo)</option>
-                </select>
-                <a href="onboard.html" class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1 transition-all">
-                    <span class="material-symbols-outlined text-sm">add</span> New Twin
-                </a>
                 <div id="dashboard-auth-box">
                     <a href="/api/auth/google?redirect=/settings.html" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-3.5 py-2 rounded-lg text-xs font-medium transition-all">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -129,15 +123,21 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Twin Display Name / Moniker</label>
+                            <input type="text" id="twin-name-input" placeholder="e.g. Kevin Day"
+                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
+                        </div>
+                        <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Public Headline / Subtitle</label>
                             <input type="text" id="headline-input" placeholder="e.g. Official AI Twin"
                                 class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Avatar Image URL</label>
-                            <input type="url" id="avatar-url-input" placeholder="https://..."
-                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
-                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Avatar Image URL</label>
+                        <input type="url" id="avatar-url-input" placeholder="https://..."
+                            class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
                     </div>
 
                     <div class="flex justify-end pt-2">
@@ -325,7 +325,6 @@
         async function initSettingsPage() {
             await checkDashboardAuth();
             syncLinksWithCreatorId();
-            await loadCreatorsList();
             await loadCreatorDetails(currentCreatorId);
         }
 
@@ -348,31 +347,13 @@
                     `;
                 }
 
-                if (data.creator && !urlParams.get('id')) {
+                if (data.creator) {
                     currentCreatorId = data.creator.id;
+                } else {
+                    window.location.href = 'onboard.html';
                 }
             } catch (e) {
                 console.warn('Settings auth check skipped:', e);
-            }
-        }
-
-        async function loadCreatorsList() {
-            try {
-                const res = await fetch('/api/creators');
-                if (res.ok) {
-                    const creators = await res.json();
-                    const select = document.getElementById('creator-select');
-                    select.innerHTML = '';
-                    creators.forEach(c => {
-                        const opt = document.createElement('option');
-                        opt.value = c.id;
-                        opt.textContent = c.name;
-                        if (c.id === currentCreatorId) opt.selected = true;
-                        select.appendChild(opt);
-                    });
-                }
-            } catch (e) {
-                console.warn(e);
             }
         }
 
@@ -385,6 +366,7 @@
                     syncLinksWithCreatorId();
 
                     document.getElementById('creator-name-header').textContent = currentCreator.name;
+                    document.getElementById('twin-name-input').value = currentCreator.name || '';
                     if (currentCreator.avatar_url) {
                         document.getElementById('creator-avatar-img').src = currentCreator.avatar_url;
                         document.getElementById('avatar-url-input').value = currentCreator.avatar_url;
@@ -427,6 +409,7 @@
         }
 
         async function savePersonaRules() {
+            const nameVal = document.getElementById('twin-name-input').value.trim();
             const prompt = document.getElementById('persona-prompt-input').value.trim();
             const welcome = document.getElementById('welcome-message-input').value.trim();
             const headline = document.getElementById('headline-input').value.trim();
@@ -442,6 +425,7 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        name: nameVal || undefined,
                         persona_prompt: prompt,
                         welcome_message: welcome,
                         headline: headline,
@@ -449,6 +433,7 @@
                     })
                 });
                 if (res.ok) {
+                    if (nameVal) document.getElementById('creator-name-header').textContent = nameVal;
                     if (avatarUrl) document.getElementById('creator-avatar-img').src = avatarUrl;
                     badge.classList.remove('opacity-0');
                     setTimeout(() => badge.classList.add('opacity-0'), 2500);
@@ -496,15 +481,6 @@
                     btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span> Copy`;
                 }, 2000);
             });
-        }
-
-        function switchCreator(newId) {
-            currentCreatorId = newId;
-            const url = new URL(window.location.href);
-            url.searchParams.set('id', newId);
-            window.history.replaceState({}, '', url);
-            syncLinksWithCreatorId();
-            loadCreatorDetails(newId);
         }
 
         function escapeHtml(str) {

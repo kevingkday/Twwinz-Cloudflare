@@ -53,12 +53,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <select id="creator-select" onchange="switchCreator(this.value)" class="bg-[#1e1e1e] border border-white/10 text-xs rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500">
-                    <option value="clb_jaxson_reed">Jaxson Reed (Demo)</option>
-                </select>
-                <a href="onboard.html" class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1 transition-all">
-                    <span class="material-symbols-outlined text-sm">add</span> New Twin
-                </a>
                 <div id="dashboard-auth-box">
                     <a href="/api/auth/google?redirect=/dashboard.html" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-3.5 py-2 rounded-lg text-xs font-medium transition-all">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -517,7 +511,6 @@
         async function initDashboard() {
             await checkDashboardAuth();
             syncLinksWithCreatorId();
-            await loadCreatorsList();
             await loadCreatorDetails(currentCreatorId);
             await loadKnowledgeItems();
         }
@@ -541,31 +534,13 @@
                     `;
                 }
 
-                if (data.creator && !urlParams.get('id')) {
+                if (data.creator) {
                     currentCreatorId = data.creator.id;
+                } else {
+                    window.location.href = 'onboard.html';
                 }
             } catch (e) {
                 console.warn('Dashboard auth check skipped:', e);
-            }
-        }
-
-        async function loadCreatorsList() {
-            try {
-                const res = await fetch('/api/creators');
-                if (res.ok) {
-                    const creators = await res.json();
-                    const select = document.getElementById('creator-select');
-                    select.innerHTML = '';
-                    creators.forEach(c => {
-                        const opt = document.createElement('option');
-                        opt.value = c.id;
-                        opt.textContent = c.name;
-                        if (c.id === currentCreatorId) opt.selected = true;
-                        select.appendChild(opt);
-                    });
-                }
-            } catch (e) {
-                console.warn(e);
             }
         }
 
@@ -846,16 +821,6 @@
                     👋 <strong>Chat Reset.</strong> Ask a question about your uploaded documents, tour dates, or ask to see a photo you uploaded!
                 </div>
             `;
-        }
-
-        function switchCreator(newId) {
-            currentCreatorId = newId;
-            const url = new URL(window.location.href);
-            url.searchParams.set('id', newId);
-            window.history.replaceState({}, '', url);
-            syncLinksWithCreatorId();
-            loadCreatorDetails(newId);
-            loadKnowledgeItems();
         }
 
         function escapeHtml(str) {

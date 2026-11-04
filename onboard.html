@@ -794,6 +794,12 @@
                 const data = await res.json();
                 if (!data.authenticated || !data.user) return;
 
+                // Each user can only set up one Digital Twin — redirect straight to their dashboard if already created
+                if (data.creator && data.creator.id) {
+                    window.location.href = `dashboard.html?id=${encodeURIComponent(data.creator.id)}`;
+                    return;
+                }
+
                 const user = data.user;
                 const nameInput = document.getElementById('creator-name');
                 const emailInput = document.getElementById('creator-email');
