@@ -383,6 +383,10 @@
     msgDiv.innerHTML = `<div>${escapeHtml(text)}</div>`;
     
     if (sources && sources.length > 0) {
+      const sourceWithImg = sources.find(s => s.imageUrl);
+      if (sourceWithImg && sourceWithImg.imageUrl) {
+        msgDiv.innerHTML += `<div style="margin-top:8px;"><img src="${sourceWithImg.imageUrl}" alt="${escapeHtml(sourceWithImg.title || 'Photo')}" style="max-width:100%;max-height:220px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);display:block;object-fit:cover;" /></div>`;
+      }
       const sourceTitles = sources.map(s => s.title).join(', ');
       msgDiv.innerHTML += `<span class="twwinz-sources-badge">⚡ Grounded via: ${escapeHtml(sourceTitles)}</span>`;
     }

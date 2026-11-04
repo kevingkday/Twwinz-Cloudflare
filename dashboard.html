@@ -3,8 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Content & Live RAG Test | Twwinz.com</title>
+    <title>Content &amp; Live RAG Test | Twwinz.com</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Client-side Word (.docx) & PDF (.pdf) text extractors -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
     <style>
@@ -28,6 +31,7 @@
         .tag-offer { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
         .tag-faq { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
         .tag-bio { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .tag-photo { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
     </style>
 </head>
 <body class="min-h-screen bg-[#111111] text-[#e5e2e1]">
@@ -71,22 +75,22 @@
     </nav>
 
     <!-- Simplified Artist Header -->
-    <header class="border-b border-white/5 bg-gradient-to-b from-[#181818] to-[#111111] py-6 px-6">
+    <header class="border-b border-white/5 bg-gradient-to-b from-[#181818] to-[#111111] py-5 px-6">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <img id="creator-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
-                     class="w-14 h-14 rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg" alt="Avatar" />
+                     class="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg" alt="Avatar" />
                 <div>
                     <div class="flex items-center gap-3">
-                        <h1 id="creator-name-header" class="text-2xl font-bold text-white font-headline">Jaxson Reed</h1>
+                        <h1 id="creator-name-header" class="text-xl sm:text-2xl font-bold text-white font-headline">Jaxson Reed</h1>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Memory Online
                         </span>
                     </div>
-                    <p id="creator-headline-header" class="text-slate-400 text-xs sm:text-sm mt-0.5">Add updates on the left and test how your AI Twin answers fans on the right.</p>
+                    <p id="creator-headline-header" class="text-slate-400 text-xs mt-0.5">Type or upload documents &amp; photos on the left, then test how your AI Twin answers on the right.</p>
                 </div>
             </div>
-            <a href="settings.html" id="header-settings-btn" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-200 transition-all self-start sm:self-auto">
+            <a href="settings.html" id="header-settings-btn" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-xs font-semibold text-slate-200 transition-all self-start sm:self-auto">
                 <span class="material-symbols-outlined text-sm text-blue-400">tune</span>
                 <span>Widget, Persona &amp; Voice Controls</span>
                 <span class="material-symbols-outlined text-sm text-slate-400">arrow_forward</span>
@@ -101,83 +105,140 @@
             <!-- LEFT COLUMN: 1. ADD & MANAGE CONTENT (RAG INPUT) (7 cols) -->
             <div class="lg:col-span-7 space-y-6">
                 
-                <!-- Inline Quick-Add Card: Super Simple for Artists -->
+                <!-- Large Content & File/Photo Input Card -->
                 <div class="glass-card rounded-2xl p-6 border border-blue-500/20 shadow-xl space-y-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
                             <span class="w-6 h-6 rounded-full bg-blue-500 text-slate-950 font-bold text-xs flex items-center justify-center">1</span>
-                            <h2 class="text-base font-bold text-white font-headline">Add Knowledge to Your AI Twin</h2>
+                            <h2 class="text-base font-bold text-white font-headline">Add Knowledge, Documents or Photos</h2>
                         </div>
-                        <span class="text-[11px] text-blue-400 font-medium">Instant D1 + Vector Sync</span>
+                        <span class="text-[11px] text-blue-400 font-medium">Auto-Indexed in D1 + Vectorize</span>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed">
-                        Drop in tour dates, secret promo codes, new merch drops, or personal facts. Your AI Twin will immediately use this to answer fans accurately.
-                    </p>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <!-- Drag & Drop Upload Bar for Word, PDF, Text & Pictures -->
+                    <div id="drop-zone" onclick="document.getElementById('file-upload-input').click()"
+                         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)"
+                         class="border border-dashed border-white/15 hover:border-blue-400/60 bg-[#161616]/90 hover:bg-blue-500/5 rounded-xl p-4 cursor-pointer transition-all flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <input type="file" id="file-upload-input" class="hidden"
+                               accept=".txt,.md,.csv,.json,.docx,.pdf,image/png,image/jpeg,image/webp"
+                               onchange="handleFileSelect(event)" />
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                                <span class="material-symbols-outlined text-xl">upload_file</span>
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-white">Upload a Document or Picture <span class="text-slate-400 font-normal">(or drag &amp; drop here)</span></div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">
+                                    Supports <strong class="text-slate-300">Word (.docx)</strong>, <strong class="text-slate-300">PDF (.pdf)</strong>, <strong class="text-slate-300">Text (.txt, .md, .csv)</strong> &amp; <strong class="text-slate-300">Photos (.jpg, .png, .webp)</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <span id="upload-badge" class="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300 whitespace-nowrap">
+                            Browse Files
+                        </span>
+                    </div>
+
+                    <!-- Attached Photo Preview Banner (Shown when an image is uploaded) -->
+                    <div id="attached-photo-banner" class="hidden bg-pink-500/10 border border-pink-500/25 rounded-xl p-3.5 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <img id="attached-photo-preview" src="" alt="Preview" class="w-14 h-14 rounded-lg object-cover border border-white/15 flex-shrink-0" />
+                            <div>
+                                <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-pink-400 text-sm">photo_camera</span>
+                                    <span id="attached-photo-name">Photo Attached for Chat</span>
+                                </div>
+                                <p id="attached-photo-hint" class="text-[11px] text-slate-300 mt-0.5">
+                                    Describe this photo below so when fans ask about it, your AI Twin can show them this picture right in the chat!
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="clearAttachedPhoto()" class="text-xs text-slate-400 hover:text-red-400 px-2.5 py-1 rounded-lg bg-black/30">
+                            Remove
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Category</label>
                             <select id="quick-category" class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
                                 <option value="schedule">📅 Tour / Event</option>
                                 <option value="offer">🎟️ Offer / VIP Code</option>
                                 <option value="faq">💡 FAQ / Gear / Info</option>
-                                <option value="bio">👤 Bio / Story</option>
+                                <option value="bio">👤 Bio / Story / Press</option>
+                                <option value="photo">📸 Photo / Visual</option>
                             </select>
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Topic / Title *</label>
-                            <input type="text" id="quick-title" placeholder="e.g. Chicago Show VIP Meet & Greet" 
+                            <input type="text" id="quick-title" placeholder="e.g. 2026 North American Tour Dates, Full Biography, or Backstage Guitar Photo" 
                                 class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
                         </div>
                     </div>
 
+                    <!-- Large Text Editor Area -->
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">What should your Twin know? *</label>
-                        <textarea id="quick-content" rows="3" placeholder="e.g. We are playing House of Blues in Chicago on Nov 18 at 8 PM. Fans can use code CHICAGOVIP for 20% off backstage passes."
-                            class="w-full bg-[#181818] border border-white/10 rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
+                                Detailed Content / Document Text / Photo Description *
+                            </label>
+                            <div class="flex items-center gap-3">
+                                <span id="word-count-label" class="text-[11px] text-slate-500 font-mono">0 words</span>
+                                <button type="button" onclick="toggleEditorSize()" id="btn-expand-editor" class="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">open_in_full</span>
+                                    <span id="expand-editor-text">Expand Box</span>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="quick-content" rows="10" oninput="updateWordCount()"
+                            placeholder="Paste or type as much detail as you want — full tour schedules, press releases, interview transcripts, merch details, or descriptions of uploaded photos. You can also drag and drop a Word (.docx), PDF, or text file above to auto-fill this box."
+                            class="w-full bg-[#161616] border border-white/10 rounded-xl p-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 leading-relaxed resize-y min-h-[220px]"></textarea>
                     </div>
 
                     <div class="flex items-center justify-between pt-1">
-                        <span id="quick-save-status" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ Added to your Twin's memory!</span>
-                        <button onclick="submitQuickFact()" id="btn-quick-submit" class="primary-gradient text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-blue-500/10">
+                        <span id="quick-save-status" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ Saved to your Twin's memory!</span>
+                        <button onclick="submitQuickFact()" id="btn-quick-submit" class="primary-gradient text-slate-950 font-bold px-6 py-3 rounded-xl text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-blue-500/10">
                             <span class="material-symbols-outlined text-sm">add_circle</span>
                             <span>Save to Twin Memory</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Saved Knowledge Base List -->
+                <!-- Saved Knowledge Base List (Compact Titles + 1-Sentence Summary) -->
                 <div class="space-y-3">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
-                        <h3 class="text-sm font-bold text-white font-headline flex items-center gap-2">
-                            <span class="material-symbols-outlined text-blue-400 text-base">database</span>
-                            Active Facts in Memory (<span id="fact-count">0</span>)
-                        </h3>
+                        <div>
+                            <h3 class="text-sm font-bold text-white font-headline flex items-center gap-2">
+                                <span class="material-symbols-outlined text-blue-400 text-base">database</span>
+                                Saved Memories (<span id="fact-count">0</span>)
+                            </h3>
+                            <p class="text-[11px] text-slate-500">Click any item to view its full text or attached photo.</p>
+                        </div>
                         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="filter-tabs">
-                            <button onclick="filterCategory('all')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-blue-500 text-white" data-cat="all">All</button>
-                            <button onclick="filterCategory('schedule')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="schedule">Tour</button>
-                            <button onclick="filterCategory('offer')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="offer">Offers</button>
-                            <button onclick="filterCategory('faq')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="faq">FAQs</button>
-                            <button onclick="filterCategory('bio')" class="cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="bio">Bio</button>
+                            <button onclick="filterCategory('all')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500 text-white" data-cat="all">All</button>
+                            <button onclick="filterCategory('schedule')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="schedule">Tour</button>
+                            <button onclick="filterCategory('offer')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="offer">Offers</button>
+                            <button onclick="filterCategory('faq')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="faq">FAQs</button>
+                            <button onclick="filterCategory('bio')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="bio">Bio</button>
+                            <button onclick="filterCategory('photo')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="photo">Photos</button>
                         </div>
                     </div>
 
-                    <div id="knowledge-items-container" class="space-y-3">
-                        <div class="text-center py-12 text-slate-500 text-sm">Loading knowledge items from D1...</div>
+                    <div id="knowledge-items-container" class="space-y-2">
+                        <div class="text-center py-10 text-slate-500 text-sm">Loading saved memories...</div>
                     </div>
                 </div>
             </div>
 
             <!-- RIGHT COLUMN: 2. TEST YOUR TWIN (RAG OUTPUT TEST) (5 cols) -->
             <div class="lg:col-span-5 lg:sticky lg:top-20">
-                <div class="glass-card rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col h-[620px]">
+                <div class="glass-card rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col h-[680px]">
                     <!-- Sandbox Header -->
                     <div class="p-4 bg-gradient-to-r from-blue-900/40 to-slate-900 border-b border-white/10 flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
                             <span class="w-6 h-6 rounded-full bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center">2</span>
                             <div>
                                 <div class="text-xs font-bold text-white uppercase tracking-wider">Test Your AI Twin</div>
-                                <div class="text-[11px] text-slate-400">Ask a question to verify how your Twin responds</div>
+                                <div class="text-[11px] text-slate-400">Ask questions or ask to see a photo you uploaded</div>
                             </div>
                         </div>
                         <button onclick="clearSandboxChat()" class="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
@@ -188,13 +249,13 @@
                     <!-- Sandbox Messages Box -->
                     <div id="sandbox-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#0d0d0d] text-xs">
                         <div class="bg-[#1a1a1a] p-3.5 rounded-xl border border-white/5 text-slate-200 leading-relaxed">
-                            👋 <strong>Try it out!</strong> Add a new fact on the left (like an upcoming show or promo code), then ask me about it right here to see the grounded response and source badge.
+                            👋 <strong>Try it out!</strong> Add text, upload a Word/PDF document, or upload a picture on the left. Then ask me about it right here (e.g. <em>"Show me a picture of..."</em> or <em>"What are the tour dates?"</em>) to see the grounded response!
                         </div>
                     </div>
 
                     <!-- Sandbox Input Box -->
                     <div class="p-3.5 bg-[#161616] border-t border-white/10 flex gap-2 items-center">
-                        <input type="text" id="sandbox-input" placeholder="Ask your Twin anything..." 
+                        <input type="text" id="sandbox-input" placeholder="Ask a question or 'Show me a picture of...'" 
                             class="flex-1 bg-[#222222] border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" 
                             onkeydown="if(event.key==='Enter') sendSandboxMessage()" />
                         <button onclick="sendSandboxMessage()" id="btn-sandbox-send" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-3 rounded-xl text-xs transition-colors flex items-center justify-center">
@@ -212,6 +273,9 @@
         let currentCreator = null;
         let knowledgeItems = [];
         let activeCategoryFilter = 'all';
+        let attachedImageDataUrl = null;
+        let attachedFileName = null;
+        let editorExpanded = false;
 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('id')) {
@@ -227,6 +291,227 @@
             if (navSettings) navSettings.href = settingsUrl;
             if (headerSettings) headerSettings.href = settingsUrl;
             if (navContent) navContent.href = contentUrl;
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('quick-content').value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            document.getElementById('word-count-label').textContent = `${words.toLocaleString()} word${words === 1 ? '' : 's'}`;
+        }
+
+        function toggleEditorSize() {
+            const textarea = document.getElementById('quick-content');
+            const label = document.getElementById('expand-editor-text');
+            editorExpanded = !editorExpanded;
+            if (editorExpanded) {
+                textarea.rows = 22;
+                label.textContent = 'Shrink Box';
+            } else {
+                textarea.rows = 10;
+                label.textContent = 'Expand Box';
+            }
+        }
+
+        // Drag & Drop + File Upload Handlers (.docx, .pdf, .txt, .md, .csv, and Images)
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('drop-zone').classList.add('border-blue-400', 'bg-blue-500/10');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('drop-zone').classList.remove('border-blue-400', 'bg-blue-500/10');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDragLeave(e);
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processUploadedFile(e.dataTransfer.files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            if (e.target.files && e.target.files.length > 0) {
+                processUploadedFile(e.target.files[0]);
+                e.target.value = '';
+            }
+        }
+
+        async function processUploadedFile(file) {
+            const badge = document.getElementById('upload-badge');
+            const titleInput = document.getElementById('quick-title');
+            const contentInput = document.getElementById('quick-content');
+            const categorySelect = document.getElementById('quick-category');
+            const cleanBaseName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+
+            if (!titleInput.value.trim()) {
+                titleInput.value = cleanBaseName;
+            }
+
+            // 1. Handle Image Upload (.jpg, .png, .webp)
+            if (file.type.startsWith('image/')) {
+                badge.textContent = 'Processing photo...';
+                try {
+                    const compressedDataUrl = await compressImageFile(file, 720, 0.82);
+                    attachedImageDataUrl = compressedDataUrl;
+                    attachedFileName = file.name;
+                    categorySelect.value = 'photo';
+
+                    const banner = document.getElementById('attached-photo-banner');
+                    const preview = document.getElementById('attached-photo-preview');
+                    const nameEl = document.getElementById('attached-photo-name');
+                    const hintEl = document.getElementById('attached-photo-hint');
+
+                    preview.src = compressedDataUrl;
+                    nameEl.textContent = `Photo Ready: ${file.name}`;
+                    hintEl.textContent = 'Generating AI visual description for RAG search...';
+                    banner.classList.remove('hidden');
+                    badge.textContent = '✓ Photo Attached';
+
+                    // Ask Workers AI Vision to auto-describe the photo if content is empty
+                    const visionRes = await fetch('/api/utils/analyze-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            imageDataUrl: compressedDataUrl,
+                            title: titleInput.value.trim()
+                        })
+                    });
+                    if (visionRes.ok) {
+                        const visionData = await visionRes.json();
+                        if (visionData.description && !contentInput.value.trim()) {
+                            contentInput.value = visionData.description;
+                            updateWordCount();
+                        }
+                    }
+                    hintEl.textContent = 'Edit or add details below so your Twin knows when to share this photo in chat!';
+                } catch (err) {
+                    alert('Could not process image: ' + err.message);
+                    badge.textContent = 'Browse Files';
+                }
+                return;
+            }
+
+            // 2. Handle Word Document (.docx)
+            const lowerName = file.name.toLowerCase();
+            if (lowerName.endsWith('.docx')) {
+                badge.textContent = 'Reading Word doc...';
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    if (window.mammoth) {
+                        const result = await window.mammoth.extractRawText({ arrayBuffer });
+                        const extracted = (result.value || '').trim();
+                        if (extracted) {
+                            contentInput.value = contentInput.value.trim()
+                                ? `${contentInput.value.trim()}\n\n${extracted}`
+                                : extracted;
+                            updateWordCount();
+                            badge.textContent = `✓ Loaded ${file.name}`;
+                        } else {
+                            alert('No readable text found in this Word document.');
+                            badge.textContent = 'Browse Files';
+                        }
+                    } else {
+                        alert('Word parser is still loading, please try again in a second.');
+                        badge.textContent = 'Browse Files';
+                    }
+                } catch (err) {
+                    alert('Failed to read .docx file: ' + err.message);
+                    badge.textContent = 'Browse Files';
+                }
+                return;
+            }
+
+            // 3. Handle PDF Document (.pdf)
+            if (lowerName.endsWith('.pdf')) {
+                badge.textContent = 'Extracting PDF text...';
+                try {
+                    if (!window.pdfjsLib) {
+                        alert('PDF reader is still loading, please try again in a second.');
+                        badge.textContent = 'Browse Files';
+                        return;
+                    }
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    const pageTexts = [];
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageStr = textContent.items.map(item => item.str).join(' ');
+                        if (pageStr.trim()) pageTexts.push(pageStr.trim());
+                    }
+                    const fullPdfText = pageTexts.join('\n\n');
+                    if (fullPdfText) {
+                        contentInput.value = contentInput.value.trim()
+                            ? `${contentInput.value.trim()}\n\n${fullPdfText}`
+                            : fullPdfText;
+                        updateWordCount();
+                        badge.textContent = `✓ Loaded ${file.name} (${pdf.numPages}p)`;
+                    } else {
+                        alert('Could not extract text from this PDF (it may be a scanned image).');
+                        badge.textContent = 'Browse Files';
+                    }
+                } catch (err) {
+                    alert('Failed to read PDF: ' + err.message);
+                    badge.textContent = 'Browse Files';
+                }
+                return;
+            }
+
+            // 4. Handle Plain Text / Markdown / CSV / JSON (.txt, .md, .csv, .json)
+            badge.textContent = 'Reading file...';
+            try {
+                const text = await file.text();
+                if (text.trim()) {
+                    contentInput.value = contentInput.value.trim()
+                        ? `${contentInput.value.trim()}\n\n${text.trim()}`
+                        : text.trim();
+                    updateWordCount();
+                    badge.textContent = `✓ Loaded ${file.name}`;
+                }
+            } catch (err) {
+                alert('Failed to read file: ' + err.message);
+                badge.textContent = 'Browse Files';
+            }
+        }
+
+        function compressImageFile(file, maxWidth = 720, quality = 0.82) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function clearAttachedPhoto() {
+            attachedImageDataUrl = null;
+            attachedFileName = null;
+            document.getElementById('attached-photo-banner').classList.add('hidden');
+            document.getElementById('upload-badge').textContent = 'Browse Files';
         }
 
         async function initDashboard() {
@@ -323,6 +608,38 @@
             }
         }
 
+        function getOneSentenceSummary(text) {
+            const clean = (text || '').replace(/\s+/g, ' ').trim();
+            if (!clean) return '';
+            const firstSentenceMatch = clean.match(/^.*?[.!?](?:\s|$)/);
+            const sentence = firstSentenceMatch ? firstSentenceMatch[0].trim() : clean;
+            return sentence.length > 110 ? sentence.slice(0, 110) + '...' : sentence;
+        }
+
+        function getItemImageUrl(item) {
+            if (!item || !item.metadata) return null;
+            try {
+                const meta = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+                return meta && meta.image_url ? meta.image_url : null;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function toggleMemoryDetail(itemId) {
+            const detailEl = document.getElementById(`detail-${itemId}`);
+            const iconEl = document.getElementById(`chevron-${itemId}`);
+            if (!detailEl) return;
+            const isHidden = detailEl.classList.contains('hidden');
+            if (isHidden) {
+                detailEl.classList.remove('hidden');
+                if (iconEl) iconEl.textContent = 'expand_less';
+            } else {
+                detailEl.classList.add('hidden');
+                if (iconEl) iconEl.textContent = 'expand_more';
+            }
+        }
+
         function renderKnowledgeList() {
             const container = document.getElementById('knowledge-items-container');
             const countEl = document.getElementById('fact-count');
@@ -336,7 +653,7 @@
                 container.innerHTML = `
                     <div class="glass-card rounded-2xl p-8 text-center text-slate-400 space-y-2">
                         <span class="material-symbols-outlined text-3xl text-slate-600">note_add</span>
-                        <div class="text-xs">No facts in this category yet. Use the form above to add your first item!</div>
+                        <div class="text-xs">No saved memories in this category yet. Add text, documents, or photos above!</div>
                     </div>
                 `;
                 return;
@@ -344,18 +661,32 @@
 
             container.innerHTML = filtered.map(item => {
                 const tagClass = `tag-${item.category}`;
+                const summary = getOneSentenceSummary(item.content);
+                const imgUrl = getItemImageUrl(item);
+                const wordCount = (item.content || '').trim().split(/\s+/).filter(Boolean).length;
+
                 return `
-                    <div class="glass-card rounded-xl p-4 transition-all hover:border-slate-600 flex justify-between items-start gap-4" id="item-${item.id}">
-                        <div class="space-y-1.5 flex-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${tagClass}">${escapeHtml(item.category)}</span>
-                                <h4 class="text-xs font-bold text-white">${escapeHtml(item.title)}</h4>
+                    <div class="glass-card rounded-xl px-4 py-3 transition-all hover:border-slate-600" id="item-${item.id}">
+                        <div class="flex items-center justify-between gap-3 cursor-pointer" onclick="toggleMemoryDetail('${item.id}')">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex-shrink-0 ${tagClass}">${escapeHtml(item.category)}</span>
+                                ${imgUrl ? `<img src="${imgUrl}" class="w-6 h-6 rounded object-cover border border-white/15 flex-shrink-0" alt="" />` : ''}
+                                <h4 class="text-xs font-bold text-white flex-shrink-0">${escapeHtml(item.title)}</h4>
+                                <span class="text-slate-600 flex-shrink-0">•</span>
+                                <p class="text-xs text-slate-400 truncate">${escapeHtml(summary)}</p>
                             </div>
-                            <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(item.content)}</p>
+                            <div class="flex items-center gap-1 flex-shrink-0">
+                                <span class="text-[10px] text-slate-500 font-mono hidden sm:inline mr-1">${wordCount}w</span>
+                                <span id="chevron-${item.id}" class="material-symbols-outlined text-slate-400 text-base">expand_more</span>
+                                <button onclick="event.stopPropagation(); deleteKnowledgeItem('${item.id}')" class="text-slate-500 hover:text-red-400 transition-colors p-1" title="Delete Memory">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                            </div>
                         </div>
-                        <button onclick="deleteKnowledgeItem('${item.id}')" class="text-slate-500 hover:text-red-400 transition-colors p-1" title="Delete Fact">
-                            <span class="material-symbols-outlined text-sm">delete</span>
-                        </button>
+                        <div id="detail-${item.id}" class="hidden mt-3 pt-3 border-t border-white/5 space-y-3">
+                            ${imgUrl ? `<img src="${imgUrl}" alt="${escapeHtml(item.title)}" class="max-h-56 rounded-xl border border-white/10 object-cover" />` : ''}
+                            <p class="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">${escapeHtml(item.content)}</p>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -365,7 +696,7 @@
             activeCategoryFilter = cat;
             document.querySelectorAll('.cat-filter-btn').forEach(btn => {
                 const isMatch = btn.getAttribute('data-cat') === cat;
-                btn.className = `cat-filter-btn px-3 py-1 rounded-lg text-xs font-semibold ${isMatch ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`;
+                btn.className = `cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold ${isMatch ? 'bg-blue-500 text-white' : 'text-slate-400 hover:text-white'}`;
             });
             renderKnowledgeList();
         }
@@ -381,7 +712,7 @@
             const category = categoryInput.value;
 
             if (!title || !content) {
-                alert('Please enter both a Topic/Title and what your Twin should know.');
+                alert('Please enter both a Topic/Title and content (or photo description).');
                 return;
             }
 
@@ -389,11 +720,15 @@
             btn.disabled = true;
             btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">refresh</span><span>Saving...</span>`;
 
+            const metadata = attachedImageDataUrl
+                ? { image_url: attachedImageDataUrl, file_name: attachedFileName || 'photo.jpg' }
+                : null;
+
             try {
                 const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/knowledge`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ category, title, content, priority: 10 })
+                    body: JSON.stringify({ category, title, content, metadata, priority: 10 })
                 });
 
                 if (res.ok) {
@@ -402,15 +737,18 @@
                     renderKnowledgeList();
                     titleInput.value = '';
                     contentInput.value = '';
+                    updateWordCount();
+                    clearAttachedPhoto();
+                    document.getElementById('upload-badge').textContent = 'Browse Files';
                     if (statusEl) {
                         statusEl.classList.remove('opacity-0');
                         setTimeout(() => statusEl.classList.add('opacity-0'), 3000);
                     }
                 } else {
-                    alert('Error saving fact.');
+                    alert('Error saving memory.');
                 }
             } catch (err) {
-                alert('Error saving fact: ' + err.message);
+                alert('Error saving memory: ' + err.message);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span class="material-symbols-outlined text-sm">add_circle</span><span>Save to Twin Memory</span>`;
@@ -418,7 +756,7 @@
         }
 
         async function deleteKnowledgeItem(itemId) {
-            if (!confirm('Remove this fact from your AI Twin?')) return;
+            if (!confirm('Remove this memory from your AI Twin?')) return;
             try {
                 const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/knowledge/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
                 if (res.ok) {
@@ -470,8 +808,17 @@
                 const data = await res.json();
                 document.getElementById(typingId)?.remove();
 
+                let imageHtml = '';
                 let sourcesHtml = '';
                 if (data.ragSources && data.ragSources.length > 0) {
+                    const sourceWithPhoto = data.ragSources.find(s => s.imageUrl);
+                    if (sourceWithPhoto && sourceWithPhoto.imageUrl) {
+                        imageHtml = `
+                            <div class="mt-2.5">
+                                <img src="${sourceWithPhoto.imageUrl}" alt="${escapeHtml(sourceWithPhoto.title)}" class="rounded-xl border border-white/10 max-h-56 w-auto object-cover shadow-md" />
+                            </div>
+                        `;
+                    }
                     sourcesHtml = `<div class="mt-2 text-[10px] text-amber-400/90 font-mono flex items-center gap-1 border-t border-white/5 pt-1.5">
                         <span class="material-symbols-outlined text-[12px]">verified</span> Grounded via: ${data.ragSources.map(s => escapeHtml(s.title)).join(', ')}
                     </div>`;
@@ -481,6 +828,7 @@
                     <div class="flex justify-start">
                         <div class="bg-[#1e1e1e] border border-white/10 text-white px-3.5 py-2.5 rounded-xl rounded-bl-xs max-w-[88%] leading-relaxed">
                             <div>${escapeHtml(data.reply || 'No response generated.')}</div>
+                            ${imageHtml}
                             ${sourcesHtml}
                         </div>
                     </div>
@@ -495,7 +843,7 @@
         function clearSandboxChat() {
             document.getElementById('sandbox-messages').innerHTML = `
                 <div class="bg-[#1a1a1a] p-3.5 rounded-xl border border-white/5 text-slate-200 text-xs leading-relaxed">
-                    👋 <strong>Chat Reset.</strong> Ask a question about your tour dates, VIP perks, or facts on the left to test your Twin!
+                    👋 <strong>Chat Reset.</strong> Ask a question about your uploaded documents, tour dates, or ask to see a photo you uploaded!
                 </div>
             `;
         }

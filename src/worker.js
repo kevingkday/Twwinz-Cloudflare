@@ -278,6 +278,44 @@ async function handleApiRoute(url, request, env) {
     return jsonResponse(styles);
   }
 
+  // 1b. Analyze Uploaded Image for RAG Indexing via Cloudflare Workers AI Vision
+  if (path === '/api/utils/analyze-image' && method === 'POST') {
+    const body = await request.json();
+    const { imageDataUrl, title } = body;
+    if (!imageDataUrl) {
+      return jsonResponse({ error: 'imageDataUrl is required' }, 400);
+    }
+
+    if (env.AI) {
+      try {
+        const base64Data = imageDataUrl.includes(',') ? imageDataUrl.split(',')[1] : imageDataUrl;
+        const binaryStr = atob(base64Data);
+        const bytes = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) {
+          bytes[i] = binaryStr.charCodeAt(i);
+        }
+
+        const aiVision = await env.AI.run('@cf/llava-hf/llava-1.5-7b-hf', {
+          image: Array.from(bytes),
+          prompt: `Describe what is in this photo${title ? ` titled "${title}"` : ''} in 2 concise, factual sentences so fans asking about it in chat can get an accurate description and see the photo.`,
+          max_tokens: 120
+        });
+
+        if (aiVision && aiVision.description) {
+          return jsonResponse({ description: aiVision.description.trim() });
+        }
+      } catch (visionErr) {
+        console.warn('[Workers AI Vision Warning]', visionErr.message);
+      }
+    }
+
+    return jsonResponse({
+      description: title
+        ? `Official photo: ${title}. Ask to see this picture in chat!`
+        : 'Official uploaded photo. Add a short caption describing what is in this picture so your AI Twin knows when to share it with fans.'
+    });
+  }
+
   // 2. Creator Signup & Automated GHL Provisioning
   if (path === '/api/creators/signup' && method === 'POST') {
     const body = await request.json();

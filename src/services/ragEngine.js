@@ -16,7 +16,7 @@ export class RAGEngine {
    * Cloudflare Workers AI, OpenAI, or local deterministic fallback.
    */
   async generateEmbedding(text) {
-    const cleanText = (text || '').trim();
+    const cleanText = (text || '').trim().slice(0, 4000);
     if (!cleanText) return null;
 
     // 1. Cloudflare Workers AI Native Embedding
@@ -181,13 +181,24 @@ export class RAGEngine {
 
       // Keyword FTS match bonus
       const ftsScore = ftsMatchedIds.has(item.id) ? 1.0 : 0.0;
+
+      // Extract image_url from metadata if present
+      let imageUrl = null;
+      if (item.metadata) {
+        try {
+          const metaObj = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+          if (metaObj && metaObj.image_url) imageUrl = metaObj.image_url;
+        } catch (_) {}
+      }
       
       // Category heuristics with word boundaries
       const isScheduleQuery = /\b(tour|concert|gig|dates?|convention|galaxycon|comic\s*con|appearances?|booths?|venues?)\b/i.test(cleanQuery);
       const isOfferQuery = /\b(merch|cameo|buy|discounts?|promos?|codes?|posters?|autographs?|prices?|costs?|shops?|shoutouts?)\b/i.test(cleanQuery);
+      const isPhotoQuery = /\b(pic|pics|picture|pictures|photo|photos|image|images|show\s+me|see|look\s+like)\b/i.test(cleanQuery);
       let categoryBonus = 0;
       if (isScheduleQuery && item.category === 'schedule') categoryBonus = 0.25;
       if (isOfferQuery && item.category === 'offer') categoryBonus = 0.25;
+      if (isPhotoQuery && (item.category === 'photo' || imageUrl)) categoryBonus = 0.35;
 
       // Combined Hybrid Score: prioritize semantic vector similarity and exact keyword matches
       const priorityBonus = (item.priority || 0) * 0.01;
@@ -195,6 +206,7 @@ export class RAGEngine {
 
       return {
         ...item,
+        imageUrl,
         vectorScore,
         ftsScore,
         combinedScore
@@ -221,10 +233,15 @@ export class RAGEngine {
       if (item.metadata) {
         try {
           const metaObj = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
-          metaStr = ` | Details: ${JSON.stringify(metaObj)}`;
+          const cleanMeta = { ...metaObj };
+          delete cleanMeta.image_url; // Exclude base64 data from prompt tokens
+          if (Object.keys(cleanMeta).length > 0) {
+            metaStr = ` | Details: ${JSON.stringify(cleanMeta)}`;
+          }
         } catch (_) {}
       }
-      return `[Fact #${idx + 1}] (${item.category.toUpperCase()}) ${item.title}: ${item.content}${metaStr}`;
+      const photoNote = item.imageUrl ? ` [Attached Photo "${item.title}" will be shown automatically in chat]` : '';
+      return `[Fact #${idx + 1}] (${item.category.toUpperCase()}) ${item.title}: ${item.content.slice(0, 2500)}${photoNote}${metaStr}`;
     }).join('\n\n');
   }
 
@@ -286,7 +303,7 @@ ${formattedContext}
           const reply = data.choices[0]?.message?.content?.trim();
           return {
             reply,
-            ragSources: knowledgeItems.map(k => ({ id: k.id, title: k.title, category: k.category, score: k.combinedScore })),
+            ragSources: this.formatSources(knowledgeItems, query),
             model: 'gpt-4o-mini'
           };
         }
@@ -309,7 +326,7 @@ ${formattedContext}
         if (aiResponse && aiResponse.response) {
           return {
             reply: aiResponse.response.trim(),
-            ragSources: knowledgeItems.map(k => ({ id: k.id, title: k.title, category: k.category, score: k.combinedScore })),
+            ragSources: this.formatSources(knowledgeItems, query),
             model: 'llama-3.1-8b-instruct'
           };
         }
@@ -335,8 +352,19 @@ ${formattedContext}
 
     return {
       reply: fallbackReply,
-      ragSources: knowledgeItems.map(k => ({ id: k.id, title: k.title, category: k.category, score: k.combinedScore })),
+      ragSources: this.formatSources(knowledgeItems, query),
       model: 'twwinz-grounded-fallback'
     };
+  }
+
+  formatSources(knowledgeItems, query = '') {
+    const isPhotoQuery = /\b(pic|pics|picture|pictures|photo|photos|image|images|show\s+me|see|look\s+like)\b/i.test(query);
+    return knowledgeItems.map((k, idx) => ({
+      id: k.id,
+      title: k.title,
+      category: k.category,
+      score: k.combinedScore,
+      imageUrl: (k.imageUrl && (idx === 0 || isPhotoQuery || k.combinedScore >= 0.45)) ? k.imageUrl : null
+    }));
   }
 }
