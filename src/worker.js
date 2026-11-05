@@ -2,6 +2,14 @@ import { scrapeWebsiteStyles } from './services/styleScraper.js';
 import { GHLService } from './services/ghlService.js';
 import { RAGEngine } from './services/ragEngine.js';
 
+const DEMO_CREATOR_ID = 'clb_jaxson_reed';
+const DEMO_CREATOR_SLUG = 'jaxson-reed';
+const ALLOWED_REDIRECT_PATHS = new Set(['/', '/index.html', '/onboard.html', '/dashboard.html', '/settings.html']);
+const PUBLIC_CREATOR_FIELDS = [
+  'id', 'name', 'slug', 'headline', 'avatar_url', 'brand_colors', 'brand_fonts',
+  'welcome_message', 'website_type', 'is_active'
+];
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -83,7 +91,7 @@ async function handleApiRoute(url, request, env) {
       return jsonResponse({ error: 'GOOGLE_CLIENT_ID is not configured on this Worker' }, 500);
     }
 
-    const redirectAfter = url.searchParams.get('redirect') || '';
+    const redirectAfter = sanitizeInternalPath(url.searchParams.get('redirect') || '');
     const nonce = crypto.randomUUID();
     const statePayload = btoa(JSON.stringify({ nonce, redirect: redirectAfter }));
     const redirectUri = env.GOOGLE_REDIRECT_URI || `${url.origin}/api/auth/google/callback`;
@@ -97,14 +105,11 @@ async function handleApiRoute(url, request, env) {
     googleAuthUrl.searchParams.set('prompt', 'select_account');
     googleAuthUrl.searchParams.set('state', statePayload);
 
-    const isSecure = url.protocol === 'https:';
-    const cookieFlags = `Path=/; HttpOnly; SameSite=Lax; Max-Age=600${isSecure ? '; Secure' : ''}`;
-
     return new Response(null, {
       status: 302,
       headers: {
         'Location': googleAuthUrl.toString(),
-        'Set-Cookie': `twwinz_oauth_state=${ nonce }; ${ cookieFlags }`
+        'Set-Cookie': serializeCookie('twwinz_oauth_state', nonce, { maxAge: 600, secure: requestIsSecure(url) })
       }
     });
   }
@@ -114,24 +119,22 @@ async function handleApiRoute(url, request, env) {
     const stateParam = url.searchParams.get('state');
     const oauthError = url.searchParams.get('error');
 
-    if (oauthError || !code) {
-      return Response.redirect(`${url.origin}/onboard.html?auth_error=${encodeURIComponent(oauthError || 'missing_code')}`, 302);
+    if (oauthError) {
+      return Response.redirect(`${url.origin}/onboard.html?auth_error=${encodeURIComponent(oauthError)}`, 302);
+    }
+
+    const stateCheck = verifyOAuthState(request, stateParam);
+    if (!stateCheck.ok) {
+      return Response.redirect(`${url.origin}/onboard.html?auth_error=invalid_state`, 302);
+    }
+    const requestedRedirect = stateCheck.redirect;
+
+    if (!code) {
+      return Response.redirect(`${url.origin}/onboard.html?auth_error=missing_code`, 302);
     }
 
     if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
       return jsonResponse({ error: 'Google OAuth credentials are not configured on this Worker' }, 500);
-    }
-
-    let requestedRedirect = '';
-    if (stateParam) {
-      try {
-        const parsedState = JSON.parse(atob(stateParam));
-        const cookies = parseCookies(request.headers.get('Cookie') || '');
-        if (cookies.twwinz_oauth_state && parsedState.nonce !== cookies.twwinz_oauth_state) {
-          return Response.redirect(`${url.origin}/onboard.html?auth_error=invalid_state`, 302);
-        }
-        requestedRedirect = parsedState.redirect || '';
-      } catch (_) {}
     }
 
     const redirectUri = env.GOOGLE_REDIRECT_URI || `${url.origin}/api/auth/google/callback`;
@@ -198,9 +201,9 @@ async function handleApiRoute(url, request, env) {
       targetPath = `/dashboard.html?id=${encodeURIComponent(existingCreator.id)}`;
     }
 
-    const isSecure = url.protocol === 'https:';
-    const sessionCookie = `twwinz_session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${30 * 24 * 60 * 60}${isSecure ? '; Secure' : ''}`;
-    const clearStateCookie = `twwinz_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${isSecure ? '; Secure' : ''}`;
+    const secure = requestIsSecure(url);
+    const sessionCookie = serializeCookie('twwinz_session', sessionToken, { maxAge: 30 * 24 * 60 * 60, secure });
+    const clearStateCookie = serializeCookie('twwinz_oauth_state', '', { maxAge: 0, secure });
 
     const headers = new Headers();
     headers.set('Location', `${url.origin}${targetPath}`);
@@ -235,7 +238,7 @@ async function handleApiRoute(url, request, env) {
         name: session.name,
         picture: session.picture
       },
-      creator: creator || null
+      creator: creator ? toOwnerCreator(creator, { includeApiKey: false }) : null
     });
   }
 
@@ -246,8 +249,7 @@ async function handleApiRoute(url, request, env) {
       await db.prepare('DELETE FROM auth_sessions WHERE token = ?').bind(cookies.twwinz_session).run();
     }
 
-    const isSecure = url.protocol === 'https:';
-    const clearCookie = `twwinz_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${isSecure ? '; Secure' : ''}`;
+    const clearCookie = serializeCookie('twwinz_session', '', { maxAge: 0, secure: requestIsSecure(url) });
 
     if (method === 'GET') {
       return new Response(null, {
@@ -268,21 +270,32 @@ async function handleApiRoute(url, request, env) {
     });
   }
 
-  // 1. Scrape Website Styles (Colors, Fonts, Meta)
+  // 1. Scrape Website Styles (Colors, Fonts, Meta) — signed-in creators only
   if (path === '/api/utils/scrape-styles' && method === 'POST') {
+    const sessionGate = await requireSession(request, db);
+    if (sessionGate.response) return sessionGate.response;
+    const scrapeLimit = await hitRateLimit(db, `scrape:${sessionGate.session.email.toLowerCase()}`, 8, 600);
+    if (!scrapeLimit.allowed) return tooMany(scrapeLimit.retryAfter);
+
     const body = await request.json();
-    if (!body.url) {
-      return jsonResponse({ error: 'URL is required' }, 400);
+    const safeUrl = assertPublicHttpUrl(body.url);
+    if (!safeUrl) {
+      return jsonResponse({ error: 'A public http(s) URL is required' }, 400);
     }
-    const styles = await scrapeWebsiteStyles(body.url);
+    const styles = await scrapeWebsiteStyles(safeUrl);
     return jsonResponse(styles);
   }
 
   // 1b. Analyze Uploaded Image for RAG Indexing via Cloudflare Workers AI Vision
   if (path === '/api/utils/analyze-image' && method === 'POST') {
+    const sessionGate = await requireSession(request, db);
+    if (sessionGate.response) return sessionGate.response;
+    const visionLimit = await hitRateLimit(db, `vision:${sessionGate.session.email.toLowerCase()}`, 20, 600);
+    if (!visionLimit.allowed) return tooMany(visionLimit.retryAfter);
+
     const body = await request.json();
     const { imageDataUrl, title } = body;
-    if (!imageDataUrl) {
+    if (!imageDataUrl || String(imageDataUrl).length > 2_000_000) {
       return jsonResponse({ error: 'imageDataUrl is required' }, 400);
     }
 
@@ -316,10 +329,20 @@ async function handleApiRoute(url, request, env) {
     });
   }
 
-  // 2. Creator Signup & Automated GHL Provisioning (Enforces 1 Digital Twin per account/email)
+  // 2. Creator Signup & Automated GHL Provisioning (Enforces 1 Digital Twin per signed-in account)
   if (path === '/api/creators/signup' && method === 'POST') {
+    const sessionGate = await requireSession(request, db);
+    if (sessionGate.response) return sessionGate.response;
+    const session = sessionGate.session;
+    const signupLimit = await hitRateLimit(db, `signup:${session.email.toLowerCase()}`, 5, 3600);
+    if (!signupLimit.allowed) return tooMany(signupLimit.retryAfter);
+
     const body = await request.json();
-    const { name, email, websiteType, websiteUrl, personaPrompt, avatarUrl, headline } = body;
+    const { name, websiteType, websiteUrl, personaPrompt, avatarUrl, headline } = body;
+    if (body.email && String(body.email).toLowerCase() !== String(session.email).toLowerCase()) {
+      return jsonResponse({ error: 'Email must match the signed-in Google account' }, 403);
+    }
+    const email = session.email;
 
     if (!name || !email) {
       return jsonResponse({ error: 'Name and email are required' }, 400);
@@ -331,6 +354,9 @@ async function handleApiRoute(url, request, env) {
       .first();
 
     if (existingCreator) {
+      if (isDemoCreator(existingCreator.id) || isDemoCreator(existingCreator.slug)) {
+        return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+      }
       await db.prepare(`
         UPDATE creators
         SET name = ?, headline = COALESCE(?, headline), avatar_url = COALESCE(?, avatar_url), updated_at = CURRENT_TIMESTAMP
@@ -466,30 +492,35 @@ async function handleApiRoute(url, request, env) {
   }
 
   // 3. List or Get Creators
+  // The directory is private. Slug/id lookups return a public widget profile unless the caller owns the creator.
   if (path === '/api/creators' && method === 'GET') {
     const slug = url.searchParams.get('slug');
     const id = url.searchParams.get('id');
 
-    if (slug) {
-      const creator = await db.prepare('SELECT * FROM creators WHERE slug = ?').bind(slug).first();
+    if (slug || id) {
+      const creator = await loadCreator(db, slug || id);
       if (!creator) return jsonResponse({ error: 'Creator not found' }, 404);
-      return jsonResponse(creator);
+      const session = await readSession(request, db);
+      if (sessionOwnsCreator(session, creator)) return jsonResponse(toOwnerCreator(creator));
+      if (!creator.is_active) return jsonResponse({ error: 'Creator not found' }, 404);
+      return jsonResponse(toPublicCreator(creator));
     }
 
-    if (id) {
-      const creator = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(id).first();
-      if (!creator) return jsonResponse({ error: 'Creator not found' }, 404);
-      return jsonResponse(creator);
-    }
-
-    const { results } = await db.prepare('SELECT id, name, slug, headline, avatar_url, website_type, website_url, created_at FROM creators WHERE is_active = 1 ORDER BY created_at DESC').all();
-    return jsonResponse(results);
+    const sessionGate = await requireSession(request, db);
+    if (sessionGate.response) return sessionGate.response;
+    const own = await findCreatorForSession(db, sessionGate.session);
+    return jsonResponse(own ? [toOwnerCreator(own)] : []);
   }
 
   // 4. Update Creator Profile / Persona
   const creatorMatch = path.match(/^\/api\/creators\/([^/]+)$/);
   if (creatorMatch && method === 'PUT') {
     const creatorId = creatorMatch[1];
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    if (isDemoCreator(owned.creator.id) || isDemoCreator(owned.creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
     const body = await request.json();
 
     const updates = [];
@@ -508,12 +539,12 @@ async function handleApiRoute(url, request, env) {
 
     if (updates.length > 0) {
       updates.push('updated_at = CURRENT_TIMESTAMP');
-      values.push(creatorId);
+      values.push(owned.creator.id);
       await db.prepare(`UPDATE creators SET ${updates.join(', ')} WHERE id = ?`).bind(...values).run();
     }
 
-    const updated = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(creatorId).first();
-    return jsonResponse(updated);
+    const updated = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(owned.creator.id).first();
+    return jsonResponse(toOwnerCreator(updated));
   }
 
   // 5. Get Knowledge Items (RAG Data)
@@ -521,22 +552,24 @@ async function handleApiRoute(url, request, env) {
   if (knowledgeListMatch && method === 'GET') {
     const creatorId = knowledgeListMatch[1];
     const category = url.searchParams.get('category');
-
-    let sql = 'SELECT * FROM knowledge_items WHERE creator_id = ? AND is_active = 1';
-    const params = [creatorId];
-    if (category) {
-      sql += ' AND category = ?';
-      params.push(category);
+    if (isDemoCreator(creatorId)) {
+      const results = await queryKnowledge(db, DEMO_CREATOR_ID, category);
+      return jsonResponse(results);
     }
-    sql += ' ORDER BY priority DESC, created_at DESC';
-
-    const { results } = await db.prepare(sql).bind(...params).all();
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    const results = await queryKnowledge(db, owned.creator.id, category);
     return jsonResponse(results);
   }
 
   // 6. Add Knowledge Item (with automatic Vector Embedding & Vectorize storage)
   if (knowledgeListMatch && method === 'POST') {
     const creatorId = knowledgeListMatch[1];
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    if (isDemoCreator(owned.creator.id) || isDemoCreator(owned.creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
     const body = await request.json();
     const { category, title, content, metadata, priority } = body;
 
@@ -545,6 +578,7 @@ async function handleApiRoute(url, request, env) {
     }
 
     const itemId = `k_${category.substring(0, 3)}_${Date.now()}`;
+    const storedCreatorId = owned.creator.id;
     const metaStr = metadata ? (typeof metadata === 'string' ? metadata : JSON.stringify(metadata)) : null;
 
     // Generate 768-dimensional vector embedding
@@ -556,13 +590,13 @@ async function handleApiRoute(url, request, env) {
     await db.prepare(`
       INSERT INTO knowledge_items (id, creator_id, category, title, content, metadata, embedding, priority, is_active)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
-    `).bind(itemId, creatorId, category, title, content, metaStr, embeddingStr, priority || 0).run();
+    `).bind(itemId, storedCreatorId, category, title, content, metaStr, embeddingStr, priority || 0).run();
 
     // 2. Sync to D1 FTS5 full-text search table
     await db.prepare(`
       INSERT INTO knowledge_fts (id, creator_id, title, content)
       VALUES (?, ?, ?, ?)
-    `).bind(itemId, creatorId, title, content).run();
+    `).bind(itemId, storedCreatorId, title, content).run();
 
     // 3. Sync to Cloudflare Vectorize index
     if (env.VECTORIZE && vector) {
@@ -570,7 +604,7 @@ async function handleApiRoute(url, request, env) {
         await env.VECTORIZE.insert([{
           id: itemId,
           values: vector,
-          metadata: { creatorId, category, title }
+          metadata: { creatorId: storedCreatorId, category, title }
         }]);
       } catch (vecErr) {
         console.warn('[Vectorize Insert Warning]', vecErr.message);
@@ -586,8 +620,13 @@ async function handleApiRoute(url, request, env) {
   if (knowledgeDeleteMatch && method === 'DELETE') {
     const creatorId = knowledgeDeleteMatch[1];
     const itemId = knowledgeDeleteMatch[2];
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    if (isDemoCreator(owned.creator.id) || isDemoCreator(owned.creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
 
-    await db.prepare('DELETE FROM knowledge_items WHERE id = ? AND creator_id = ?').bind(itemId, creatorId).run();
+    await db.prepare('DELETE FROM knowledge_items WHERE id = ? AND creator_id = ?').bind(itemId, owned.creator.id).run();
     await db.prepare('DELETE FROM knowledge_fts WHERE id = ?').bind(itemId).run();
 
     if (env.VECTORIZE) {
@@ -603,8 +642,13 @@ async function handleApiRoute(url, request, env) {
   const embedMatch = path.match(/^\/api\/creators\/([^/]+)\/embed$/);
   if (embedMatch && method === 'GET') {
     const creatorId = embedMatch[1];
-    const creator = await db.prepare('SELECT * FROM creators WHERE id = ? OR slug = ?').bind(creatorId, creatorId).first();
+    const creator = await loadCreator(db, creatorId);
     if (!creator) return jsonResponse({ error: 'Creator not found' }, 404);
+    const demoRead = isDemoCreator(creator.id) || isDemoCreator(creator.slug);
+    if (!demoRead) {
+      const owned = await requireOwnedCreator(request, db, creator.id);
+      if (owned.response) return owned.response;
+    }
 
     const embedCode = ghlService.generateEmbedSnippet(creator, url.origin);
     const ghlWidgetId = creator.ghl_widget_id || `wgt_${creator.ghl_location_id}`;
@@ -622,20 +666,43 @@ async function handleApiRoute(url, request, env) {
 
   // 9. Interactive Chat Preview (Test Grounded RAG in Sandbox)
   if (path === '/api/chat/preview' && method === 'POST') {
-    const body = await request.json();
-    const { creatorId, query, chatHistory } = body;
+    const body = await request.json().catch(() => null);
+    const creatorId = body?.creatorId;
+    const query = typeof body?.query === 'string' ? body.query.trim() : '';
+    const chatHistory = clampChatHistory(body?.chatHistory);
 
     if (!creatorId || !query) {
       return jsonResponse({ error: 'creatorId and query are required' }, 400);
     }
+    if (query.length > 500) {
+      return jsonResponse({ error: 'Query is too long' }, 400);
+    }
 
-    const creator = await db.prepare('SELECT * FROM creators WHERE id = ? OR slug = ?').bind(creatorId, creatorId).first();
-    if (!creator) return jsonResponse({ error: 'Creator not found' }, 404);
+    const creator = await loadCreator(db, creatorId);
+    if (!creator || !creator.is_active) return jsonResponse({ error: 'Creator not found' }, 404);
+
+    const session = await readSession(request, db);
+    const owns = sessionOwnsCreator(session, creator);
+    const ip = clientIp(request);
+    const windowSec = 600;
+    const limits = owns
+      ? [
+          [`chat-owner:${session.email.toLowerCase()}:${creator.id}`, 60]
+        ]
+      : [
+          [`chat:${ip}:${creator.id}`, 20],
+          [`chat-ip:${ip}`, 40],
+          [`chat-creator:${creator.id}`, 200]
+        ];
+    for (const [bucket, limit] of limits) {
+      const result = await hitRateLimit(db, bucket, limit, windowSec);
+      if (!result.allowed) return tooMany(result.retryAfter);
+    }
 
     const result = await ragEngine.generateResponse({
       creator,
       query,
-      chatHistory: chatHistory || []
+      chatHistory
     });
 
     return jsonResponse(result);
@@ -643,6 +710,15 @@ async function handleApiRoute(url, request, env) {
 
   // 10. GoHighLevel Inbound Message Webhook (Choice A: Cloudflare RAG Brain -> GHL Chat Widget)
   if (path === '/api/chat/ghl-webhook' && method === 'POST') {
+    const webhookAuth = webhookSecretOk(request, url, env);
+    if (webhookAuth.configured && !webhookAuth.ok) {
+      return jsonResponse({ error: 'Unauthorized webhook' }, 401);
+    }
+    const ip = clientIp(request);
+    const webhookLimit = webhookAuth.ok ? 400 : 40;
+    const ipLimit = await hitRateLimit(db, `ghl:${ip}`, webhookLimit, 600);
+    if (!ipLimit.allowed) return tooMany(ipLimit.retryAfter);
+
     const body = await request.json();
 
     // Support both GHL Workflow Webhook payloads (nested location.id & message.body) and flat payloads
@@ -663,7 +739,8 @@ async function handleApiRoute(url, request, env) {
     if (creatorIdParam) {
       creator = await db.prepare('SELECT * FROM creators WHERE id = ? OR slug = ?').bind(creatorIdParam, creatorIdParam).first();
       // Auto-link the real GHL location ID on first webhook if creator still has a placeholder loc_ghl_ ID
-      if (creator && locationId && creator.ghl_location_id !== locationId) {
+      const placeholderLocation = !creator?.ghl_location_id || String(creator.ghl_location_id).startsWith('loc_ghl_');
+      if (creator && locationId && creator.ghl_location_id !== locationId && placeholderLocation && webhookAuth.ok) {
         await db.prepare('UPDATE creators SET ghl_location_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
           .bind(locationId, creator.id)
           .run();
@@ -748,10 +825,16 @@ async function handleApiRoute(url, request, env) {
   return jsonResponse({ error: `Not Found: ${method} ${path}` }, 404);
 }
 
-function jsonResponse(data, status = 200) {
+function jsonResponse(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data, null, 2), {
     status,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json', ...extraHeaders }
+  });
+}
+
+function tooMany(retryAfter) {
+  return jsonResponse({ error: 'Too many requests' }, 429, {
+    'Retry-After': String(Math.max(1, Math.ceil(retryAfter || 60)))
   });
 }
 
@@ -804,4 +887,237 @@ async function getAuthenticatedSession(request, db) {
   }
 
   return session;
+}
+
+export function sanitizeInternalPath(value) {
+  if (typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//') || trimmed.includes('\\') || trimmed.includes('://')) {
+    return '';
+  }
+  let parsed;
+  try {
+    parsed = new URL(trimmed, 'https://www.twwinz.com');
+  } catch (_) {
+    return '';
+  }
+  if (parsed.origin !== 'https://www.twwinz.com') return '';
+  if (!ALLOWED_REDIRECT_PATHS.has(parsed.pathname)) return '';
+  return parsed.pathname + parsed.search;
+}
+
+export function requestIsSecure(url) {
+  return url.protocol === 'https:';
+}
+
+export function serializeCookie(name, value, { maxAge, secure }) {
+  const parts = [
+    `${name}=${encodeURIComponent(value)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    `Max-Age=${maxAge}`
+  ];
+  if (secure) parts.push('Secure');
+  return parts.join('; ');
+}
+
+function verifyOAuthState(request, stateParam) {
+  if (!stateParam || stateParam.length > 2000) return { ok: false };
+  const cookies = parseCookies(request.headers.get('Cookie') || '');
+  if (!cookies.twwinz_oauth_state) return { ok: false };
+  try {
+    const parsed = JSON.parse(atob(stateParam));
+    if (!parsed || typeof parsed.nonce !== 'string' || !safeEqual(parsed.nonce, cookies.twwinz_oauth_state)) {
+      return { ok: false };
+    }
+    return { ok: true, redirect: sanitizeInternalPath(parsed.redirect || '') };
+  } catch (_) {
+    return { ok: false };
+  }
+}
+
+function safeEqual(a, b) {
+  const enc = new TextEncoder();
+  const left = enc.encode(String(a ?? ''));
+  const right = enc.encode(String(b ?? ''));
+  const len = Math.max(left.length, right.length);
+  let diff = left.length === right.length ? 0 : 1;
+  for (let i = 0; i < len; i++) {
+    diff |= (left[i] || 0) ^ (right[i] || 0);
+  }
+  return diff === 0;
+}
+
+function isDemoCreator(idOrSlug) {
+  if (!idOrSlug) return false;
+  const value = String(idOrSlug);
+  return value === DEMO_CREATOR_ID || value === DEMO_CREATOR_SLUG;
+}
+
+function sessionOwnsCreator(session, creator) {
+  if (!session || !creator) return false;
+  if (session.creator_id && session.creator_id === creator.id) return true;
+  if (session.email && creator.email && String(session.email).toLowerCase() === String(creator.email).toLowerCase()) {
+    return true;
+  }
+  return false;
+}
+
+async function loadCreator(db, idOrSlug) {
+  return db.prepare('SELECT * FROM creators WHERE id = ? OR slug = ?').bind(idOrSlug, idOrSlug).first();
+}
+
+async function findCreatorForSession(db, session) {
+  if (!session) return null;
+  if (session.creator_id) {
+    const byId = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(session.creator_id).first();
+    if (byId) return byId;
+  }
+  if (session.email) {
+    return db.prepare('SELECT * FROM creators WHERE LOWER(email) = LOWER(?) ORDER BY created_at DESC LIMIT 1')
+      .bind(session.email)
+      .first();
+  }
+  return null;
+}
+
+async function readSession(request, db) {
+  await ensureAuthTables(db);
+  return getAuthenticatedSession(request, db);
+}
+
+async function requireSession(request, db) {
+  const session = await readSession(request, db);
+  if (!session) return { response: jsonResponse({ error: 'Authentication required' }, 401) };
+  return { session };
+}
+
+async function requireOwnedCreator(request, db, idOrSlug) {
+  const creator = await loadCreator(db, idOrSlug);
+  if (!creator) return { response: jsonResponse({ error: 'Creator not found' }, 404) };
+  const sessionGate = await requireSession(request, db);
+  if (sessionGate.response) return sessionGate;
+  if (!sessionOwnsCreator(sessionGate.session, creator)) {
+    return { response: jsonResponse({ error: 'Forbidden' }, 403) };
+  }
+  return { session: sessionGate.session, creator };
+}
+
+function toPublicCreator(creator) {
+  const pub = {};
+  for (const field of PUBLIC_CREATOR_FIELDS) pub[field] = creator[field];
+  return pub;
+}
+
+function toOwnerCreator(creator, { includeApiKey = true } = {}) {
+  const copy = { ...creator };
+  if (!includeApiKey) delete copy.ghl_api_key;
+  return copy;
+}
+
+async function queryKnowledge(db, creatorId, category) {
+  let sql = 'SELECT * FROM knowledge_items WHERE creator_id = ? AND is_active = 1';
+  const params = [creatorId];
+  if (category) {
+    sql += ' AND category = ?';
+    params.push(category);
+  }
+  sql += ' ORDER BY priority DESC, created_at DESC';
+  const { results } = await db.prepare(sql).bind(...params).all();
+  return results || [];
+}
+
+function clientIp(request) {
+  return request.headers.get('CF-Connecting-IP') || 'unknown';
+}
+
+async function ensureRateTable(db) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS api_rate_limits (
+      bucket TEXT PRIMARY KEY,
+      window_start INTEGER NOT NULL,
+      hits INTEGER NOT NULL
+    )
+  `).run();
+}
+
+async function hitRateLimit(db, bucket, limit, windowSec) {
+  await ensureRateTable(db);
+  const now = Math.floor(Date.now() / 1000);
+  const row = await db.prepare('SELECT window_start, hits FROM api_rate_limits WHERE bucket = ?').bind(bucket).first();
+  if (!row || (now - Number(row.window_start)) >= windowSec) {
+    await db.prepare('INSERT OR REPLACE INTO api_rate_limits (bucket, window_start, hits) VALUES (?, ?, 1)')
+      .bind(bucket, now)
+      .run();
+    return { allowed: true };
+  }
+  if (Number(row.hits) >= limit) {
+    return { allowed: false, retryAfter: windowSec - (now - Number(row.window_start)) };
+  }
+  await db.prepare('UPDATE api_rate_limits SET hits = ? WHERE bucket = ?')
+    .bind(Number(row.hits) + 1, bucket)
+    .run();
+  return { allowed: true };
+}
+
+function clampChatHistory(history) {
+  if (!Array.isArray(history)) return [];
+  return history.slice(-6).map((msg) => ({
+    sender: msg?.sender === 'twin' ? 'twin' : 'fan',
+    message: String(msg?.message || '').slice(0, 1000)
+  }));
+}
+
+function assertPublicHttpUrl(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+  let target = raw.trim();
+  if (!target) return null;
+  if (!/^https?:\/\//i.test(target)) target = `https://${target}`;
+  let parsed;
+  try {
+    parsed = new URL(target);
+  } catch (_) {
+    return null;
+  }
+  if (parsed.username || parsed.password) return null;
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+  const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  if (
+    host === 'localhost' ||
+    host.endsWith('.localhost') ||
+    host.endsWith('.local') ||
+    host.endsWith('.internal') ||
+    isBlockedHost(host)
+  ) {
+    return null;
+  }
+  return parsed.href;
+}
+
+function isBlockedHost(host) {
+  if (host === '0.0.0.0' || host === '::1' || host === '::') return true;
+  const match = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!match) {
+    return host.startsWith('fc') || host.startsWith('fd') || host.startsWith('fe80');
+  }
+  const octets = match.slice(1).map(Number);
+  if (octets.some((n) => n > 255)) return true;
+  const [a, b] = octets;
+  if (a === 10 || a === 127 || a === 0) return true;
+  if (a === 169 && b === 254) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  if (a === 192 && b === 168) return true;
+  if (a === 100 && b >= 64 && b <= 127) return true;
+  return false;
+}
+
+function webhookSecretOk(request, url, env) {
+  const expected = env.GHL_WEBHOOK_SECRET;
+  if (!expected) return { configured: false, ok: false };
+  const header = request.headers.get('X-Twwinz-Webhook-Token') || '';
+  const auth = request.headers.get('Authorization') || '';
+  const bearer = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+  const token = url.searchParams.get('token') || header || bearer;
+  return { configured: true, ok: !!token && safeEqual(token, expected) };
 }
