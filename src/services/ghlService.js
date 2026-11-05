@@ -227,7 +227,7 @@ export class GHLService {
   /**
    * Send AI Twin's response back to the fan via GHL Conversations API.
    */
-  async sendReplyToConversation({ locationApiKey, locationId, conversationId, contactId, replyText }) {
+  async sendReplyToConversation({ locationApiKey, locationId, conversationId, contactId, replyText, messageType }) {
     const token = locationApiKey || this.agencyKey;
 
     if (!token) {
@@ -239,24 +239,30 @@ export class GHLService {
     }
 
     try {
+      const msgPayload = {
+        type: messageType || 'Live_Chat',
+        contactId: contactId,
+        message: replyText
+      };
+      if (conversationId) {
+        msgPayload.conversationId = conversationId;
+      }
+
       const res = await fetch(`${GHL_API_BASE}/conversations/messages`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Version': GHL_API_VERSION,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          type: 'Live_Chat',
-          conversationId: conversationId,
-          contactId: contactId,
-          message: replyText
-        })
+        body: JSON.stringify(msgPayload)
       });
 
       const data = await res.json();
       return {
         success: res.ok,
+        status: res.status,
         data
       };
     } catch (err) {

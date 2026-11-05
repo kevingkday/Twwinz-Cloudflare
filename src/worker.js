@@ -500,6 +500,9 @@ async function handleApiRoute(url, request, env) {
     if (body.persona_prompt) { updates.push('persona_prompt = ?'); values.push(body.persona_prompt); }
     if (body.welcome_message) { updates.push('welcome_message = ?'); values.push(body.welcome_message); }
     if (body.avatar_url) { updates.push('avatar_url = ?'); values.push(body.avatar_url); }
+    if (body.ghl_location_id !== undefined) { updates.push('ghl_location_id = ?'); values.push(body.ghl_location_id); }
+    if (body.ghl_widget_id !== undefined) { updates.push('ghl_widget_id = ?'); values.push(body.ghl_widget_id); }
+    if (body.ghl_api_key !== undefined) { updates.push('ghl_api_key = ?'); values.push(body.ghl_api_key); }
     if (body.brand_colors) { updates.push('brand_colors = ?'); values.push(JSON.stringify(body.brand_colors)); }
     if (body.brand_fonts) { updates.push('brand_fonts = ?'); values.push(JSON.stringify(body.brand_fonts)); }
 
@@ -638,54 +641,97 @@ async function handleApiRoute(url, request, env) {
     return jsonResponse(result);
   }
 
-  // 10. GoHighLevel Inbound Message Webhook
+  // 10. GoHighLevel Inbound Message Webhook (Choice A: Cloudflare RAG Brain -> GHL Chat Widget)
   if (path === '/api/chat/ghl-webhook' && method === 'POST') {
     const body = await request.json();
-    
-    // GHL inbound webhook fields: locationId, conversationId, contactId, body (message)
-    const locationId = body.locationId || body.location_id;
-    const conversationId = body.conversationId || body.conversation_id;
-    const contactId = body.contactId || body.contact_id;
-    const fanMessage = body.body || body.message || body.text;
 
-    if (!locationId || !fanMessage) {
-      return jsonResponse({ error: 'Missing locationId or message' }, 400);
+    // Support both GHL Workflow Webhook payloads (nested location.id & message.body) and flat payloads
+    const creatorIdParam = url.searchParams.get('creatorId') || body.creatorId || body.customData?.creatorId || null;
+    const locationId = body.locationId || body.location_id || body.location?.id || body.customData?.locationId || null;
+    const conversationId = body.conversationId || body.conversation_id || body.message?.conversationId || body.customData?.conversationId || null;
+    const contactId = body.contactId || body.contact_id || body.contact?.id || body.id || null;
+    const fanMessage = typeof body.message === 'object' && body.message !== null
+      ? (body.message.body || body.message.text)
+      : (body.body || body.message || body.text || body.customData?.message);
+
+    if (!fanMessage || (!locationId && !creatorIdParam)) {
+      return jsonResponse({ error: 'Missing fan message or creatorId/locationId' }, 400);
     }
 
-    // Locate the creator linked to this GHL Sub-Account
-    const creator = await db.prepare('SELECT * FROM creators WHERE ghl_location_id = ?').bind(locationId).first();
+    // Locate the creator by explicit creatorId (from webhook URL) or by ghl_location_id
+    let creator = null;
+    if (creatorIdParam) {
+      creator = await db.prepare('SELECT * FROM creators WHERE id = ? OR slug = ?').bind(creatorIdParam, creatorIdParam).first();
+      // Auto-link the real GHL location ID on first webhook if creator still has a placeholder loc_ghl_ ID
+      if (creator && locationId && creator.ghl_location_id !== locationId) {
+        await db.prepare('UPDATE creators SET ghl_location_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+          .bind(locationId, creator.id)
+          .run();
+        creator.ghl_location_id = locationId;
+      }
+    }
+    if (!creator && locationId) {
+      creator = await db.prepare('SELECT * FROM creators WHERE ghl_location_id = ?').bind(locationId).first();
+    }
+
     if (!creator) {
-      return jsonResponse({ error: `No creator matched to GHL location ${locationId}` }, 404);
+      return jsonResponse({ error: `No creator matched to GHL location ${locationId || creatorIdParam}` }, 404);
     }
 
-    // Execute RAG & Persona Generation
+    const sessionId = `ses_${conversationId || contactId || Date.now()}`;
+
+    // Retrieve recent chat history for this fan session so multi-turn context matches the website widget
+    let chatHistory = [];
+    try {
+      const historyRes = await db.prepare(
+        'SELECT sender, message FROM chat_messages WHERE session_id = ? ORDER BY created_at DESC LIMIT 6'
+      ).bind(sessionId).all();
+      if (historyRes.results) {
+        chatHistory = historyRes.results.reverse();
+      }
+    } catch (_) {}
+
+    // Execute RAG & Persona Generation (Exact same engine as dashboard & website widget)
     const ragResult = await ragEngine.generateResponse({
       creator,
-      query: fanMessage
+      query: fanMessage,
+      chatHistory
     });
 
     // Send response back to the fan via GHL Conversations API
     const ghlReplyResult = await ghlService.sendReplyToConversation({
       locationApiKey: creator.ghl_api_key,
-      locationId: locationId,
+      locationId: locationId || creator.ghl_location_id,
       conversationId: conversationId,
       contactId: contactId,
       replyText: ragResult.reply
     });
 
-    // Record interaction in D1 for telemetry
+    // Record fan message and AI twin response in D1 for conversation continuity & telemetry
     try {
-      const sessionId = `ses_${conversationId || Date.now()}`;
       await db.prepare(`
-        INSERT OR REPLACE INTO chat_sessions (id, creator_id, ghl_contact_id, ghl_conversation_id, last_message_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-      `).bind(sessionId, creator.id, contactId, conversationId).run();
+        INSERT OR REPLACE INTO chat_sessions (id, creator_id, ghl_contact_id, ghl_conversation_id, fan_name, fan_email, last_message_at)
+        VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      `).bind(
+        sessionId,
+        creator.id,
+        contactId,
+        conversationId,
+        body.full_name || body.first_name || null,
+        body.email || null
+      ).run();
 
-      const msgId = `msg_${Date.now()}`;
+      const fanMsgId = `msg_fan_${Date.now()}`;
+      await db.prepare(`
+        INSERT INTO chat_messages (id, session_id, creator_id, sender, message)
+        VALUES (?, ?, ?, 'fan', ?)
+      `).bind(fanMsgId, sessionId, creator.id, fanMessage).run();
+
+      const twinMsgId = `msg_twin_${Date.now() + 1}`;
       await db.prepare(`
         INSERT INTO chat_messages (id, session_id, creator_id, sender, message, rag_sources)
         VALUES (?, ?, ?, 'twin', ?, ?)
-      `).bind(msgId, sessionId, creator.id, ragResult.reply, JSON.stringify(ragResult.ragSources)).run();
+      `).bind(twinMsgId, sessionId, creator.id, ragResult.reply, JSON.stringify(ragResult.ragSources)).run();
     } catch (logErr) {
       console.warn('[Telemetry Log Warning]', logErr.message);
     }

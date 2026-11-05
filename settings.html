@@ -251,18 +251,56 @@
                     </div>
                 </div>
 
-                <!-- 5. System & CRM Connection Details -->
-                <div class="glass-card p-5 rounded-2xl space-y-3 text-xs">
-                    <div class="text-xs font-bold text-white uppercase tracking-wider">System &amp; CRM Bindings</div>
-                    <div class="flex items-center justify-between py-1.5 border-b border-white/5">
-                        <span class="text-slate-400">GoHighLevel Sub-Account:</span>
-                        <span id="ghl-loc-badge" class="font-mono text-blue-400 font-semibold">loc_ghl_demo_8829</span>
+                <!-- 5. GoHighLevel Chat Widget & Webhook Connection -->
+                <div class="glass-card p-6 rounded-2xl space-y-4 text-xs">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                        <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">webhook</span>
+                            GoHighLevel Chat Widget Connection
+                        </h2>
+                        <span id="save-ghl-badge" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ GHL Saved</span>
                     </div>
-                    <div class="flex items-center justify-between py-1.5">
-                        <span class="text-slate-400">Memory Engine:</span>
-                        <span class="text-emerald-400 font-medium flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Cloudflare D1 + Vectorize
-                        </span>
+
+                    <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3.5 space-y-2">
+                        <div class="font-semibold text-white flex items-center justify-between">
+                            <span>1. Your GHL Workflow Webhook URL</span>
+                            <button type="button" onclick="copyWebhookUrl()" id="btn-copy-webhook" class="bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 transition-all">
+                                <span class="material-symbols-outlined text-xs">content_copy</span> Copy URL
+                            </button>
+                        </div>
+                        <div id="ghl-webhook-url-box" class="bg-black/50 border border-white/10 rounded-lg px-3 py-2 font-mono text-[11px] text-blue-300 break-all select-all">
+                            https://twwinz.com/api/chat/ghl-webhook
+                        </div>
+                        <div class="text-[11px] text-slate-300 leading-relaxed pt-1">
+                            <strong>In GoHighLevel:</strong> Go to <em>Automation → Workflows → Create Workflow</em>:
+                            <ol class="list-decimal list-inside mt-1 space-y-0.5 text-slate-400">
+                                <li><strong>Trigger:</strong> <em>Customer Replied</em> (Filter: Reply Channel = <em>Live Chat</em>)</li>
+                                <li><strong>Action:</strong> <em>Webhook</em> (Method: <code class="text-white">POST</code>, URL: paste the URL above)</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-1">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">GHL Sub-Account Location ID</label>
+                            <input type="text" id="ghl-location-input" placeholder="e.g. ve9EPM428h8vShlRW1KT (auto-detected on first webhook)"
+                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">GHL Native Chat Widget ID (Optional)</label>
+                            <input type="text" id="ghl-widget-input" placeholder="e.g. 66f..."
+                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">GHL Sub-Account Private Integration Token (Required for GHL Chat Replies)</label>
+                            <input type="password" id="ghl-apikey-input" placeholder="pit-... (from GHL Settings → Private Integrations)"
+                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
+                        </div>
+                        <div class="flex justify-end pt-1">
+                            <button type="button" onclick="saveGhlConnection()" id="btn-save-ghl" class="bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all">
+                                Save GHL Settings
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -374,7 +412,10 @@
                     document.getElementById('headline-input').value = currentCreator.headline || '';
                     document.getElementById('persona-prompt-input').value = currentCreator.persona_prompt || '';
                     document.getElementById('welcome-message-input').value = currentCreator.welcome_message || '';
-                    document.getElementById('ghl-loc-badge').textContent = currentCreator.ghl_location_id || 'loc_ghl_demo';
+                    document.getElementById('ghl-location-input').value = currentCreator.ghl_location_id || '';
+                    document.getElementById('ghl-widget-input').value = currentCreator.ghl_widget_id || '';
+                    document.getElementById('ghl-apikey-input').value = currentCreator.ghl_api_key || '';
+                    document.getElementById('ghl-webhook-url-box').textContent = `${window.location.origin}/api/chat/ghl-webhook?creatorId=${encodeURIComponent(currentCreator.id)}`;
 
                     const colors = typeof currentCreator.brand_colors === 'string'
                         ? JSON.parse(currentCreator.brand_colors || '{}')
@@ -481,6 +522,50 @@
                     btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span> Copy`;
                 }, 2000);
             });
+        }
+
+        function copyWebhookUrl() {
+            const text = document.getElementById('ghl-webhook-url-box').textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('btn-copy-webhook');
+                btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span> Copied!`;
+                setTimeout(() => {
+                    btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span> Copy URL`;
+                }, 2000);
+            });
+        }
+
+        async function saveGhlConnection() {
+            const ghlLocationId = document.getElementById('ghl-location-input').value.trim();
+            const ghlWidgetId = document.getElementById('ghl-widget-input').value.trim();
+            const ghlApiKey = document.getElementById('ghl-apikey-input').value.trim();
+            const badge = document.getElementById('save-ghl-badge');
+            const btn = document.getElementById('btn-save-ghl');
+
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ghl_location_id: ghlLocationId,
+                        ghl_widget_id: ghlWidgetId,
+                        ghl_api_key: ghlApiKey
+                    })
+                });
+                if (res.ok) {
+                    badge.classList.remove('opacity-0');
+                    setTimeout(() => badge.classList.add('opacity-0'), 2500);
+                    await loadCreatorDetails(currentCreatorId);
+                }
+            } catch (err) {
+                alert('Error saving GHL settings: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save GHL Settings';
+            }
         }
 
         function escapeHtml(str) {
