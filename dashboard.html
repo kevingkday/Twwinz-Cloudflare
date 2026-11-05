@@ -577,6 +577,8 @@
                 if (res.ok) {
                     knowledgeItems = await res.json();
                     renderKnowledgeList();
+                } else if (res.status === 401 || res.status === 403) {
+                    container.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">Sign in with Google to view this twin's private memory. The Jaxson Reed demo stays readable without an account.</div>`;
                 }
             } catch (err) {
                 container.innerHTML = `<div class="p-6 text-center text-red-400 text-xs">Error loading facts: ${err.message}</div>`;

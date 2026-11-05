@@ -604,6 +604,11 @@
                 });
                 const data = await res.json();
 
+                if (res.status === 401) {
+                    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Sign in with Google to analyze a site`;
+                    return;
+                }
+
                 if (data && data.colors) {
                     detectedColors = data.colors;
                     detectedFonts = data.fonts;
