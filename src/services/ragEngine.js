@@ -258,36 +258,41 @@ export class RAGEngine {
     const knowledgeItems = await this.retrieveContext(creator.id, query);
     const formattedContext = this.formatContextForPrompt(knowledgeItems);
 
-    const systemPrompt = `You are the official verified Digital Representative and AI Twin for ${creator.name}.
+    const isCasualGreeting = /^(hi|hey|hello|howdy|yo|sup|what'?s\s*up|how\s+are\s+you(\s+doing)?|good\s+(morning|afternoon|evening))[\s?!.]*$/i.test((query || '').trim());
+
+    const systemPrompt = isCasualGreeting
+      ? `You are the official verified AI Twin for ${creator.name}${creator.headline ? ` (${creator.headline})` : ''}.
+Persona & Tone Guidelines:
+${creator.persona_prompt || 'Speak warmly, authentically, and conversationally in the first-person voice.'}
+The fan is greeting you or asking how you are. Reply warmly in 1-2 short, natural sentences in first-person voice as ${creator.name}, and invite them to ask about your upcoming convention appearances, signed merch, or booking inquiries.`
+      : `You are the official verified Digital Representative and AI Twin for ${creator.name}${creator.headline ? ` (${creator.headline})` : ''}.
 Persona & Tone Guidelines:
 ${creator.persona_prompt || 'Speak warmly, authentically, and conversationally in the first-person voice. Keep answers concise (2-3 sentences) unless the fan explicitly asks for detailed itinerary or stories.'}
 
-CRITICAL GROUNDING RULES:
-1. Below are UNINDEXED PRIVATE FACTS provided directly by ${creator.name} (schedules, secret discount codes, Cameo links, appearance booths, FAQs).
-2. Answer the fan's query using ONLY these verified facts when relevant.
-3. If the fan asks about upcoming dates, tickets, or purchases, provide the exact verified details from the facts.
-4. DO NOT make up dates, unconfirmed projects, or private phone numbers.
-5. If the answer is not in the private facts or general common knowledge about ${creator.name}, say you don't have that detail yet, and invite them to leave their email or check back!
+CRITICAL GROUNDING & CONVERSATION RULES:
+1. Speak in first-person ("I", "my") as ${creator.name}'s AI Twin. Answer ONLY what the fan actually asked in a natural, conversational 2-4 sentence response. NEVER copy-paste or dump the entire private facts block verbatim.
+2. When the fan asks a specific question (e.g., about convention booths, dates, panels, signed merch, promo codes, or bookings), extract ONLY the specific facts that answer their question from the VERIFIED PRIVATE FACTS below.
+3. DO NOT invent dates, prices, promo codes, or private phone numbers that are not in the verified facts.
+4. If the fan's question isn't covered in the verified facts below, let them know you don't have that exact detail posted yet and invite them to leave their name and email in the chat so ${creator.name}'s team can follow up.
 
 === VERIFIED PRIVATE FACTS ===
 ${formattedContext}
 === END PRIVATE FACTS ===
 `;
 
+    const historyMessages = chatHistory.slice(-4).map(msg => ({
+      role: msg.sender === 'fan' ? 'user' : 'assistant',
+      content: String(msg.message || '')
+    }));
+
     // 2. Call OpenAI if API key available
     if (this.openaiKey) {
       try {
         const messages = [
-          { role: 'system', content: systemPrompt }
+          { role: 'system', content: systemPrompt },
+          ...historyMessages,
+          { role: 'user', content: query }
         ];
-
-        for (const msg of chatHistory.slice(-4)) {
-          messages.push({
-            role: msg.sender === 'fan' ? 'user' : 'assistant',
-            content: msg.message
-          });
-        }
-        messages.push({ role: 'user', content: query });
 
         const res = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -298,19 +303,21 @@ ${formattedContext}
           body: JSON.stringify({
             model: 'gpt-4o-mini',
             messages,
-            temperature: 0.7,
-            max_tokens: 300
+            temperature: 0.65,
+            max_tokens: 280
           })
         });
 
         if (res.ok) {
           const data = await res.json();
           const reply = data.choices[0]?.message?.content?.trim();
-          return {
-            reply,
-            ragSources: await this.formatSources(knowledgeItems, query),
-            model: 'gpt-4o-mini'
-          };
+          if (reply) {
+            return {
+              reply,
+              ragSources: isCasualGreeting ? [] : await this.formatSources(knowledgeItems, query),
+              model: 'gpt-4o-mini'
+            };
+          }
         }
       } catch (err) {
         console.error('[OpenAI Generation Error]', err);
@@ -319,30 +326,58 @@ ${formattedContext}
 
     // 3. Call Cloudflare Workers AI if bound in env
     if (this.env.AI) {
-      try {
-        const aiMessages = [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: query }
-        ];
-        const aiResponse = await this.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-          messages: aiMessages,
-          max_tokens: 300
-        });
-        if (aiResponse && aiResponse.response) {
-          return {
-            reply: aiResponse.response.trim(),
-            ragSources: await this.formatSources(knowledgeItems, query),
-            model: 'llama-3.1-8b-instruct'
-          };
+      const aiMessages = [
+        { role: 'system', content: systemPrompt },
+        ...historyMessages,
+        { role: 'user', content: query }
+      ];
+
+      const candidateModels = [
+        '@cf/mistral/mistral-7b-instruct-v0.1',
+        '@cf/meta/llama-3.1-8b-instruct',
+        '@cf/meta/llama-3-8b-instruct'
+      ];
+
+      for (const modelName of candidateModels) {
+        try {
+          let aiResponse;
+          try {
+            aiResponse = await this.env.AI.run(modelName, {
+              messages: aiMessages,
+              max_tokens: 280
+            });
+          } catch (innerErr) {
+            const errMsg = String(innerErr?.message || innerErr || '');
+            if (errMsg.toLowerCase().includes('agree') || errMsg.toLowerCase().includes('license')) {
+              await this.env.AI.run(modelName, { prompt: 'agree' }).catch(() => {});
+              aiResponse = await this.env.AI.run(modelName, {
+                messages: aiMessages,
+                max_tokens: 280
+              });
+            } else {
+              throw innerErr;
+            }
+          }
+
+          const textReply = aiResponse?.response?.trim();
+          if (textReply) {
+            return {
+              reply: textReply,
+              ragSources: isCasualGreeting ? [] : await this.formatSources(knowledgeItems, query),
+              model: modelName.split('/').pop()
+            };
+          }
+        } catch (err) {
+          console.warn(`[Workers AI Warning: ${modelName}]`, err.message);
         }
-      } catch (err) {
-        console.error('[Workers AI Error]', err);
       }
     }
 
-    // 4. Intelligent Local Synthesizer Fallback
+    // 4. Intelligent Local Synthesizer Fallback (for offline tests without Workers AI binding)
     let fallbackReply = '';
-    if (knowledgeItems.length > 0) {
+    if (isCasualGreeting) {
+      fallbackReply = `Doing great, thanks for asking! Welcome to ${creator.name}'s official AI Twin hub — feel free to ask me about upcoming appearances, signed merch, promo codes, or booking requests!`;
+    } else if (knowledgeItems.length > 0) {
       const topFact = knowledgeItems[0];
       if (topFact.category === 'schedule') {
         fallbackReply = `Catch me in person! ${topFact.content}`;
@@ -357,7 +392,7 @@ ${formattedContext}
 
     return {
       reply: fallbackReply,
-      ragSources: await this.formatSources(knowledgeItems, query),
+      ragSources: isCasualGreeting ? [] : await this.formatSources(knowledgeItems, query),
       model: 'twwinz-grounded-fallback'
     };
   }

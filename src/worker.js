@@ -1051,9 +1051,18 @@ async function handleApiRoute(url, request, env) {
       }
       await db.prepare(`
         UPDATE creators
-        SET name = ?, headline = COALESCE(?, headline), avatar_url = COALESCE(?, avatar_url), updated_at = CURRENT_TIMESTAMP
+        SET name = ?, headline = COALESCE(?, headline), avatar_url = COALESCE(?, avatar_url),
+            persona_prompt = COALESCE(?, persona_prompt), welcome_message = COALESCE(?, welcome_message),
+            updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-      `).bind(name, headline || null, avatarUrl || null, existingCreator.id).run();
+      `).bind(
+        name,
+        headline || null,
+        avatarUrl || null,
+        personaPrompt || null,
+        body.welcomeMessage || null,
+        existingCreator.id
+      ).run();
 
       try {
         await ensureAuthTables(db);
@@ -1136,8 +1145,8 @@ async function handleApiRoute(url, request, env) {
       INSERT INTO creators (
         id, name, slug, email, headline, bio_summary, website_type, website_url,
         brand_colors, brand_fonts, avatar_url, ghl_location_id, ghl_widget_id,
-        persona_prompt, is_active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        persona_prompt, welcome_message, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `;
 
     await db.prepare(insertSql).bind(
@@ -1154,7 +1163,8 @@ async function handleApiRoute(url, request, env) {
       avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
       ghlProvision.locationId,
       ghlProvision.widgetId,
-      personaPrompt || `You are the official verified AI Twin for ${name}. Speak warmly, concisely, and accurately based on verified schedule and offers.`
+      personaPrompt || `You are the official verified AI Twin for ${name}. Speak warmly, concisely, and accurately based on verified schedule and offers.`,
+      body.welcomeMessage || `Hey! Welcome to ${name}'s official AI Twin. Ask me about upcoming appearances, signed merch, booking inquiries, or FAQs!`
     ).run();
 
     // Persist provisioned Sub-Account Admin login credentials (encrypted) so the creator can authorize OAuth in 1 click
@@ -1604,6 +1614,38 @@ async function handleApiRoute(url, request, env) {
       query,
       chatHistory
     });
+
+    // Automatically extract fan email / phone from chat message (if provided) and sync to creator's GHL Sub-Account
+    try {
+      const emailMatch = query.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const phoneMatch = query.match(/(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+      const nameMatch = query.match(/(?:my\s+name\s+is|i\s*am|i'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+
+      const detectedEmail = body?.fanEmail || (emailMatch ? emailMatch[0].toLowerCase() : null);
+      const detectedPhone = body?.fanPhone || (phoneMatch ? phoneMatch[0] : null);
+      const detectedName = body?.fanName || (nameMatch ? nameMatch[1].trim() : null);
+
+      if ((detectedEmail || detectedPhone) && !isDemoCreator(creator.id) && !isDemoCreator(creator.slug)) {
+        const creds = await resolveCreatorGhlCredentials(db, env, creator);
+        if (creds.token && creds.locationId && !String(creds.locationId).startsWith('loc_')) {
+          const contactRes = await ghlService.upsertContact({
+            token: creds.token,
+            locationId: creds.locationId,
+            name: detectedName || (detectedEmail ? detectedEmail.split('@')[0] : 'Fan Lead'),
+            email: detectedEmail,
+            phone: detectedPhone,
+            tags: ['twwinz-fan', 'chat-lead'],
+            source: 'Twwinz AI Twin Chat'
+          });
+          if (contactRes.success) {
+            result.ghlContactSynced = true;
+            result.ghlContactId = contactRes.contactId;
+          }
+        }
+      }
+    } catch (syncErr) {
+      console.warn('[Auto GHL Contact Sync Warning]', syncErr.message);
+    }
 
     return jsonResponse(result);
   }
