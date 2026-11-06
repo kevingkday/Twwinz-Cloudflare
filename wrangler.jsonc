@@ -13,6 +13,13 @@
       "database_id": "04f745ca-b55a-450b-824a-bad05f2d3957"
     }
   ],
+  // Uncomment after enabling R2 in the Cloudflare Dashboard and running: npx wrangler r2 bucket create twwinz-media
+  // "r2_buckets": [
+  //   {
+  //     "binding": "MEDIA_BUCKET",
+  //     "bucket_name": "twwinz-media"
+  //   }
+  // ],
   "ai": {
     "binding": "AI"
   },

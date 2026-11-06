@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html class="dark" lang="en">
 
 <head>
@@ -14,9 +13,23 @@
     </script>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta name="description" content="Twwinz helps creators, public figures, and talent brands launch branded AI twins on their own websites. Fans interact by voice and chat — you keep the traffic, branding, and revenue." />
-    <title>Twwinz.com | Your Official AI Twin. Your Site. Your Fans.</title>
+    <meta name="description" content="Twwinz gives convention guests, local TV/radio hosts, regional athletes, authors, musicians, and independent personalities an official AI twin that answers fans from their own info, sells signed merch, and captures booking leads — on your site or your hosted Twwinz page." />
+    <title>Twwinz.com | Your Official AI Twin for Fan Chat, Merch &amp; Bookings</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://twwinz.com/" />
+    <!-- Open Graph / Twitter Card Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Twwinz" />
+    <meta property="og:title" content="Twwinz.com | Your Official AI Twin for Fan Chat, Merch &amp; Bookings" />
+    <meta property="og:description" content="Built for independent personalities with no social media team. Add your convention dates, signed merch offers, booking info, and FAQs — your twin answers fans 24/7 on your website or your hosted twwinz.com page." />
+    <meta property="og:url" content="https://twwinz.com/" />
+    <meta property="og:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Twwinz.com | Your Official AI Twin for Fan Chat, Merch &amp; Bookings" />
+    <meta name="twitter:description" content="Super simple AI twin setup for convention guests, hosts, authors, athletes, and musicians. Works on your site or your hosted twwinz.com page." />
+    <meta name="twitter:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="/pricing-config.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap"
         rel="stylesheet" />
@@ -125,23 +138,18 @@
         <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
             <a href="index.html" class="text-xl font-bold tracking-tighter text-blue-400 font-['Space_Grotesk']">Twwinz.com</a>
             <div class="hidden md:flex items-center space-x-8 font-['Space_Grotesk'] font-medium tracking-tight">
-                <a class="text-slate-400 hover:text-white transition-colors" href="#what-you-get">What You Get</a>
-                <a class="text-slate-400 hover:text-white transition-colors" href="#how-it-works">How It Works</a>
-                <a class="text-slate-400 hover:text-white transition-colors" href="#why-twwinz">Why Twwinz</a>
-                <a class="text-slate-400 hover:text-white transition-colors" href="dashboard.html">Creator Dashboard</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="#live-demo">Try Demo Twin</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="#what-you-get">What Creators Get</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="#whats-included">What's Included</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="#pricing">Pricing</a>
             </div>
             <div class="flex items-center gap-3 sm:gap-4">
-                <a href="https://assets.cdn.filesafe.space/9TKh7JGFQXrmzx2AB0HI/media/69c208543b3a5825f8195434.pdf" target="_blank" class="hidden lg:block px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">Investor Deck</a>
+                <a href="dashboard.html" class="hidden lg:block px-3 py-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">Creator Portal</a>
                 <div id="home-auth-container">
-                    <a href="/api/auth/google" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-4 py-2.5 rounded-md text-xs font-semibold transition-all">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24">
-                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
-                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
-                            <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
-                            <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
-                        </svg>
+                    <button type="button" onclick="openHomeSignInModal()" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-4 py-2.5 rounded-md text-xs font-semibold transition-all">
+                        <span class="material-symbols-outlined text-sm">login</span>
                         <span>Sign In</span>
-                    </a>
+                    </button>
                 </div>
                 <a href="onboard.html" id="home-launch-btn"
                     class="primary-gradient text-on-primary px-6 py-2.5 rounded-md font-bold text-sm tracking-tight active:scale-95 transition-transform inline-flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
@@ -154,72 +162,68 @@
     <main>
 
         <!-- ============================================ -->
-        <!-- HERO SECTION -->
+        <!-- HERO SECTION (Independent Personalities & Local Celebrities) -->
         <!-- ============================================ -->
-        <section class="relative pt-32 pb-24 px-8 overflow-hidden">
+        <section class="relative pt-32 pb-20 px-8 overflow-hidden">
             <!-- Background -->
             <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
                 <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px]"></div>
                 <div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px]"></div>
             </div>
-            <div class="max-w-7xl mx-auto relative z-10 grid lg:grid-cols-12 gap-16 items-center">
+            <div class="max-w-7xl mx-auto relative z-10 grid lg:grid-cols-12 gap-14 items-center">
                 <div class="lg:col-span-7">
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline-variant/20 mb-8">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-high border border-outline-variant/20 mb-6">
                         <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                        <span class="text-[0.6875rem] font-bold tracking-widest uppercase text-primary">Now Live</span>
+                        <span class="text-[0.6875rem] font-bold tracking-widest uppercase text-primary">For Convention Guests, Hosts, Authors, Athletes &amp; Musicians</span>
                     </div>
-                    <h1 class="font-headline text-[3.5rem] lg:text-[4rem] leading-[1.08] font-bold mb-8 text-glow">
-                        Your official AI twin.<br />
-                        <span class="text-primary">Your site. Your fans.</span>
+                    <h1 class="font-headline text-[3.1rem] lg:text-[3.75rem] leading-[1.08] font-bold mb-6 text-glow">
+                        Answer Every Fan &amp; Sell More Merch —<br />
+                        <span class="text-primary">Without a Social Media Team.</span>
                     </h1>
-                    <p class="font-body text-lg text-on-surface-variant max-w-xl mb-10 leading-relaxed">
-                        Launch a branded voice and chat experience that lets fans interact with your content directly on your own website — while we handle the backend delivery.
+                    <p class="font-body text-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed">
+                        You don't need an agency budget or even your own website. Add your unpublished convention appearances, signed merch discount codes, booking details, podcast episodes, and photos in one simple dashboard — and your official AI Twin answers fans 24/7 on your site or your free hosted <code class="text-primary font-mono text-base">twwinz.com/your-name</code> page.
                     </p>
                     <!-- Hero Bullets -->
-                    <ul class="space-y-3 mb-12 max-w-md">
+                    <ul class="space-y-3 mb-10 max-w-xl">
                         <li class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                            <span class="text-sm text-slate-300">Voice and chat interaction</span>
+                            <span class="text-sm text-slate-300"><strong>Answers from your private info:</strong> convention booths, local event times, podcast notes &amp; fan FAQs</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                            <span class="text-sm text-slate-300">Fully branded to you</span>
+                            <span class="text-sm text-slate-300"><strong>Sells while you sleep:</strong> shares signed merch links, Cameo shoutouts &amp; promo codes in chat</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                            <span class="text-sm text-slate-300">Runs on your own website</span>
+                            <span class="text-sm text-slate-300"><strong>No website required:</strong> embed a 1-line widget on your site OR use your hosted <code class="text-blue-300">twwinz.com/&lt;slug&gt;</code> page</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                            <span class="text-sm text-slate-300">Backend handled for you</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                            <span class="text-sm text-slate-300">Fans stay on your domain</span>
+                            <span class="text-sm text-slate-300"><strong>Built on consent:</strong> you approve your voice, likeness and every piece of content your twin uses, and can pause or delete it anytime</span>
                         </li>
                     </ul>
                     <div class="flex flex-wrap gap-4">
-                        <a href="onboard.html" class="primary-gradient text-on-primary px-8 py-4 rounded-md font-bold text-lg active:scale-95 transition-all shadow-lg shadow-primary/20 inline-flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-xl">rocket_launch</span> Launch Your Twin
+                        <a href="#live-demo" class="primary-gradient text-on-primary px-8 py-4 rounded-md font-bold text-base sm:text-lg active:scale-95 transition-all shadow-lg shadow-primary/20 inline-flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-xl">forum</span> Talk to the Demo Twin
                         </a>
-                        <a href="dashboard.html" class="bg-surface-container-highest/40 backdrop-blur-md border border-primary/10 px-8 py-4 rounded-md font-bold text-lg text-white hover:bg-surface-container-highest transition-all inline-flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-lg">dashboard</span> Live Demo Dashboard
+                        <a href="onboard.html" class="bg-surface-container-highest/40 backdrop-blur-md border border-primary/10 px-8 py-4 rounded-md font-bold text-base sm:text-lg text-white hover:bg-surface-container-highest transition-all inline-flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-lg">rocket_launch</span> Create Your Twin
                         </a>
                     </div>
                 </div>
                 <div class="lg:col-span-5 relative">
                     <div class="rounded-2xl overflow-hidden mockup-shadow">
-                        <img alt="Branded AI chat widget on a creator's website" class="w-full h-auto rounded-2xl" src="images/chat-widget-mockup.png" />
+                        <img alt="Branded AI chat widget answering convention and merch questions" class="w-full h-auto rounded-2xl" src="images/chat-widget-mockup.png" />
                     </div>
                     <!-- Floating badge -->
                     <div class="absolute -bottom-4 -left-4 glass-card p-4 rounded-xl shadow-2xl">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-green-400 text-xl" style="font-variation-settings: 'FILL' 1;">wifi</span>
+                                <span class="material-symbols-outlined text-green-400 text-xl" style="font-variation-settings: 'FILL' 1;">verified</span>
                             </div>
                             <div>
-                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</div>
-                                <div class="text-green-400 font-bold font-headline text-sm">Live on your site</div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Your Site or Ours</div>
+                                <div class="text-green-400 font-bold font-headline text-sm">Live in under 5 minutes</div>
                             </div>
                         </div>
                     </div>
@@ -229,123 +233,166 @@
 
 
         <!-- ============================================ -->
-        <!-- WHAT CREATORS GET -->
+        <!-- LIVE DEMO SECTION: TALK TO JAXSON REED'S TWIN -->
         <!-- ============================================ -->
-        <section id="what-you-get" class="py-24 px-8 bg-surface-container-lowest">
+        <section id="live-demo" class="py-20 px-8 bg-surface-container-lowest border-y border-white/5">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 text-secondary mb-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Interactive Live Demo — Try It Before Signing Up</span>
+                        </div>
+                        <h2 class="font-headline text-3xl md:text-4xl font-bold text-white">Talk to a Demo Twin: Jaxson Reed</h2>
+                        <p class="text-on-surface-variant text-base mt-2 max-w-2xl">
+                            Jaxson Reed is a sci-fi actor &amp; convention guest appearing at <strong>GalaxyCon Raleigh</strong>. Ask his read-only twin about his booth number, signed poster discount code, podcast stories, or booking requests!
+                        </p>
+                    </div>
+                    <a href="/jaxson-reed" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-primary transition-all self-start md:self-auto">
+                        <span class="material-symbols-outlined text-sm">open_in_new</span>
+                        <span>View Hosted Page (twwinz.com/jaxson-reed)</span>
+                    </a>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-8 items-stretch">
+                    <!-- Left: What Jaxson added in his dashboard -->
+                    <div class="lg:col-span-5 glass-card rounded-2xl p-6 flex flex-col justify-between space-y-5">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3.5 pb-4 border-b border-white/10">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Jaxson Reed" class="w-14 h-14 rounded-2xl object-cover border-2 border-primary" />
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-headline font-bold text-lg text-white">Jaxson Reed</h3>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">Read-Only Demo</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400">Sci-Fi Actor • Convention Guest • Podcast Host</p>
+                                </div>
+                            </div>
+
+                            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Click a sample fan question to test:</div>
+                            <div class="space-y-2">
+                                <button type="button" onclick="askHomeDemo('Where can I meet you at GalaxyCon Raleigh and what are your booth hours?')" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-primary/15 border border-white/10 hover:border-primary/40 text-xs text-slate-200 transition flex items-center justify-between gap-2">
+                                    <span>📍 "Where can I meet you at GalaxyCon Raleigh?"</span>
+                                    <span class="material-symbols-outlined text-sm text-primary">send</span>
+                                </button>
+                                <button type="button" onclick="askHomeDemo('Do you have a discount code for signed posters or Cameo video shoutouts?')" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-primary/15 border border-white/10 hover:border-primary/40 text-xs text-slate-200 transition flex items-center justify-between gap-2">
+                                    <span>🎟️ "Do you have a discount code for signed posters?"</span>
+                                    <span class="material-symbols-outlined text-sm text-primary">send</span>
+                                </button>
+                                <button type="button" onclick="askHomeDemo('How did you prepare for the zero-gravity scenes in Nebula Drifter?')" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-primary/15 border border-white/10 hover:border-primary/40 text-xs text-slate-200 transition flex items-center justify-between gap-2">
+                                    <span>🎙️ "How did you prepare for the zero-gravity scenes?"</span>
+                                    <span class="material-symbols-outlined text-sm text-primary">send</span>
+                                </button>
+                                <button type="button" onclick="askHomeDemo('How can I book you for a local comic con or podcast interview?')" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-primary/15 border border-white/10 hover:border-primary/40 text-xs text-slate-200 transition flex items-center justify-between gap-2">
+                                    <span>📅 "How can I book you for a local event or podcast?"</span>
+                                    <span class="material-symbols-outlined text-sm text-primary">send</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-black/40 border border-white/10 text-[11px] text-slate-400 leading-relaxed">
+                            💡 <strong class="text-slate-200">How this works:</strong> Jaxson typed these private booth numbers and promo codes into his Twwinz dashboard. General AI chatbots don't know them — only his grounded twin does.
+                        </div>
+                    </div>
+
+                    <!-- Right: Embedded Live Chat & Voice Box -->
+                    <div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden border border-primary/25 shadow-2xl flex flex-col h-[500px]">
+                        <div class="px-5 py-3.5 bg-gradient-to-r from-blue-950/80 to-slate-900 border-b border-white/10 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                                <div>
+                                    <div class="text-xs font-bold text-white uppercase tracking-wider font-headline">Jaxson Reed's Official AI Twin</div>
+                                    <div class="text-[11px] text-slate-400">Grounded in Jaxson's GalaxyCon schedule, signed merch &amp; FAQs</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" id="home-demo-voice-btn" onclick="toggleHomeDemoVoice()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition">
+                                    <span class="material-symbols-outlined text-sm text-secondary">volume_up</span>
+                                    <span id="home-demo-voice-label">Voice: Off</span>
+                                </button>
+                                <button type="button" onclick="resetHomeDemoChat()" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-slate-400 hover:text-white transition">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="home-demo-messages" class="flex-1 p-5 overflow-y-auto space-y-3 bg-[#0c0d12] text-xs sm:text-sm">
+                            <div class="bg-white/5 border border-white/10 text-slate-100 px-4 py-3 rounded-2xl rounded-bl-sm max-w-[85%] leading-relaxed">
+                                Yo! It's Jaxson Reed's AI Twin. Ask me about my GalaxyCon Raleigh booth schedule, signed poster discount codes, or behind-the-scenes stories from <em>Nebula Drifter</em>!
+                            </div>
+                        </div>
+
+                        <form onsubmit="event.preventDefault(); sendHomeDemoMessage();" class="p-3.5 bg-[#15161e] border-t border-white/10 flex gap-2.5 items-center">
+                            <input id="home-demo-input" type="text" placeholder="Ask Jaxson about GalaxyCon booth #412, signed posters, or booking..." class="flex-1 bg-black/50 border border-white/15 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-primary" />
+                            <button type="submit" id="home-demo-send" class="primary-gradient text-on-primary font-bold px-5 py-3 rounded-xl text-xs sm:text-sm transition hover:opacity-90">
+                                Ask Twin
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- WHAT CREATORS GET (Tailored for Independent Personalities) -->
+        <!-- ============================================ -->
+        <section id="what-you-get" class="py-24 px-8">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="font-headline text-3xl md:text-4xl font-bold mb-4">What Creators Get</h2>
-                    <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Twwinz gives you a branded AI twin experience you can host on your own website — without needing to build the backend yourself.</p>
+                    <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">
+                        Designed for working personalities — convention guests, regional athletes, local radio/TV hosts, authors, podcasters, and musicians — who want to serve fans and sell merch without hiring a team.
+                    </p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Card 1 -->
                     <div class="glass-card p-8 rounded-2xl hover:border-primary/30 transition-colors group">
                         <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                            <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">chat</span>
+                            <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">event_available</span>
                         </div>
-                        <h3 class="font-headline text-xl font-bold mb-3">Branded Chat Assistant</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">A creator-specific AI chat experience embedded directly on your own site. Fans interact in real-time, and it speaks in your voice.</p>
+                        <h3 class="font-headline text-xl font-bold mb-3">Convention &amp; Local Event Info</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Drop in your upcoming convention booth numbers, photo-op times, book signings, or local appearances so fans never miss where to find you.</p>
                     </div>
                     <!-- Card 2 -->
                     <div class="glass-card p-8 rounded-2xl hover:border-primary/30 transition-colors group">
                         <div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center mb-6 group-hover:bg-secondary/20 transition-colors">
-                            <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">mic</span>
+                            <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
                         </div>
-                        <h3 class="font-headline text-xl font-bold mb-3">Voice Interaction</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Fans can speak with your AI twin using a branded voice experience. It sounds like you, responds like you, and represents you 24/7.</p>
+                        <h3 class="font-headline text-xl font-bold mb-3">Signed Merch &amp; Promo Codes</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Share exclusive discount codes, signed poster bundles, book links, or Cameo video shoutouts automatically whenever fans ask how to support you.</p>
                     </div>
                     <!-- Card 3 -->
                     <div class="glass-card p-8 rounded-2xl hover:border-primary/30 transition-colors group">
                         <div class="w-14 h-14 rounded-xl bg-tertiary/10 flex items-center justify-center mb-6 group-hover:bg-tertiary/20 transition-colors">
-                            <span class="material-symbols-outlined text-tertiary text-2xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
+                            <span class="material-symbols-outlined text-tertiary text-2xl" style="font-variation-settings: 'FILL' 1;">contact_mail</span>
                         </div>
-                        <h3 class="font-headline text-xl font-bold mb-3">Content-Trained Twin</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Your twin is configured around your approved content, tone, personality, and brand direction. It knows what you know — and nothing you don't want it to.</p>
+                        <h3 class="font-headline text-xl font-bold mb-3">Booking &amp; Podcast Inquiries</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Capture event organizers, local sponsors, and podcast hosts asking about your availability — without giving out your personal phone number.</p>
                     </div>
                     <!-- Card 4 -->
                     <div class="glass-card p-8 rounded-2xl hover:border-primary/30 transition-colors group">
                         <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                            <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">language</span>
+                            <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">public</span>
                         </div>
-                        <h3 class="font-headline text-xl font-bold mb-3">Own-Domain Experience</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Fan engagement happens on your own website — not a third-party platform. You keep 100% of the traffic, the data, and the relationship.</p>
+                        <h3 class="font-headline text-xl font-bold mb-3">No Website? Hosted Twin Page Included</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Have a site? Paste our 1-line chat widget. Don't have a website? Put your <code class="text-blue-300">twwinz.com/your-name</code> link right in your Instagram, TikTok, or X bio.</p>
                     </div>
                     <!-- Card 5 -->
                     <div class="glass-card p-8 rounded-2xl hover:border-primary/30 transition-colors group">
                         <div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center mb-6 group-hover:bg-secondary/20 transition-colors">
-                            <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">engineering</span>
+                            <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">upload_file</span>
                         </div>
-                        <h3 class="font-headline text-xl font-bold mb-3">Backend Handled For You</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Twwinz handles setup, backend delivery, hosting, and supporting infrastructure. You don't need a tech team — we are your tech team.</p>
+                        <h3 class="font-headline text-xl font-bold mb-3">2-Minute Content Updates</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Type notes or drag-and-drop Word docs, PDFs, podcast transcripts, and photos in your dashboard. Your twin learns them immediately.</p>
                     </div>
                     <!-- Card 6 -->
                     <div class="glass-card p-8 rounded-2xl hover:border-primary/30 transition-colors group">
                         <div class="w-14 h-14 rounded-xl bg-tertiary/10 flex items-center justify-center mb-6 group-hover:bg-tertiary/20 transition-colors">
-                            <span class="material-symbols-outlined text-tertiary text-2xl" style="font-variation-settings: 'FILL' 1;">paid</span>
+                            <span class="material-symbols-outlined text-tertiary text-2xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
                         </div>
-                        <h3 class="font-headline text-xl font-bold mb-3">Monetization Ready</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Structured to support commerce, lead capture, subscriptions, or premium fan interactions. Your twin can drive real revenue from day one.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ============================================ -->
-        <!-- WHAT FANS EXPERIENCE -->
-        <!-- ============================================ -->
-        <section class="py-24 px-8">
-            <div class="max-w-7xl mx-auto">
-                <div class="text-center mb-16">
-                    <h2 class="font-headline text-3xl md:text-4xl font-bold mb-4">What Fans Experience</h2>
-                    <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Fans get an official, branded way to interact with you through voice and chat — directly on your own website.</p>
-                </div>
-                <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
-                    <!-- Chat mockup -->
-                    <div class="rounded-2xl overflow-hidden mockup-shadow">
-                        <img alt="Fan chat interface with a creator's AI twin" class="w-full h-auto rounded-2xl" src="images/chat-widget-mockup.png" />
-                    </div>
-                    <div class="space-y-6">
-                        <h3 class="font-headline text-2xl font-bold">Chat in Real Time</h3>
-                        <p class="text-on-surface-variant leading-relaxed">Fans can ask questions, get recommendations, and have real conversations with your AI twin — any time, day or night. It feels personal because it's trained on your actual content and personality.</p>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">forum</span>
-                                <span class="text-slate-300">Ask questions and get instant, authentic answers</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
-                                <span class="text-slate-300">Get personalized product recommendations</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">schedule</span>
-                                <span class="text-slate-300">Available 24/7 — no wait times</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="grid lg:grid-cols-2 gap-12 items-center">
-                    <div class="space-y-6 order-2 lg:order-1">
-                        <h3 class="font-headline text-2xl font-bold">Talk by Voice</h3>
-                        <p class="text-on-surface-variant leading-relaxed">Fans can speak with your AI twin using a branded voice experience. It sounds like you, responds in your style, and creates a connection that text alone can't match.</p>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-secondary mt-0.5" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
-                                <span class="text-slate-300">Hear voice responses that sound like you</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-secondary mt-0.5" style="font-variation-settings: 'FILL' 1;">headphones</span>
-                                <span class="text-slate-300">Engage with official content through voice</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-secondary mt-0.5" style="font-variation-settings: 'FILL' 1;">verified</span>
-                                <span class="text-slate-300">Stay inside your branded environment</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- Voice mockup -->
-                    <div class="rounded-2xl overflow-hidden mockup-shadow order-1 lg:order-2">
-                        <img alt="Voice interaction with a creator's AI twin" class="w-full h-auto rounded-2xl" src="images/voice-interaction-mockup.png" />
+                        <h3 class="font-headline text-xl font-bold mb-3">100% Consent &amp; Control</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Built on consent: you approve your voice, likeness and every piece of content your twin uses, and can pause or delete it anytime.</p>
                     </div>
                 </div>
             </div>
@@ -359,7 +406,7 @@
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="font-headline text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-                    <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">From first conversation to live on your site — we handle the heavy lifting.</p>
+                    <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Super simple setup — whether you do it yourself in 5 minutes or let our team set it up for you.</p>
                 </div>
                 <!-- Flow diagram image -->
                 <div class="mb-16 rounded-2xl overflow-hidden mockup-shadow max-w-5xl mx-auto">
@@ -370,42 +417,42 @@
                     <div class="glass-card rounded-xl p-6 text-center relative">
                         <div class="text-[3rem] font-headline font-bold text-primary/10 leading-none mb-2">1</div>
                         <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">mic</span>
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">edit_note</span>
                         </div>
-                        <h4 class="font-headline font-bold mb-2 text-sm">Creator Input</h4>
-                        <p class="text-slate-500 text-xs leading-relaxed">You provide voice, content, tone, and brand direction.</p>
+                        <h4 class="font-headline font-bold mb-2 text-sm">Add Your Info</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">Upload your bio, convention dates, signed merch offers, FAQs, and photos.</p>
                     </div>
                     <div class="glass-card rounded-xl p-6 text-center relative">
                         <div class="text-[3rem] font-headline font-bold text-primary/10 leading-none mb-2">2</div>
                         <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-4">
-                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">settings</span>
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">palette</span>
                         </div>
-                        <h4 class="font-headline font-bold mb-2 text-sm">Twin Setup</h4>
-                        <p class="text-slate-500 text-xs leading-relaxed">Twwinz configures the AI twin, voice/chat behavior, and backend logic.</p>
+                        <h4 class="font-headline font-bold mb-2 text-sm">Match Your Brand</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">Set your greeting, speaking style, avatar, and colors.</p>
                     </div>
                     <div class="glass-card rounded-xl p-6 text-center relative border-t-2 border-primary">
                         <div class="text-[3rem] font-headline font-bold text-primary/10 leading-none mb-2">3</div>
                         <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">code</span>
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">share</span>
                         </div>
-                        <h4 class="font-headline font-bold mb-2 text-sm">Website Install</h4>
-                        <p class="text-slate-500 text-xs leading-relaxed">A branded widget is installed on your own website.</p>
+                        <h4 class="font-headline font-bold mb-2 text-sm">Share or Embed</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">Paste the 1-line widget on your website or share your hosted <code class="text-blue-300">twwinz.com/&lt;slug&gt;</code> link.</p>
                     </div>
                     <div class="glass-card rounded-xl p-6 text-center relative">
                         <div class="text-[3rem] font-headline font-bold text-primary/10 leading-none mb-2">4</div>
                         <div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center mx-auto mb-4">
                             <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">forum</span>
                         </div>
-                        <h4 class="font-headline font-bold mb-2 text-sm">Fan Interaction</h4>
-                        <p class="text-slate-500 text-xs leading-relaxed">Fans engage with your twin through voice and chat directly on the site.</p>
+                        <h4 class="font-headline font-bold mb-2 text-sm">Fans Chat 24/7</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">Fans get accurate answers, discount codes, and booking links anytime.</p>
                     </div>
                     <div class="glass-card rounded-xl p-6 text-center relative">
                         <div class="text-[3rem] font-headline font-bold text-primary/10 leading-none mb-2">5</div>
                         <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-4">
                             <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">tune</span>
                         </div>
-                        <h4 class="font-headline font-bold mb-2 text-sm">Ongoing Control</h4>
-                        <p class="text-slate-500 text-xs leading-relaxed">You keep control of brand, traffic, audience experience, and monetization.</p>
+                        <h4 class="font-headline font-bold mb-2 text-sm">Update Anytime</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">Add new appearances or pause/delete content in seconds from your phone or laptop.</p>
                     </div>
                 </div>
             </div>
@@ -413,192 +460,179 @@
 
 
         <!-- ============================================ -->
-        <!-- WHY NOT CHARACTER.AI? -->
+        <!-- WHAT'S INCLUDED (Formerly "Under the Hood", Plain Benefits, Zero Jargon) -->
         <!-- ============================================ -->
-        <section id="why-twwinz" class="py-24 px-8">
-            <div class="max-w-7xl mx-auto">
-                <div class="grid lg:grid-cols-2 gap-16 items-center">
-                    <div>
-                        <h2 class="font-headline text-3xl md:text-4xl font-bold mb-6">Why Not Send Fans to Someone Else's Platform?</h2>
-                        <p class="text-on-surface-variant text-lg mb-10 leading-relaxed">
-                            Third-party AI platforms control the environment, the data, and the revenue. Twwinz is built to help creators <strong class="text-white font-medium">own it</strong>.
-                        </p>
-                        <div class="space-y-5">
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center mt-0.5">
-                                    <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">home</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm mb-1">Keep fan traffic on your own website</p>
-                                    <p class="text-slate-400 text-sm">Every interaction happens on your domain. You don't send fans somewhere else.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-lg bg-secondary/10 flex items-center justify-center mt-0.5">
-                                    <span class="material-symbols-outlined text-secondary text-xl" style="font-variation-settings: 'FILL' 1;">palette</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm mb-1">Maintain your own branding</p>
-                                    <p class="text-slate-400 text-sm">Your colors, your logo, your personality — not someone else's platform design.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-lg bg-tertiary/10 flex items-center justify-center mt-0.5">
-                                    <span class="material-symbols-outlined text-tertiary text-xl" style="font-variation-settings: 'FILL' 1;">payments</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm mb-1">Control monetization</p>
-                                    <p class="text-slate-400 text-sm">Revenue from fan interactions goes to you — not to a platform that hosts your likeness.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center mt-0.5">
-                                    <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">shield</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm mb-1">Build an official AI presence you control</p>
-                                    <p class="text-slate-400 text-sm">No risk of deplatforming, no algorithm changes, no surprise policy updates.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 shrink-0 rounded-lg bg-secondary/10 flex items-center justify-center mt-0.5">
-                                    <span class="material-symbols-outlined text-secondary text-xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm mb-1">Own the fan experience end-to-end</p>
-                                    <p class="text-slate-400 text-sm">You decide what the twin says, how it looks, and what it does. Full creative control.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <!-- Comparison visual -->
-                        <div class="space-y-6">
-                            <div class="p-8 rounded-2xl bg-red-500/5 border border-red-500/20">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings: 'FILL' 1;">dangerous</span>
-                                    <h4 class="font-headline font-bold text-red-300 text-lg">Third-Party Platforms</h4>
-                                </div>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center gap-2 text-slate-400 text-sm"><span class="material-symbols-outlined text-red-400/60 text-base">close</span> Fans leave your site</li>
-                                    <li class="flex items-center gap-2 text-slate-400 text-sm"><span class="material-symbols-outlined text-red-400/60 text-base">close</span> Platform controls the brand</li>
-                                    <li class="flex items-center gap-2 text-slate-400 text-sm"><span class="material-symbols-outlined text-red-400/60 text-base">close</span> Revenue goes to the platform</li>
-                                    <li class="flex items-center gap-2 text-slate-400 text-sm"><span class="material-symbols-outlined text-red-400/60 text-base">close</span> Data belongs to someone else</li>
-                                    <li class="flex items-center gap-2 text-slate-400 text-sm"><span class="material-symbols-outlined text-red-400/60 text-base">close</span> Risk of deplatforming</li>
-                                </ul>
-                            </div>
-                            <div class="p-8 rounded-2xl bg-primary/5 border border-primary/20">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">verified</span>
-                                    <h4 class="font-headline font-bold text-primary text-lg">Twwinz on Your Site</h4>
-                                </div>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center gap-2 text-slate-300 text-sm"><span class="material-symbols-outlined text-primary text-base" style="font-variation-settings: 'FILL' 1;">check</span> Fans stay on your website</li>
-                                    <li class="flex items-center gap-2 text-slate-300 text-sm"><span class="material-symbols-outlined text-primary text-base" style="font-variation-settings: 'FILL' 1;">check</span> Your branding, your design</li>
-                                    <li class="flex items-center gap-2 text-slate-300 text-sm"><span class="material-symbols-outlined text-primary text-base" style="font-variation-settings: 'FILL' 1;">check</span> Revenue goes to you</li>
-                                    <li class="flex items-center gap-2 text-slate-300 text-sm"><span class="material-symbols-outlined text-primary text-base" style="font-variation-settings: 'FILL' 1;">check</span> You own all the data</li>
-                                    <li class="flex items-center gap-2 text-slate-300 text-sm"><span class="material-symbols-outlined text-primary text-base" style="font-variation-settings: 'FILL' 1;">check</span> Your platform, your rules</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ============================================ -->
-        <!-- BUILT ON ENTERPRISE INFRASTRUCTURE -->
-        <!-- ============================================ -->
-        <section class="py-24 px-8 bg-surface-container-lowest">
+        <section id="whats-included" class="py-24 px-8">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-16">
                     <div class="inline-flex items-center gap-2 text-secondary mb-4">
-                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
-                        <span class="text-xs font-bold uppercase tracking-widest">Under the Hood</span>
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified</span>
+                        <span class="text-xs font-bold uppercase tracking-widest">Everything Handled For You</span>
                     </div>
-                    <h2 class="font-headline text-3xl md:text-4xl font-bold mb-4">Built on Enterprise-Grade Infrastructure</h2>
-                    <p class="text-on-surface-variant max-w-2xl mx-auto">You don't need to understand the technology — just know that it's reliable, fast, and built for real-world deployment.</p>
+                    <h2 class="font-headline text-3xl md:text-4xl font-bold mb-4">What's Included</h2>
+                    <p class="text-on-surface-variant max-w-2xl mx-auto">
+                        No complicated tech setup, no coding, and no social media staff required. Here is what your twin does for you out of the box:
+                    </p>
                 </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="glass-card p-8 rounded-2xl">
-                        <span class="material-symbols-outlined text-3xl text-primary mb-4" style="font-variation-settings: 'FILL' 1;">hub</span>
-                        <h4 class="font-headline font-bold mb-2">GoHighLevel CRM</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed">Advanced CRM and communication platform handles chat, voice, and lead capture workflows behind the scenes.</p>
+                        <span class="material-symbols-outlined text-3xl text-primary mb-4" style="font-variation-settings: 'FILL' 1;">fact_check</span>
+                        <h4 class="font-headline font-bold mb-2">Answers From Your Own Info</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">Your twin only answers from the schedules, bios, podcast notes, FAQs, and photos you upload — never guessing or making up dates.</p>
                     </div>
                     <div class="glass-card p-8 rounded-2xl">
-                        <span class="material-symbols-outlined text-3xl text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">sync_alt</span>
-                        <h4 class="font-headline font-bold mb-2">Live Knowledge via MCP</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed">Model Context Protocol keeps your twin grounded in live data — inventory, calendars, content — so it's always accurate.</p>
+                        <span class="material-symbols-outlined text-3xl text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+                        <h4 class="font-headline font-bold mb-2">Sells Your Merch &amp; Promos</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">Recommends your signed posters, books, apparel, and Cameo shoutouts right inside the conversation with your custom discount codes.</p>
                     </div>
                     <div class="glass-card p-8 rounded-2xl">
-                        <span class="material-symbols-outlined text-3xl text-tertiary mb-4" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
-                        <h4 class="font-headline font-bold mb-2">Shopify Integration</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed">Your twin connects directly to your store — managing inventory queries, product recommendations, and checkout in real-time.</p>
+                        <span class="material-symbols-outlined text-3xl text-tertiary mb-4" style="font-variation-settings: 'FILL' 1;">inbox</span>
+                        <h4 class="font-headline font-bold mb-2">Captures Fan Leads &amp; Bookings</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">Collects fan emails and routes appearance, convention, or podcast booking inquiries straight to your GoHighLevel inbox.</p>
                     </div>
                     <div class="glass-card p-8 rounded-2xl">
-                        <span class="material-symbols-outlined text-3xl text-primary mb-4" style="font-variation-settings: 'FILL' 1;">gavel</span>
-                        <h4 class="font-headline font-bold mb-2">Legal Protections</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed">Built-in compliance with the 2025 NO FAKES Act. Your voice, likeness, and digital identity are legally protected property.</p>
+                        <span class="material-symbols-outlined text-3xl text-primary mb-4" style="font-variation-settings: 'FILL' 1;">devices</span>
+                        <h4 class="font-headline font-bold mb-2">Works on Your Site or Ours</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">Embed the chat widget on WordPress, Shopify, or Squarespace — or use your ready-to-share <code class="text-blue-300">twwinz.com/your-name</code> page.</p>
                     </div>
+                </div>
+
+                <!-- Consent Callout Banner -->
+                <div class="mt-10 glass-card rounded-2xl p-6 border border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+                        </div>
+                        <p class="text-sm text-slate-200 leading-relaxed">
+                            <strong>Built on consent:</strong> you approve your voice, likeness and every piece of content your twin uses, and can pause or delete it anytime.
+                        </p>
+                    </div>
+                    <a href="terms-of-service.html#likeness-consent" class="text-xs font-bold text-primary hover:underline whitespace-nowrap">
+                        Read Likeness &amp; Consent Terms →
+                    </a>
                 </div>
             </div>
         </section>
 
 
         <!-- ============================================ -->
-        <!-- PRICING -->
+        <!-- PRICING (Driven by single /pricing-config.js) -->
         <!-- ============================================ -->
-        <section id="pricing" class="py-24 px-8">
+        <section id="pricing" class="py-24 px-8 bg-surface-container-lowest">
             <div class="max-w-7xl mx-auto">
-                <div class="text-center mb-8">
-                    <h2 class="font-headline text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-                    <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">No hidden fees. No complicated contracts. You know exactly what you're paying from day one.</p>
+                <div class="text-center mb-14">
+                    <h2 class="font-headline text-3xl md:text-4xl font-bold mb-4">Simple, Budget-Friendly Pricing</h2>
+                    <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">
+                        Start self-serve with our Starter plan, or let our team handle voice cloning, website installation, and store setup with Done-for-You.
+                    </p>
                 </div>
-                <!-- Creator benefits first -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 max-w-3xl mx-auto">
-                    <div class="text-center p-4">
-                        <span class="material-symbols-outlined text-primary text-2xl mb-2" style="font-variation-settings: 'FILL' 1;">groups</span>
-                        <p class="text-xs text-slate-400 font-medium">Fan Engagement</p>
-                    </div>
-                    <div class="text-center p-4">
-                        <span class="material-symbols-outlined text-secondary text-2xl mb-2" style="font-variation-settings: 'FILL' 1;">storefront</span>
-                        <p class="text-xs text-slate-400 font-medium">Commerce</p>
-                    </div>
-                    <div class="text-center p-4">
-                        <span class="material-symbols-outlined text-tertiary text-2xl mb-2" style="font-variation-settings: 'FILL' 1;">contact_mail</span>
-                        <p class="text-xs text-slate-400 font-medium">Lead Capture</p>
-                    </div>
-                    <div class="text-center p-4">
-                        <span class="material-symbols-outlined text-primary text-2xl mb-2" style="font-variation-settings: 'FILL' 1;">loyalty</span>
-                        <p class="text-xs text-slate-400 font-medium">Paid Experiences</p>
-                    </div>
-                </div>
-                <!-- Pricing cards -->
-                <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                    <div class="p-8 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-colors text-center">
-                        <div class="w-14 h-14 rounded-full bg-secondary/10 flex items-center justify-center mb-6 mx-auto">
-                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">build</span>
+
+                <!-- 3-Column Pricing Cards -->
+                <div class="grid lg:grid-cols-3 gap-8 items-stretch">
+                    <!-- 1. STARTER TIER -->
+                    <div class="glass-card p-8 rounded-2xl flex flex-col justify-between border border-white/10">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-bold mb-4" data-price-bind="starter.badge">
+                                Self-Serve • Budget Friendly
+                            </div>
+                            <h3 class="font-headline text-2xl font-bold text-white mb-2" data-price-bind="starter.name">Starter</h3>
+                            <div class="flex items-baseline gap-2 mb-1">
+                                <span class="font-headline text-4xl font-bold text-white" data-price-bind="starter.monthlyFee">$79</span>
+                                <span class="text-slate-400 text-sm" data-price-bind="starter.period">/mo</span>
+                            </div>
+                            <p class="text-xs text-emerald-400 font-semibold mb-4">
+                                <span data-price-bind="starter.setupFee">$0</span> setup fee • <span data-price-bind="starter.messageCap">Up to 1,000 fan messages / mo</span>
+                            </p>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6" data-price-bind="starter.description">
+                                Built for independent personalities, convention guests, authors, local hosts, and regional athletes who want an accurate fan chat without hiring a team.
+                            </p>
+                            <div class="p-3.5 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-300 leading-relaxed mb-6" data-price-bind="starter.setupIncludes">
+                                Sign in with Google, paste your appearance dates, FAQs, merch links, and photos into your dashboard, and go live in minutes on your hosted twwinz.com/&lt;slug&gt; page or your own website.
+                            </div>
+                            <ul class="space-y-2.5 text-xs text-slate-300 mb-8">
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Hosted Twin Page at <code class="text-blue-300">twwinz.com/your-name</code></li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> 1-Line Chat Widget for your existing site</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Chat-only AI Twin grounded in your private info &amp; photos</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Up to 1,000 fan replies per month included</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Pause or delete your twin and content anytime</li>
+                            </ul>
                         </div>
-                        <h3 class="font-headline text-lg font-bold mb-2">Setup</h3>
-                        <p class="font-headline text-4xl font-bold text-white mb-3">$1,000</p>
-                        <p class="text-slate-400 text-sm leading-relaxed">One-time fee to train the AI, configure voice and chat, and set everything up.</p>
+                        <a href="onboard.html?plan=starter" class="w-full py-3.5 px-6 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-sm text-center transition">
+                            Start Self-Serve Setup
+                        </a>
                     </div>
-                    <div class="p-8 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-colors border-t-2 border-primary text-center">
-                        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 mx-auto">
-                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">sync</span>
+
+                    <!-- 2. DONE-FOR-YOU TIER -->
+                    <div class="glass-card p-8 rounded-2xl flex flex-col justify-between border-2 border-primary relative shadow-2xl shadow-primary/10">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold mb-4" data-price-bind="doneForYou.badge">
+                                Most Popular • White-Glove Setup
+                            </div>
+                            <h3 class="font-headline text-2xl font-bold text-white mb-2" data-price-bind="doneForYou.name">Done-for-You</h3>
+                            <div class="flex items-baseline gap-2 mb-1">
+                                <span class="font-headline text-4xl font-bold text-white" data-price-bind="doneForYou.monthlyFee">$400</span>
+                                <span class="text-slate-400 text-sm" data-price-bind="doneForYou.period">/mo</span>
+                                <span class="text-xs text-slate-400">+ <strong class="text-white" data-price-bind="doneForYou.setupFee">$1,000</strong> one-time setup</span>
+                            </div>
+                            <p class="text-xs text-primary font-semibold mb-4" data-price-bind="doneForYou.messageCap">
+                                Up to 10,000 chat &amp; voice replies / mo
+                            </p>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-5" data-price-bind="doneForYou.description">
+                                We build, style, and connect everything for you — including voice cloning, custom website widget, GoHighLevel CRM workflow, and merch store integration.
+                            </p>
+                            <div class="p-4 rounded-xl bg-primary/10 border border-primary/25 text-xs text-slate-200 leading-relaxed mb-6">
+                                <div class="font-bold text-white mb-1">What the <span data-price-bind="doneForYou.setupFee">$1,000</span> Setup Includes:</div>
+                                <ul class="list-disc pl-4 space-y-1 text-slate-300">
+                                    <li><strong>1-on-1 Setup Call:</strong> We interview you and gather your schedule, bio, and offers</li>
+                                    <li><strong>Custom Voice Cloning:</strong> Trained from your approved podcast or video clips</li>
+                                    <li><strong>Custom Site Widget:</strong> Styled &amp; installed on your website + GoHighLevel CRM</li>
+                                    <li><strong>Shopify &amp; Merch Connection:</strong> Live product links and promo codes wired in</li>
+                                </ul>
+                            </div>
+                            <ul class="space-y-2.5 text-xs text-slate-200 mb-8">
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Voice + Chat interaction on your site &amp; hosted page</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Custom website widget + GoHighLevel CRM setup</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Shopify, Cameo &amp; signed merch store integration</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base">check_circle</span> Up to 10,000 interactions/mo + priority convention updates</li>
+                            </ul>
                         </div>
-                        <h3 class="font-headline text-lg font-bold mb-2">Monthly</h3>
-                        <p class="font-headline text-4xl font-bold text-white mb-3">$400</p>
-                        <p class="text-slate-400 text-sm leading-relaxed">Keeps the system running 24/7. Includes hosting, maintenance, updates, and support.</p>
+                        <a href="onboard.html?plan=done-for-you" class="w-full py-3.5 px-6 rounded-xl primary-gradient text-on-primary font-bold text-sm text-center transition hover:opacity-90 shadow-lg shadow-primary/20">
+                            Book Done-for-You Setup
+                        </a>
                     </div>
-                    <div class="p-8 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest transition-colors text-center">
-                        <div class="w-14 h-14 rounded-full bg-tertiary/10 flex items-center justify-center mb-6 mx-auto">
-                            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+
+                    <!-- 3. 10% SUCCESS SHARE -->
+                    <div class="glass-card p-8 rounded-2xl flex flex-col justify-between border border-white/10">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary/15 text-tertiary text-xs font-bold mb-4" data-price-bind="successShare.badge">
+                                Aligned Upside
+                            </div>
+                            <h3 class="font-headline text-2xl font-bold text-white mb-2" data-price-bind="successShare.name">Success Share</h3>
+                            <div class="flex items-baseline gap-2 mb-1">
+                                <span class="font-headline text-4xl font-bold text-white" data-price-bind="successShare.rate">10%</span>
+                                <span class="text-slate-400 text-sm" data-price-bind="successShare.rateLabel">on twin-attributed sales only</span>
+                            </div>
+                            <p class="text-xs text-tertiary font-semibold mb-4">
+                                $0 on regular website traffic or in-person table sales
+                            </p>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-5" data-price-bind="successShare.description">
+                                Your twin recommends signed merch, VIP bundles, Cameo shoutouts, and event tickets while answering fan questions.
+                            </p>
+                            <div class="p-4 rounded-xl bg-tertiary/10 border border-tertiary/25 text-xs text-slate-200 leading-relaxed mb-6">
+                                <div class="font-bold text-white mb-1" data-price-bind="successShare.trackingTitle">How attributed sales are tracked:</div>
+                                <p class="text-slate-300" data-price-bind="successShare.trackingExplanation">
+                                    We only count orders completed using a twin-exclusive discount code (like GALAXY20) or a tracked checkout link clicked directly inside the chat widget. Regular website orders, social links, and in-person convention table sales are never charged.
+                                </p>
+                            </div>
+                            <ul class="space-y-2.5 text-xs text-slate-300 mb-8">
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-tertiary text-base">check_circle</span> Tracked strictly via twin-generated discount codes &amp; chat links</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-tertiary text-base">check_circle</span> 0% fee on regular store traffic or convention table sales</li>
+                                <li class="flex items-start gap-2"><span class="material-symbols-outlined text-tertiary text-base">check_circle</span> Captures booking &amp; appearance requests at no extra charge</li>
+                            </ul>
                         </div>
-                        <h3 class="font-headline text-lg font-bold mb-2">Success Share</h3>
-                        <p class="font-headline text-4xl font-bold text-white mb-3">10%</p>
-                        <p class="text-slate-400 text-sm leading-relaxed">We take 10% of sales the AI twin generates. We only win when you win.</p>
+                        <a href="performance-share.html" class="w-full py-3.5 px-6 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-sm text-center transition">
+                            See How Attribution Works
+                        </a>
                     </div>
                 </div>
             </div>
@@ -608,15 +642,15 @@
         <!-- ============================================ -->
         <!-- CTA SECTION -->
         <!-- ============================================ -->
-        <section class="py-32 px-8 text-center relative">
+        <section class="py-28 px-8 text-center relative">
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/5 blur-[150px] rounded-full pointer-events-none"></div>
             <div class="max-w-3xl mx-auto relative z-10">
-                <h2 class="font-headline text-[3rem] font-bold mb-6 leading-tight">Ready to put your AI twin<br /><span class="text-primary text-glow">on your own website?</span></h2>
-                <p class="text-on-surface-variant text-lg mb-10 max-w-xl mx-auto">Get started in days, not months. We handle the tech so you can focus on what you do best — creating.</p>
+                <h2 class="font-headline text-[2.75rem] sm:text-[3rem] font-bold mb-6 leading-tight">Ready to launch your AI twin<br /><span class="text-primary text-glow">on your site or ours?</span></h2>
+                <p class="text-on-surface-variant text-lg mb-10 max-w-xl mx-auto">Add your convention dates, signed merch offers, and FAQs in minutes — and let your twin answer fans 24/7.</p>
                 <div class="flex flex-wrap justify-center gap-4">
-                    <button class="primary-gradient text-on-primary px-10 py-5 rounded-md font-bold text-xl active:scale-95 transition-all shadow-2xl shadow-primary/30">
-                        Book a Demo
-                    </button>
+                    <a href="onboard.html" class="primary-gradient text-on-primary px-10 py-5 rounded-md font-bold text-xl active:scale-95 transition-all shadow-2xl shadow-primary/30">
+                        Create Your Twin
+                    </a>
                     <a href="mailto:hello@twwinz.com" class="bg-surface-container-highest/40 backdrop-blur-md border border-primary/10 px-10 py-5 rounded-md font-bold text-lg text-white hover:bg-surface-container-highest transition-all inline-flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-lg">mail</span> hello@twwinz.com
                     </a>
@@ -629,12 +663,15 @@
     <!-- Footer -->
     <footer class="w-full py-12 border-t border-white/5 bg-[#0E0E0E]">
         <div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-8">
-            <div class="flex flex-col items-center md:items-start gap-4">
+            <div class="flex flex-col items-center md:items-start gap-3">
                 <div class="text-lg font-bold text-white font-['Space_Grotesk'] tracking-tighter">Twwinz.com</div>
-                <p class="font-['Inter'] text-sm text-slate-500 mb-1">&copy; 2026 Twwinz.com. All rights reserved.</p>
-                <a href="mailto:hello@twwinz.com" class="font-['Inter'] text-sm text-slate-400 hover:text-white transition-colors">hello@twwinz.com</a>
+                <p class="font-['Inter'] text-xs text-slate-400 max-w-md text-center md:text-left">
+                    Built on consent: you approve your voice, likeness and every piece of content your twin uses, and can pause or delete it anytime.
+                </p>
+                <p class="font-['Inter'] text-xs text-slate-500">&copy; 2026 Twwinz.com. All rights reserved. • <a href="mailto:hello@twwinz.com" class="text-slate-400 hover:text-white transition-colors">hello@twwinz.com</a></p>
             </div>
             <div class="flex flex-wrap justify-center gap-8">
+                <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="/jaxson-reed">Demo Twin Page</a>
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="privacy-policy.html">Privacy Policy</a>
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="terms-of-service.html">Terms of Service</a>
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="investor-relations.html">Investor Relations</a>
@@ -650,6 +687,162 @@
     <!-- Twwinz Interactive AI Twin Floating Widget -->
     <script src="widget.js" data-creator="jaxson-reed" data-primary-color="#3b82f6" data-accent-color="#f59e0b" defer></script>
     <script>
+        let homeDemoHistory = [];
+        let homeDemoVoiceOn = false;
+
+        function toggleHomeDemoVoice() {
+            homeDemoVoiceOn = !homeDemoVoiceOn;
+            const label = document.getElementById('home-demo-voice-label');
+            if (label) label.textContent = homeDemoVoiceOn ? 'Voice: On' : 'Voice: Off';
+            if (!homeDemoVoiceOn && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function speakHomeDemo(text) {
+            if (!homeDemoVoiceOn || !('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.rate = 1.02;
+                window.speechSynthesis.speak(u);
+            } catch (_) {}
+        }
+
+        function resetHomeDemoChat() {
+            homeDemoHistory = [];
+            const box = document.getElementById('home-demo-messages');
+            if (box) {
+                box.innerHTML = `
+                    <div class="bg-white/5 border border-white/10 text-slate-100 px-4 py-3 rounded-2xl rounded-bl-sm max-w-[85%] leading-relaxed">
+                        Yo! It's Jaxson Reed's AI Twin. Ask me about my GalaxyCon Raleigh booth schedule, signed poster discount codes, or behind-the-scenes stories from <em>Nebula Drifter</em>!
+                    </div>
+                `;
+            }
+        }
+
+        function askHomeDemo(question) {
+            const input = document.getElementById('home-demo-input');
+            if (!input) return;
+            input.value = question;
+            sendHomeDemoMessage();
+        }
+
+        function escapeHomeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        async function sendHomeDemoMessage() {
+            const input = document.getElementById('home-demo-input');
+            const box = document.getElementById('home-demo-messages');
+            if (!input || !box) return;
+            const query = input.value.trim();
+            if (!query) return;
+            input.value = '';
+
+            box.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-sm max-w-[82%] leading-relaxed">
+                        ${escapeHomeHtml(query)}
+                    </div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+            homeDemoHistory.push({ sender: 'fan', message: query });
+
+            const typingId = 'demo-typing-' + Date.now();
+            box.innerHTML += `<div id="${typingId}" class="text-xs text-slate-400 italic px-2">Jaxson's Twin is checking his schedule &amp; notes...</div>`;
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat/preview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        creatorId: 'clb_jaxson_reed',
+                        query,
+                        chatHistory: homeDemoHistory.slice(-6)
+                    })
+                });
+                const data = await res.json();
+                document.getElementById(typingId)?.remove();
+
+                const reply = data.reply || "Thanks for asking! Check out my GalaxyCon booth #412 or use code GALAXY20 for 20% off signed posters.";
+                let sourcesBadge = '';
+                if (Array.isArray(data.ragSources) && data.ragSources.length > 0) {
+                    const titles = data.ragSources.map(s => escapeHomeHtml(s.title)).join(', ');
+                    sourcesBadge = `<div class="mt-2 pt-1.5 border-t border-white/10 text-[11px] text-amber-300 font-mono">✓ Verified from Jaxson's info: ${titles}</div>`;
+                }
+
+                box.innerHTML += `
+                    <div class="bg-white/5 border border-white/10 text-slate-100 px-4 py-3 rounded-2xl rounded-bl-sm max-w-[85%] leading-relaxed">
+                        <div>${escapeHomeHtml(reply)}</div>
+                        ${sourcesBadge}
+                    </div>
+                `;
+                box.scrollTop = box.scrollHeight;
+                homeDemoHistory.push({ sender: 'twin', message: reply });
+                speakHomeDemo(reply);
+            } catch (err) {
+                document.getElementById(typingId)?.remove();
+            }
+        }
+
+        function openHomeSignInModal() {
+            const modal = document.getElementById('home-signin-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeHomeSignInModal() {
+            const modal = document.getElementById('home-signin-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        async function submitHomeEmailLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('home-login-email').value.trim();
+            const password = document.getElementById('home-login-password').value;
+            const errEl = document.getElementById('home-login-error');
+            const btn = document.getElementById('btn-home-login');
+
+            if (errEl) errEl.classList.add('hidden');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Signing in...';
+            }
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (res.ok && data.authenticated) {
+                    window.location.href = data.redirectUrl || 'dashboard.html';
+                } else if (errEl) {
+                    errEl.textContent = data.error || 'Invalid email or password.';
+                    errEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                if (errEl) {
+                    errEl.textContent = 'Connection error: ' + err.message;
+                    errEl.classList.remove('hidden');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Sign In with Email';
+                }
+            }
+        }
+
         (async function() {
             try {
                 const res = await fetch('/api/auth/me');
@@ -674,6 +867,55 @@
             } catch (_) {}
         })();
     </script>
+
+    <!-- Creator Sign-In Modal (Google or Email + Password) -->
+    <div id="home-signin-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+        <div class="bg-[#181818] border border-white/10 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 class="text-lg font-bold text-white font-['Space_Grotesk']">Sign In to Your Twin</h3>
+                <button type="button" onclick="closeHomeSignInModal()" class="text-slate-400 hover:text-white">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <a href="/api/auth/google" class="w-full justify-center bg-white text-slate-900 hover:bg-slate-100 font-semibold px-4 py-3 rounded-xl text-xs inline-flex items-center gap-2.5 transition-all shadow-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                    <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+                    <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
+                </svg>
+                <span>Continue with Google</span>
+            </a>
+
+            <div class="relative flex items-center py-1">
+                <div class="flex-grow border-t border-white/10"></div>
+                <span class="flex-shrink mx-3 text-[11px] uppercase tracking-wider text-slate-500">or sign in with email</span>
+                <div class="flex-grow border-t border-white/10"></div>
+            </div>
+
+            <form onsubmit="submitHomeEmailLogin(event)" class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Email Address</label>
+                    <input type="email" id="home-login-email" required placeholder="you@mobilizedentertainment.com"
+                        class="w-full bg-[#111111] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Password</label>
+                    <input type="password" id="home-login-password" required placeholder="••••••••"
+                        class="w-full bg-[#111111] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
+                </div>
+                <div id="home-login-error" class="hidden text-xs text-red-400"></div>
+                <button type="submit" id="btn-home-login" class="w-full primary-gradient text-on-primary font-bold py-3 rounded-xl text-xs transition-all">
+                    Sign In with Email
+                </button>
+            </form>
+
+            <div class="text-center text-xs text-slate-400 pt-2 border-t border-white/10">
+                New to Twwinz? <a href="onboard.html" class="text-blue-400 hover:underline font-semibold">Create your AI Twin →</a>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

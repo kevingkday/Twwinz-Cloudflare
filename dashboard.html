@@ -3,7 +3,14 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Content &amp; Live RAG Test | Twwinz.com</title>
+    <title>Content &amp; Live Twin Test | Twwinz.com</title>
+    <meta name="description" content="Manage your AI Twin's knowledge base — add convention appearances, signed merch offers, booking info, FAQs, documents, and photos." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Creator Dashboard — Content &amp; Live Twin Test | Twwinz.com" />
+    <meta property="og:description" content="Add your unpublished convention dates, signed merch offers, FAQs, and photos so your AI Twin answers fans accurately." />
+    <meta property="og:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Client-side Word (.docx) & PDF (.pdf) text extractors -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" defer></script>
@@ -68,27 +75,42 @@
         </div>
     </nav>
 
-    <!-- Simplified Artist Header -->
+    <!-- Simplified Creator Header + Hosted Twin Page Link -->
     <header class="border-b border-white/5 bg-gradient-to-b from-[#181818] to-[#111111] py-5 px-6">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <img id="creator-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
                      class="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/30 shadow-lg" alt="Avatar" />
                 <div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 flex-wrap">
                         <h1 id="creator-name-header" class="text-xl sm:text-2xl font-bold text-white font-headline">Jaxson Reed</h1>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Memory Online
                         </span>
                     </div>
-                    <p id="creator-headline-header" class="text-slate-400 text-xs mt-0.5">Type or upload documents &amp; photos on the left, then test how your AI Twin answers on the right.</p>
+                    <p id="creator-headline-header" class="text-slate-400 text-xs mt-0.5">Add your appearances, signed merch offers, FAQs, documents &amp; photos on the left, then test how your Twin replies on the right.</p>
                 </div>
             </div>
-            <a href="settings.html" id="header-settings-btn" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-xs font-semibold text-slate-200 transition-all self-start sm:self-auto">
-                <span class="material-symbols-outlined text-sm text-blue-400">tune</span>
-                <span>Widget, Persona &amp; Voice Controls</span>
-                <span class="material-symbols-outlined text-sm text-slate-400">arrow_forward</span>
-            </a>
+
+            <!-- Your Twin Page (Public Hosted Page Link + Copy Button) & Controls Link -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2 bg-[#161616] border border-blue-500/25 rounded-xl px-3.5 py-2 text-xs">
+                    <span class="material-symbols-outlined text-blue-400 text-sm">public</span>
+                    <span class="text-slate-400 font-medium">Your twin page:</span>
+                    <a id="hosted-twin-page-link" href="/jaxson-reed" target="_blank" class="text-blue-300 hover:text-white font-mono underline">
+                        twwinz.com/jaxson-reed
+                    </a>
+                    <button type="button" id="btn-copy-twin-page" onclick="copyTwinPageUrl()" class="ml-1 px-2.5 py-1 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 font-semibold text-[11px] flex items-center gap-1 transition">
+                        <span class="material-symbols-outlined text-xs">content_copy</span>
+                        <span>Copy</span>
+                    </button>
+                </div>
+                <a href="settings.html" id="header-settings-btn" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-xs font-semibold text-slate-200 transition-all">
+                    <span class="material-symbols-outlined text-sm text-blue-400">tune</span>
+                    <span>Widget, Persona &amp; Voice Controls</span>
+                    <span class="material-symbols-outlined text-sm text-slate-400">arrow_forward</span>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -106,7 +128,7 @@
                             <span class="w-6 h-6 rounded-full bg-blue-500 text-slate-950 font-bold text-xs flex items-center justify-center">1</span>
                             <h2 class="text-base font-bold text-white font-headline">Add Knowledge, Documents or Photos</h2>
                         </div>
-                        <span class="text-[11px] text-blue-400 font-medium">Auto-Indexed in D1 + Vectorize</span>
+                        <span class="text-[11px] text-blue-400 font-medium">Instant Twin Memory + R2 Photo Storage</span>
                     </div>
 
                     <!-- Drag & Drop Upload Bar for Word, PDF, Text & Pictures -->
@@ -155,16 +177,16 @@
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Category</label>
                             <select id="quick-category" class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
-                                <option value="schedule">📅 Tour / Event</option>
-                                <option value="offer">🎟️ Offer / VIP Code</option>
-                                <option value="faq">💡 FAQ / Gear / Info</option>
-                                <option value="bio">👤 Bio / Story / Press</option>
+                                <option value="schedule">📅 Appearance / Event</option>
+                                <option value="offer">🎟️ Merch / Promo Code</option>
+                                <option value="faq">💡 Fan FAQ / Booking Info</option>
+                                <option value="bio">👤 Bio / Podcast / Story</option>
                                 <option value="photo">📸 Photo / Visual</option>
                             </select>
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Topic / Title *</label>
-                            <input type="text" id="quick-title" placeholder="e.g. 2026 North American Tour Dates, Full Biography, or Backstage Guitar Photo" 
+                            <input type="text" id="quick-title" placeholder="e.g. GalaxyCon Booth #412 Schedule, Signed Poster Discount Code, or Podcast Booking Info" 
                                 class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
                         </div>
                     </div>
@@ -184,7 +206,7 @@
                             </div>
                         </div>
                         <textarea id="quick-content" rows="10" oninput="updateWordCount()"
-                            placeholder="Paste or type as much detail as you want — full tour schedules, press releases, interview transcripts, merch details, or descriptions of uploaded photos. You can also drag and drop a Word (.docx), PDF, or text file above to auto-fill this box."
+                            placeholder="Paste or type as much detail as you want — convention appearance schedules, signed merch discount codes, booking instructions, local event details, podcast episode notes, or descriptions of uploaded photos. You can also drag and drop a Word (.docx), PDF, or text file above to auto-fill this box."
                             class="w-full bg-[#161616] border border-white/10 rounded-xl p-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 leading-relaxed resize-y min-h-[220px]"></textarea>
                     </div>
 
@@ -209,7 +231,7 @@
                         </div>
                         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="filter-tabs">
                             <button onclick="filterCategory('all')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500 text-white" data-cat="all">All</button>
-                            <button onclick="filterCategory('schedule')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="schedule">Tour</button>
+                            <button onclick="filterCategory('schedule')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="schedule">Events</button>
                             <button onclick="filterCategory('offer')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="offer">Offers</button>
                             <button onclick="filterCategory('faq')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="faq">FAQs</button>
                             <button onclick="filterCategory('bio')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white" data-cat="bio">Bio</button>
@@ -243,13 +265,13 @@
                     <!-- Sandbox Messages Box -->
                     <div id="sandbox-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#0d0d0d] text-xs">
                         <div class="bg-[#1a1a1a] p-3.5 rounded-xl border border-white/5 text-slate-200 leading-relaxed">
-                            👋 <strong>Try it out!</strong> Add text, upload a Word/PDF document, or upload a picture on the left. Then ask me about it right here (e.g. <em>"Show me a picture of..."</em> or <em>"What are the tour dates?"</em>) to see the grounded response!
+                            👋 <strong>Try it out!</strong> Add text, upload a Word/PDF document, or upload a picture on the left. Then ask me about it right here (e.g. <em>"Where is your booth at GalaxyCon?"</em>, <em>"Do you have a discount code for signed posters?"</em>, or <em>"Show me a picture of..."</em>) to see the grounded response!
                         </div>
                     </div>
 
                     <!-- Sandbox Input Box -->
                     <div class="p-3.5 bg-[#161616] border-t border-white/10 flex gap-2 items-center">
-                        <input type="text" id="sandbox-input" placeholder="Ask a question or 'Show me a picture of...'" 
+                        <input type="text" id="sandbox-input" placeholder="Ask about appearances, signed merch, bookings, or photos..." 
                             class="flex-1 bg-[#222222] border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" 
                             onkeydown="if(event.key==='Enter') sendSandboxMessage()" />
                         <button onclick="sendSandboxMessage()" id="btn-sandbox-send" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-3 rounded-xl text-xs transition-colors flex items-center justify-center">
@@ -264,6 +286,7 @@
 
     <script>
         let currentCreatorId = 'clb_jaxson_reed';
+        let currentCreatorSlug = 'jaxson-reed';
         let currentCreator = null;
         let knowledgeItems = [];
         let activeCategoryFilter = 'all';
@@ -285,6 +308,25 @@
             if (navSettings) navSettings.href = settingsUrl;
             if (headerSettings) headerSettings.href = settingsUrl;
             if (navContent) navContent.href = contentUrl;
+
+            const hostedLink = document.getElementById('hosted-twin-page-link');
+            if (hostedLink && currentCreatorSlug) {
+                hostedLink.href = `/${encodeURIComponent(currentCreatorSlug)}`;
+                hostedLink.textContent = `${window.location.host || 'twwinz.com'}/${currentCreatorSlug}`;
+            }
+        }
+
+        function copyTwinPageUrl() {
+            const slug = currentCreatorSlug || 'jaxson-reed';
+            const fullUrl = `${window.location.origin}/${slug}`;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                const btn = document.getElementById('btn-copy-twin-page');
+                if (!btn) return;
+                btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span><span>Copied!</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span><span>Copy</span>`;
+                }, 2000);
+            });
         }
 
         function updateWordCount() {
@@ -362,11 +404,10 @@
 
                     preview.src = compressedDataUrl;
                     nameEl.textContent = `Photo Ready: ${file.name}`;
-                    hintEl.textContent = 'Generating AI visual description for RAG search...';
+                    hintEl.textContent = 'Generating AI visual description for search...';
                     banner.classList.remove('hidden');
                     badge.textContent = '✓ Photo Attached';
 
-                    // Ask Workers AI Vision to auto-describe the photo if content is empty
                     const visionRes = await fetch('/api/utils/analyze-image', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -382,7 +423,7 @@
                             updateWordCount();
                         }
                     }
-                    hintEl.textContent = 'Edit or add details below so your Twin knows when to share this photo in chat!';
+                    hintEl.textContent = 'Stored in Cloudflare R2 on save. Edit or add details below so your Twin knows when to share this photo in chat!';
                 } catch (err) {
                     alert('Could not process image: ' + err.message);
                     badge.textContent = 'Browse Files';
@@ -536,6 +577,7 @@
 
                 if (data.creator) {
                     currentCreatorId = data.creator.id;
+                    currentCreatorSlug = data.creator.slug || currentCreatorSlug;
                 } else {
                     window.location.href = 'onboard.html';
                 }
@@ -550,6 +592,7 @@
                 if (res.ok) {
                     currentCreator = await res.json();
                     currentCreatorId = currentCreator.id;
+                    currentCreatorSlug = currentCreator.slug || 'jaxson-reed';
                     syncLinksWithCreatorId();
 
                     document.getElementById('creator-name-header').textContent = currentCreator.name;
@@ -697,11 +740,32 @@
             btn.disabled = true;
             btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">refresh</span><span>Saving...</span>`;
 
-            const metadata = attachedImageDataUrl
-                ? { image_url: attachedImageDataUrl, file_name: attachedFileName || 'photo.jpg' }
-                : null;
-
             try {
+                let metadata = null;
+                if (attachedImageDataUrl) {
+                    // Upload photo binary to Cloudflare R2 first, storing only R2 key/URL and metadata in D1
+                    const mediaRes = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/media`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            imageDataUrl: attachedImageDataUrl,
+                            fileName: attachedFileName || 'photo.jpg'
+                        })
+                    });
+                    if (!mediaRes.ok) {
+                        const errData = await mediaRes.json().catch(() => ({}));
+                        throw new Error(errData.error || 'Failed to upload photo to R2');
+                    }
+                    const mediaData = await mediaRes.json();
+                    metadata = {
+                        r2_key: mediaData.r2_key,
+                        image_url: mediaData.image_url,
+                        content_type: mediaData.content_type,
+                        size_bytes: mediaData.size_bytes,
+                        file_name: mediaData.file_name
+                    };
+                }
+
                 const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/knowledge`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -722,7 +786,8 @@
                         setTimeout(() => statusEl.classList.add('opacity-0'), 3000);
                     }
                 } else {
-                    alert('Error saving memory.');
+                    const errBody = await res.json().catch(() => ({}));
+                    alert(errBody.error || 'Error saving memory.');
                 }
             } catch (err) {
                 alert('Error saving memory: ' + err.message);
@@ -797,14 +862,14 @@
                         `;
                     }
                     sourcesHtml = `<div class="mt-2 text-[10px] text-amber-400/90 font-mono flex items-center gap-1 border-t border-white/5 pt-1.5">
-                        <span class="material-symbols-outlined text-[12px]">verified</span> Grounded via: ${data.ragSources.map(s => escapeHtml(s.title)).join(', ')}
+                        <span class="material-symbols-outlined text-[12px]">verified</span> Verified from: ${data.ragSources.map(s => escapeHtml(s.title)).join(', ')}
                     </div>`;
                 }
 
                 messagesBox.innerHTML += `
                     <div class="flex justify-start">
-                        <div class="bg-[#1e1e1e] border border-white/10 text-white px-3.5 py-2.5 rounded-xl rounded-bl-xs max-w-[88%] leading-relaxed">
-                            <div>${escapeHtml(data.reply || 'No response generated.')}</div>
+                        <div class="bg-[#1b1b1b] border border-white/10 text-slate-100 px-3.5 py-2.5 rounded-xl rounded-bl-xs max-w-[90%] leading-relaxed">
+                            <div>${escapeHtml(data.reply || 'Sorry, I encountered an error.')}</div>
                             ${imageHtml}
                             ${sourcesHtml}
                         </div>
@@ -813,14 +878,14 @@
                 messagesBox.scrollTop = messagesBox.scrollHeight;
             } catch (err) {
                 document.getElementById(typingId)?.remove();
-                messagesBox.innerHTML += `<div class="text-red-400 text-[11px]">Connection error: ${err.message}</div>`;
+                messagesBox.innerHTML += `<div class="text-red-400 text-xs">Failed to reach AI Twin: ${err.message}</div>`;
             }
         }
 
         function clearSandboxChat() {
             document.getElementById('sandbox-messages').innerHTML = `
-                <div class="bg-[#1a1a1a] p-3.5 rounded-xl border border-white/5 text-slate-200 text-xs leading-relaxed">
-                    👋 <strong>Chat Reset.</strong> Ask a question about your uploaded documents, tour dates, or ask to see a photo you uploaded!
+                <div class="bg-[#1a1a1a] p-3.5 rounded-xl border border-white/5 text-slate-200 leading-relaxed">
+                    👋 <strong>Chat reset!</strong> Ask a question or ask to see a photo you uploaded to test your AI Twin's grounded memory.
                 </div>
             `;
         }

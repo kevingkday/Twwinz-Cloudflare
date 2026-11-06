@@ -1,6 +1,33 @@
 import { scrapeWebsiteStyles } from './services/styleScraper.js';
 import { GHLService } from './services/ghlService.js';
 import { RAGEngine } from './services/ragEngine.js';
+import {
+  getMediaBucket,
+  isDataUriImage,
+  uploadImageToR2,
+  extractR2Key,
+  signMediaUrl,
+  verifyMediaSignature,
+  signKnowledgeItemsMedia,
+  migrateDataUriImages
+} from './services/mediaService.js';
+import {
+  encryptSecret,
+  decryptSecret,
+  isGhlOAuthConfigured,
+  getGhlOAuthRedirectUri,
+  createGhlOAuthState,
+  consumeGhlOAuthState,
+  buildGhlAuthorizationUrl,
+  exchangeGhlCodeForTokens,
+  saveGhlOAuthConnection,
+  saveProvisionedSubAccountUser,
+  resolveCreatorGhlCredentials,
+  getGhlConnectionStatus,
+  disconnectGhlOAuth
+} from './services/ghlOAuthService.js';
+
+export { migrateDataUriImages };
 
 const DEMO_CREATOR_ID = 'clb_jaxson_reed';
 const DEMO_CREATOR_SLUG = 'jaxson-reed';
@@ -8,6 +35,21 @@ const ALLOWED_REDIRECT_PATHS = new Set(['/', '/index.html', '/onboard.html', '/d
 const PUBLIC_CREATOR_FIELDS = [
   'id', 'name', 'slug', 'headline', 'avatar_url', 'brand_colors', 'brand_fonts',
   'welcome_message', 'website_type', 'is_active'
+];
+const PUBLIC_STATIC_PAGES = [
+  { path: '/', priority: '1.0' },
+  { path: '/onboard.html', priority: '0.9' },
+  { path: '/dynamic-grounding.html', priority: '0.8' },
+  { path: '/shopify-integration.html', priority: '0.8' },
+  { path: '/unified-brain.html', priority: '0.8' },
+  { path: '/sovereignty.html', priority: '0.8' },
+  { path: '/fixed-retainers.html', priority: '0.8' },
+  { path: '/usage-fees.html', priority: '0.8' },
+  { path: '/performance-share.html', priority: '0.8' },
+  { path: '/voice-cloning.html', priority: '0.8' },
+  { path: '/investor-relations.html', priority: '0.5' },
+  { path: '/privacy-policy.html', priority: '0.5' },
+  { path: '/terms-of-service.html', priority: '0.5' }
 ];
 
 export default {
@@ -17,6 +59,11 @@ export default {
     // Enable CORS for API routes
     if (request.method === 'OPTIONS') {
       return handleCors();
+    }
+
+    // Dynamic XML Sitemap (includes static public pages + active hosted twin pages)
+    if (url.pathname === '/sitemap.xml' && request.method === 'GET') {
+      return handleSitemap(url, env);
     }
 
     // Route API requests
@@ -35,6 +82,15 @@ export default {
       }
     }
 
+    // Public Hosted Twin Page: GET /<slug> (for creators without their own website)
+    if (request.method === 'GET' && isCandidateCreatorSlugPath(url.pathname) && env?.DB) {
+      const slug = decodeURIComponent(url.pathname.slice(1));
+      const creator = await loadCreator(env.DB, slug);
+      if (creator && creator.is_active) {
+        return renderHostedTwinPage(toPublicCreator(creator), url);
+      }
+    }
+
     // Fallback to static assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
@@ -43,6 +99,300 @@ export default {
     return new Response('Twwinz Platform Ready', { status: 200 });
   }
 };
+
+function isCandidateCreatorSlugPath(pathname) {
+  if (!pathname || pathname === '/' || pathname.startsWith('/api/')) return false;
+  if (pathname.includes('.')) return false;
+  return /^\/[a-z0-9][a-z0-9-_]{1,80}$/i.test(pathname);
+}
+
+async function handleSitemap(url, env) {
+  const baseOrigin = 'https://twwinz.com';
+  const slugs = new Set([DEMO_CREATOR_SLUG]);
+
+  if (env?.DB) {
+    try {
+      const { results } = await env.DB.prepare(
+        'SELECT slug FROM creators WHERE is_active = 1'
+      ).all();
+      for (const row of results || []) {
+        if (row && row.slug) slugs.add(String(row.slug));
+      }
+    } catch (_) {}
+  }
+
+  const urlsXml = [
+    ...PUBLIC_STATIC_PAGES.map(
+      (p) => `   <url>\n      <loc>${baseOrigin}${p.path}</loc>\n      <priority>${p.priority}</priority>\n   </url>`
+    ),
+    ...Array.from(slugs).map(
+      (slug) => `   <url>\n      <loc>${baseOrigin}/${escapeXml(slug)}</loc>\n      <priority>0.9</priority>\n   </url>`
+    )
+  ].join('\n');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlsXml}\n</urlset>`;
+  return new Response(xml, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=600'
+    }
+  });
+}
+
+function renderHostedTwinPage(publicCreator, url) {
+  const colors = parseJsonObject(publicCreator.brand_colors, {
+    primary: '#3b82f6',
+    accent: '#f59e0b',
+    background: '#0f172a',
+    surface: '#1e293b'
+  });
+  const fonts = parseJsonObject(publicCreator.brand_fonts, {
+    heading: 'Space Grotesk',
+    body: 'Inter'
+  });
+
+  const primaryColor = sanitizeColor(colors.primary, '#3b82f6');
+  const accentColor = sanitizeColor(colors.accent, '#f59e0b');
+  const headingFont = escapeHtml(fonts.heading || 'Space Grotesk');
+  const bodyFont = escapeHtml(fonts.body || 'Inter');
+
+  const safeName = escapeHtml(publicCreator.name || 'Creator');
+  const safeSlug = escapeHtml(publicCreator.slug || '');
+  const safeHeadline = escapeHtml(publicCreator.headline || `Official AI Twin for ${publicCreator.name || 'Creator'}`);
+  const safeWelcome = escapeHtml(
+    publicCreator.welcome_message ||
+    `Hey! I'm ${publicCreator.name}'s official AI Twin. Ask me about upcoming appearances, signed merch, booking inquiries, or FAQs!`
+  );
+  const safeAvatar = escapeHtml(
+    publicCreator.avatar_url ||
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
+  );
+  const canonicalUrl = `${url.origin}/${encodeURIComponent(publicCreator.slug)}`;
+
+  const html = `<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${safeName} — Official AI Twin | Twwinz</title>
+  <meta name="description" content="${safeHeadline}. Chat directly with ${safeName}'s consent-approved AI Twin for appearances, signed merch, booking requests, and fan FAQs." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content="${safeName} — Official AI Twin | Twwinz" />
+  <meta property="og:description" content="${safeHeadline}" />
+  <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />
+  <meta property="og:image" content="${safeAvatar}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${safeName} — Official AI Twin | Twwinz" />
+  <meta name="twitter:description" content="${safeHeadline}" />
+  <meta name="twitter:image" content="${safeAvatar}" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --twin-primary: ${primaryColor};
+      --twin-accent: ${accentColor};
+    }
+    body {
+      background-color: #0e0e11;
+      color: #f1f5f9;
+      font-family: '${bodyFont}', 'Inter', system-ui, sans-serif;
+    }
+    .font-headline {
+      font-family: '${headingFont}', 'Space Grotesk', system-ui, sans-serif;
+    }
+    .glass-card {
+      background: rgba(24, 24, 29, 0.82);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+  <div class="fixed inset-0 pointer-events-none opacity-25 z-0">
+    <div class="absolute -top-24 left-1/4 w-96 h-96 rounded-full blur-[130px]" style="background:${primaryColor}"></div>
+    <div class="absolute bottom-0 right-1/4 w-80 h-80 rounded-full blur-[130px]" style="background:${accentColor}"></div>
+  </div>
+
+  <header class="relative z-10 border-b border-white/10 bg-black/40 backdrop-blur-md">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/" class="text-lg font-bold tracking-tight text-blue-400 font-headline">Twwinz.com</a>
+      <span class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Consent-Verified Twin Page
+      </span>
+    </div>
+  </header>
+
+  <main class="relative z-10 flex-1 max-w-5xl w-full mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- Left Public Creator Card -->
+    <section class="lg:col-span-5 glass-card rounded-3xl p-7 shadow-2xl space-y-6">
+      <div class="flex items-center gap-4">
+        <img src="${safeAvatar}" alt="${safeName}" class="w-20 h-20 rounded-2xl object-cover border-2 shadow-lg" style="border-color:${primaryColor}" />
+        <div>
+          <span class="text-[11px] uppercase tracking-widest font-semibold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200">Official Digital Twin</span>
+          <h1 class="text-2xl sm:text-3xl font-bold text-white font-headline mt-1">${safeName}</h1>
+          <p class="text-xs sm:text-sm text-slate-300 mt-0.5">${safeHeadline}</p>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs sm:text-sm text-slate-200 leading-relaxed">
+        "${safeWelcome}"
+      </div>
+
+      <div class="space-y-2">
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Try asking ${safeName}'s Twin:</div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="askHostedQuestion('Where are your next convention appearances or local events?')" class="text-left text-xs px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition">
+            📍 Upcoming appearances &amp; booths
+          </button>
+          <button type="button" onclick="askHostedQuestion('Do you have any signed merch or discount codes right now?')" class="text-left text-xs px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition">
+            🎟️ Signed merch &amp; promo codes
+          </button>
+          <button type="button" onclick="askHostedQuestion('How can I book you for a podcast, event, or shoutout?')" class="text-left text-xs px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition">
+            🎙️ Booking &amp; podcast requests
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-white/10 text-[11px] text-slate-400 leading-relaxed">
+        Built on consent: ${safeName} approves the voice, likeness, and every piece of content this twin uses, and can pause or delete it anytime.
+      </div>
+    </section>
+
+    <!-- Right Embedded Live Chat Panel -->
+    <section class="lg:col-span-7 glass-card rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col h-[540px]">
+      <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between" style="background: linear-gradient(135deg, ${primaryColor}33 0%, #111827 100%);">
+        <div class="flex items-center gap-3">
+          <img src="${safeAvatar}" alt="${safeName}" class="w-10 h-10 rounded-full object-cover border border-white/40" />
+          <div>
+            <div class="text-sm font-bold text-white font-headline">Chat with ${safeName}</div>
+            <div class="text-[11px] text-emerald-300">Replies from ${safeName}'s verified info</div>
+          </div>
+        </div>
+        <button type="button" id="hosted-voice-toggle" onclick="toggleHostedVoice()" class="text-xs px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-slate-200 font-medium transition">
+          🔊 Voice: Off
+        </button>
+      </div>
+
+      <div id="hosted-chat-messages" class="flex-1 p-5 overflow-y-auto space-y-3 bg-[#0b0d13] text-sm">
+        <div class="bg-white/5 border border-white/10 text-slate-100 px-4 py-3 rounded-2xl rounded-bl-sm max-w-[85%] leading-relaxed">
+          ${safeWelcome}
+        </div>
+      </div>
+
+      <form onsubmit="event.preventDefault(); sendHostedMessage();" class="p-4 bg-[#12151e] border-t border-white/10 flex gap-2.5">
+        <input id="hosted-chat-input" type="text" placeholder="Ask ${safeName} about appearances, signed merch, bookings, or FAQs..." class="flex-1 bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-400" />
+        <button type="submit" id="hosted-chat-send" class="px-5 py-3 rounded-xl font-bold text-sm text-white transition hover:opacity-90" style="background:${primaryColor}">
+          Send
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="relative z-10 border-t border-white/5 py-6 text-center text-xs text-slate-500">
+    Hosted on <a href="/" class="text-slate-300 hover:text-white underline">Twwinz.com</a> • Want your own twin page? <a href="/onboard.html" class="text-blue-400 hover:underline">Get started in 2 minutes</a>
+  </footer>
+
+  <!-- Floating Chat Widget -->
+  <script src="/widget.js" data-creator="${safeSlug}" data-primary-color="${primaryColor}" data-accent-color="${accentColor}" data-heading-font="${headingFont}" data-body-font="${bodyFont}" defer></script>
+
+  <script>
+    const HOSTED_CREATOR_SLUG = ${JSON.stringify(publicCreator.slug)};
+    const HOSTED_CREATOR_ID = ${JSON.stringify(publicCreator.id)};
+    let hostedHistory = [];
+    let hostedVoiceEnabled = false;
+
+    function toggleHostedVoice() {
+      hostedVoiceEnabled = !hostedVoiceEnabled;
+      const btn = document.getElementById('hosted-voice-toggle');
+      btn.textContent = hostedVoiceEnabled ? '🔊 Voice: On' : '🔊 Voice: Off';
+      if (!hostedVoiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function speakHostedReply(text) {
+      if (!hostedVoiceEnabled || !('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 1.02;
+        window.speechSynthesis.speak(utter);
+      } catch (_) {}
+    }
+
+    function askHostedQuestion(q) {
+      const input = document.getElementById('hosted-chat-input');
+      input.value = q;
+      sendHostedMessage();
+    }
+
+    function escapeClientHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    async function sendHostedMessage() {
+      const input = document.getElementById('hosted-chat-input');
+      const box = document.getElementById('hosted-chat-messages');
+      const query = input.value.trim();
+      if (!query) return;
+      input.value = '';
+
+      box.innerHTML += '<div class="flex justify-end"><div class="px-4 py-2.5 rounded-2xl rounded-br-sm text-white max-w-[82%]" style="background:${primaryColor}">' + escapeClientHtml(query) + '</div></div>';
+      box.scrollTop = box.scrollHeight;
+      hostedHistory.push({ sender: 'fan', message: query });
+
+      const typingId = 'typing-' + Date.now();
+      box.innerHTML += '<div id="' + typingId + '" class="text-xs text-slate-400 italic px-2">Thinking...</div>';
+      box.scrollTop = box.scrollHeight;
+
+      try {
+        const res = await fetch('/api/chat/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creatorId: HOSTED_CREATOR_ID || HOSTED_CREATOR_SLUG,
+            query,
+            chatHistory: hostedHistory.slice(-6)
+          })
+        });
+        const data = await res.json();
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        const reply = data.reply || 'Thanks for reaching out!';
+        let photoHtml = '';
+        if (Array.isArray(data.ragSources)) {
+          const withImg = data.ragSources.find(s => s && s.imageUrl);
+          if (withImg) {
+            photoHtml = '<div class="mt-2"><img src="' + escapeClientHtml(withImg.imageUrl) + '" alt="' + escapeClientHtml(withImg.title || 'Photo') + '" class="rounded-xl max-h-52 border border-white/10 object-cover" /></div>';
+          }
+        }
+        box.innerHTML += '<div class="bg-white/5 border border-white/10 text-slate-100 px-4 py-3 rounded-2xl rounded-bl-sm max-w-[85%] leading-relaxed">' + escapeClientHtml(reply) + photoHtml + '</div>';
+        box.scrollTop = box.scrollHeight;
+        hostedHistory.push({ sender: 'twin', message: reply });
+        speakHostedReply(reply);
+      } catch (err) {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+      }
+    }
+  </script>
+</body>
+</html>`;
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=60'
+    }
+  });
+}
 
 function handleCors() {
   return new Response(null, {
@@ -80,6 +430,7 @@ async function handleApiRoute(url, request, env) {
       database: dbCheck?.alive === 1 ? 'connected' : 'unavailable',
       hasAgencyKey: !!env.GHL_AGENCY_API_KEY,
       hasGoogleOAuth: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+      hasR2Bucket: !!env.MEDIA_BUCKET,
       companyId: env.GHL_COMPANY_ID || null,
       timestamp: new Date().toISOString()
     });
@@ -270,6 +621,262 @@ async function handleApiRoute(url, request, env) {
     });
   }
 
+  // 0a-2. Email + Password Registration & Login (for non-Google / alias emails)
+  if (path === '/api/auth/register' && method === 'POST') {
+    await ensureAuthTables(db);
+    const ip = clientIp(request);
+    const regLimit = await hitRateLimit(db, `auth-reg:${ip}`, 10, 600);
+    if (!regLimit.allowed) return tooMany(regLimit.retryAfter);
+
+    const body = await request.json().catch(() => ({}));
+    const rawEmail = String(body.email || '').trim().toLowerCase();
+    const rawName = String(body.name || '').trim();
+    const rawPassword = String(body.password || '');
+
+    if (!rawEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)) {
+      return jsonResponse({ error: 'A valid email address is required' }, 400);
+    }
+    if (rawPassword.length < 8) {
+      return jsonResponse({ error: 'Password must be at least 8 characters long' }, 400);
+    }
+
+    const existingUser = await db.prepare('SELECT * FROM auth_users WHERE LOWER(email) = LOWER(?)').bind(rawEmail).first();
+    if (existingUser) {
+      return jsonResponse({ error: 'An account with this email already exists. Please sign in instead.' }, 409);
+    }
+
+    const userId = `usr_${crypto.randomUUID().replace(/-/g, '')}`;
+    const displayName = rawName || rawEmail.split('@')[0];
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const saltHex = Array.from(saltBytes, b => b.toString(16).padStart(2, '0')).join('');
+    const passwordHash = await hashPasswordPbkdf2(rawPassword, saltHex);
+    const passwordEnc = await encryptSecret(rawPassword, env);
+
+    await db.prepare(`
+      INSERT INTO auth_users (id, email, name, password_hash, password_salt, password_enc, email_verified)
+      VALUES (?, ?, ?, ?, ?, ?, 1)
+    `).bind(userId, rawEmail, displayName, passwordHash, saltHex, passwordEnc).run();
+
+    const existingCreator = await db.prepare('SELECT * FROM creators WHERE LOWER(email) = LOWER(?) ORDER BY created_at DESC LIMIT 1')
+      .bind(rawEmail)
+      .first();
+
+    const sessionToken = `sess_${crypto.randomUUID().replace(/-/g, '')}`;
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    await db.prepare(`
+      INSERT INTO auth_sessions (token, google_id, email, name, picture, creator_id, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      sessionToken,
+      `email:${userId}`,
+      rawEmail,
+      displayName,
+      null,
+      existingCreator ? existingCreator.id : null,
+      expiresAt
+    ).run();
+
+    const secure = requestIsSecure(url);
+    const sessionCookie = serializeCookie('twwinz_session', sessionToken, { maxAge: 30 * 24 * 60 * 60, secure });
+
+    return jsonResponse({
+      success: true,
+      authenticated: true,
+      user: {
+        id: userId,
+        email: rawEmail,
+        name: displayName
+      },
+      creator: existingCreator ? toOwnerCreator(existingCreator, { includeApiKey: false }) : null
+    }, 201, { 'Set-Cookie': sessionCookie });
+  }
+
+  if (path === '/api/auth/login' && method === 'POST') {
+    await ensureAuthTables(db);
+    const ip = clientIp(request);
+    const loginLimit = await hitRateLimit(db, `auth-login:${ip}`, 15, 600);
+    if (!loginLimit.allowed) return tooMany(loginLimit.retryAfter);
+
+    const body = await request.json().catch(() => ({}));
+    const rawEmail = String(body.email || '').trim().toLowerCase();
+    const rawPassword = String(body.password || '');
+
+    if (!rawEmail || !rawPassword) {
+      return jsonResponse({ error: 'Email and password are required' }, 400);
+    }
+
+    const userRow = await db.prepare('SELECT * FROM auth_users WHERE LOWER(email) = LOWER(?)').bind(rawEmail).first();
+    if (!userRow) {
+      return jsonResponse({ error: 'Invalid email or password' }, 401);
+    }
+
+    const valid = await verifyPasswordPbkdf2(rawPassword, userRow.password_salt, userRow.password_hash);
+    if (!valid) {
+      return jsonResponse({ error: 'Invalid email or password' }, 401);
+    }
+
+    const existingCreator = await db.prepare('SELECT * FROM creators WHERE LOWER(email) = LOWER(?) ORDER BY created_at DESC LIMIT 1')
+      .bind(rawEmail)
+      .first();
+
+    const sessionToken = `sess_${crypto.randomUUID().replace(/-/g, '')}`;
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    await db.prepare(`
+      INSERT INTO auth_sessions (token, google_id, email, name, picture, creator_id, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      sessionToken,
+      `email:${userRow.id}`,
+      userRow.email,
+      userRow.name || rawEmail.split('@')[0],
+      null,
+      existingCreator ? existingCreator.id : null,
+      expiresAt
+    ).run();
+
+    const secure = requestIsSecure(url);
+    const sessionCookie = serializeCookie('twwinz_session', sessionToken, { maxAge: 30 * 24 * 60 * 60, secure });
+
+    return jsonResponse({
+      success: true,
+      authenticated: true,
+      user: {
+        id: userRow.id,
+        email: userRow.email,
+        name: userRow.name
+      },
+      creator: existingCreator ? toOwnerCreator(existingCreator, { includeApiKey: false }) : null,
+      redirectUrl: existingCreator
+        ? `/dashboard.html?id=${encodeURIComponent(existingCreator.id)}`
+        : '/onboard.html'
+    }, 200, { 'Set-Cookie': sessionCookie });
+  }
+
+  // 0b. HighLevel (GoHighLevel) OAuth 2.0 Authorization Flow — Start & Callback
+  if (path === '/api/oauth/ghl/start' && method === 'GET') {
+    const sessionGate = await requireSession(request, db);
+    if (sessionGate.response) return sessionGate.response;
+    const session = sessionGate.session;
+
+    let creator = null;
+    const requestedCreatorId = url.searchParams.get('creatorId');
+    if (requestedCreatorId) {
+      const owned = await requireOwnedCreator(request, db, requestedCreatorId);
+      if (owned.response) return owned.response;
+      creator = owned.creator;
+    } else {
+      creator = await findCreatorForSession(db, session);
+    }
+
+    if (!creator) {
+      return jsonResponse({ error: 'Creator profile not found' }, 404);
+    }
+    if (isDemoCreator(creator.id) || isDemoCreator(creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
+
+    if (!isGhlOAuthConfigured(env)) {
+      return jsonResponse({
+        error: 'HighLevel OAuth is not configured on this server yet. Please set GHL_CLIENT_ID and GHL_CLIENT_SECRET.'
+      }, 503);
+    }
+
+    const redirectUri = getGhlOAuthRedirectUri(request.url, env);
+    const state = await createGhlOAuthState(db, {
+      creatorId: creator.id,
+      userEmail: session.email,
+      redirectAfter: `${url.origin}/settings.html?id=${encodeURIComponent(creator.id)}`
+    });
+
+    const authUrl = buildGhlAuthorizationUrl({
+      clientId: env.GHL_CLIENT_ID,
+      redirectUri,
+      state
+    });
+
+    return Response.redirect(authUrl, 302);
+  }
+
+  if (path === '/api/oauth/ghl/callback' && method === 'GET') {
+    const code = url.searchParams.get('code');
+    const stateParam = url.searchParams.get('state');
+    const errorParam = url.searchParams.get('error');
+
+    if (errorParam) {
+      return Response.redirect(`${url.origin}/settings.html?ghl_oauth_error=${encodeURIComponent(errorParam)}`, 302);
+    }
+    if (!code || !stateParam) {
+      return jsonResponse({ error: 'Missing code or state parameter' }, 400);
+    }
+
+    const stateRow = await consumeGhlOAuthState(db, stateParam);
+    if (!stateRow) {
+      return jsonResponse({ error: 'Invalid or expired HighLevel OAuth state' }, 400);
+    }
+
+    const creator = await loadCreator(db, stateRow.creator_id);
+    if (!creator) {
+      return jsonResponse({ error: 'Creator not found' }, 404);
+    }
+
+    const activeSession = await readSession(request, db);
+    if (activeSession && !sessionOwnsCreator(activeSession, creator)) {
+      return jsonResponse({ error: 'Forbidden' }, 403);
+    }
+    const connectedByEmail = activeSession?.email || stateRow.user_email || creator.email;
+
+    const rawRedirectAfter = stateRow.redirect_after || `/settings.html?id=${encodeURIComponent(creator.id)}`;
+    const baseRedirectUrl = /^https?:\/\//i.test(rawRedirectAfter)
+      ? rawRedirectAfter
+      : `${url.origin}${rawRedirectAfter}`;
+
+    try {
+      const redirectUri = getGhlOAuthRedirectUri(request.url, env);
+      const tokenData = await exchangeGhlCodeForTokens({
+        code,
+        redirectUri,
+        env
+      });
+
+      await saveGhlOAuthConnection(db, env, {
+        creatorId: creator.id,
+        locationId: tokenData.locationId,
+        companyId: tokenData.companyId,
+        userType: tokenData.userType,
+        scope: tokenData.scope,
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        expiresIn: tokenData.expiresIn,
+        connectedByEmail
+      });
+
+      // Attempt to auto-discover the sub-account's native Live Chat widget ID
+      try {
+        const widgetsRes = await ghlService.getChatWidgets(tokenData.locationId, tokenData.accessToken);
+        if (widgetsRes.success && Array.isArray(widgetsRes.widgets) && widgetsRes.widgets.length > 0) {
+          const firstWidgetId = widgetsRes.widgets[0]?.id || widgetsRes.widgets[0]?._id;
+          if (firstWidgetId && !String(firstWidgetId).startsWith('wgt_')) {
+            await db.prepare('UPDATE creators SET ghl_widget_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+              .bind(firstWidgetId, creator.id)
+              .run();
+          }
+        }
+      } catch (_) {}
+
+      const sep = baseRedirectUrl.includes('?') ? '&' : '?';
+      return Response.redirect(`${baseRedirectUrl}${sep}ghl_oauth=connected`, 302);
+    } catch (oauthErr) {
+      console.error('[GHL OAuth Callback Error]', oauthErr.message);
+      const sep = baseRedirectUrl.includes('?') ? '&' : '?';
+      return Response.redirect(
+        `${baseRedirectUrl}${sep}ghl_oauth_error=${encodeURIComponent(oauthErr.message)}`,
+        302
+      );
+    }
+  }
+
   // 1. Scrape Website Styles (Colors, Fonts, Meta) — signed-in creators only
   if (path === '/api/utils/scrape-styles' && method === 'POST') {
     const sessionGate = await requireSession(request, db);
@@ -326,6 +933,91 @@ async function handleApiRoute(url, request, env) {
       description: title
         ? `Official photo: ${title}. Ask to see this picture in chat!`
         : 'Official uploaded photo. Add a short caption describing what is in this picture so your AI Twin knows when to share it with fans.'
+    });
+  }
+
+  // 1c. Serve R2 Media Objects via Signed or Authenticated URL
+  if (path.startsWith('/api/media/') && method === 'GET') {
+    const r2Key = decodeURIComponent(path.slice('/api/media/'.length));
+    if (!r2Key || !r2Key.startsWith('creators/') || r2Key.includes('..')) {
+      return jsonResponse({ error: 'Invalid media key' }, 400);
+    }
+
+    const parts = r2Key.split('/');
+    const keyCreatorId = parts[1] || '';
+
+    const expParam = url.searchParams.get('exp');
+    const sigParam = url.searchParams.get('sig');
+    const hasValidSignature = await verifyMediaSignature(r2Key, expParam, sigParam, env);
+
+    if (!hasValidSignature && !isDemoCreator(keyCreatorId)) {
+      const session = await readSession(request, db);
+      if (!session) {
+        return jsonResponse({ error: 'Authentication or valid signed URL required' }, 401);
+      }
+      const creator = await loadCreator(db, keyCreatorId);
+      if (!creator || !sessionOwnsCreator(session, creator)) {
+        return jsonResponse({ error: 'Forbidden' }, 403);
+      }
+    }
+
+    const bucket = getMediaBucket(env);
+    const obj = await bucket.get(r2Key);
+    if (!obj) {
+      return jsonResponse({ error: 'Media not found' }, 404);
+    }
+
+    const contentType = obj.httpMetadata?.contentType || 'image/jpeg';
+    const bodyBuffer = typeof obj.arrayBuffer === 'function' ? await obj.arrayBuffer() : obj.body;
+
+    return new Response(bodyBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'private, max-age=3600',
+        'X-Content-Type-Options': 'nosniff'
+      }
+    });
+  }
+
+  // 1d. Direct R2 Photo Upload Endpoint for Authenticated Creator
+  const mediaUploadMatch = path.match(/^\/api\/creators\/([^/]+)\/media$/);
+  if (mediaUploadMatch && method === 'POST') {
+    const creatorId = mediaUploadMatch[1];
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    if (isDemoCreator(owned.creator.id) || isDemoCreator(owned.creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
+
+    const body = await request.json();
+    const { imageDataUrl, fileName, itemId } = body;
+    if (!imageDataUrl || !isDataUriImage(imageDataUrl)) {
+      return jsonResponse({ error: 'Valid imageDataUrl is required' }, 400);
+    }
+
+    const uploadMeta = await uploadImageToR2(env, {
+      creatorId: owned.creator.id,
+      itemId: itemId || `img_${Date.now()}`,
+      dataUri: imageDataUrl,
+      fileName: fileName || 'photo.jpg'
+    });
+    const signedUrl = await signMediaUrl(uploadMeta.r2_key, env);
+
+    return jsonResponse({
+      ...uploadMeta,
+      signed_url: signedUrl
+    }, 201);
+  }
+
+  // 1e. One-Time Data-URI to R2 Migration Endpoint
+  if (path === '/api/admin/migrate-images' && method === 'POST') {
+    const sessionGate = await requireSession(request, db);
+    if (sessionGate.response) return sessionGate.response;
+    const result = await migrateDataUriImages(db, env);
+    return jsonResponse({
+      success: true,
+      ...result
     });
   }
 
@@ -408,12 +1100,25 @@ async function handleApiRoute(url, request, env) {
       }
     }
 
+    // If user registered via Email + Password, pass their password to GHL user provisioning
+    let userChosenPassword = body.password || null;
+    if (!userChosenPassword) {
+      try {
+        await ensureAuthTables(db);
+        const authUser = await db.prepare('SELECT password_enc FROM auth_users WHERE LOWER(email) = LOWER(?)').bind(email).first();
+        if (authUser && authUser.password_enc) {
+          userChosenPassword = await decryptSecret(authUser.password_enc, env);
+        }
+      } catch (_) {}
+    }
+
     // Provision GHL Sub-Account (with snapshot template if creating site on GHL)
     const ghlProvision = await ghlService.provisionSubAccount({
       name,
       email,
       websiteType,
-      snapshotId: body.snapshotId
+      snapshotId: body.snapshotId,
+      password: userChosenPassword
     });
 
     // Configure GHL Chat Widget styling
@@ -452,6 +1157,19 @@ async function handleApiRoute(url, request, env) {
       personaPrompt || `You are the official verified AI Twin for ${name}. Speak warmly, concisely, and accurately based on verified schedule and offers.`
     ).run();
 
+    // Persist provisioned Sub-Account Admin login credentials (encrypted) so the creator can authorize OAuth in 1 click
+    try {
+      await saveProvisionedSubAccountUser(db, env, {
+        creatorId,
+        locationId: ghlProvision.locationId,
+        userId: ghlProvision.userId,
+        loginEmail: ghlProvision.loginEmail || email,
+        tempPassword: ghlProvision.tempPassword
+      });
+    } catch (subErr) {
+      console.warn('[Save Provisioned GHL User Warning]', subErr.message);
+    }
+
     // Seed default knowledge item
     const initialKnowledgeId = `k_init_${Date.now()}`;
     await db.prepare(`
@@ -460,7 +1178,7 @@ async function handleApiRoute(url, request, env) {
     `).bind(
       initialKnowledgeId,
       creatorId,
-      `Welcome to ${name}'s official AI Twin. Here fans can discover upcoming tour dates, unreleased project announcements, VIP passes, and direct merchandise discounts.`
+      `Welcome to ${name}'s official AI Twin. Here fans can ask about upcoming convention appearances, local events, signed merch, booking inquiries, and FAQs.`
     ).run();
 
     // Populate FTS
@@ -547,6 +1265,142 @@ async function handleApiRoute(url, request, env) {
     return jsonResponse(toOwnerCreator(updated));
   }
 
+  // 4b. HighLevel Connection Status (OAuth 2.0 + Provisioned Sub-Account Credentials + Fallback Status)
+  const ghlConnMatch = path.match(/^\/api\/creators\/([^/]+)\/ghl-connection$/);
+  if (ghlConnMatch && method === 'GET') {
+    const creatorId = ghlConnMatch[1];
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    const status = await getGhlConnectionStatus(db, env, owned.creator);
+    return jsonResponse(status);
+  }
+
+  // 4c. Disconnect HighLevel OAuth Connection
+  const ghlDisconnectMatch = path.match(/^\/api\/creators\/([^/]+)\/ghl-disconnect$/);
+  if (ghlDisconnectMatch && method === 'POST') {
+    const creatorId = ghlDisconnectMatch[1];
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    if (isDemoCreator(owned.creator.id) || isDemoCreator(owned.creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
+    const body = await request.json().catch(() => ({}));
+    await disconnectGhlOAuth(db, owned.creator.id, {
+      clearPrivateToken: Boolean(body?.clearPrivateToken)
+    });
+    const updatedCreator = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(owned.creator.id).first();
+    const status = await getGhlConnectionStatus(db, env, updatedCreator);
+    return jsonResponse({ success: true, ...status });
+  }
+
+  // 4d. Provision (or Re-Provision) GHL Sub-Account & Sub-Account Admin User
+  const ghlProvisionMatch = path.match(/^\/api\/creators\/([^/]+)\/ghl-provision$/);
+  if (ghlProvisionMatch && method === 'POST') {
+    const creatorId = ghlProvisionMatch[1];
+    const owned = await requireOwnedCreator(request, db, creatorId);
+    if (owned.response) return owned.response;
+    if (isDemoCreator(owned.creator.id) || isDemoCreator(owned.creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
+
+    const creator = owned.creator;
+    const hasRealLocation = creator.ghl_location_id && !String(creator.ghl_location_id).startsWith('loc_');
+
+    let locationId = creator.ghl_location_id;
+    let userId = null;
+    let loginEmail = creator.email;
+    let tempPassword = null;
+
+    if (!hasRealLocation) {
+      const prov = await ghlService.provisionSubAccount({
+        name: creator.name,
+        email: creator.email,
+        websiteType: creator.website_type || 'ghl_hosted'
+      });
+      locationId = prov.locationId;
+      userId = prov.userId;
+      loginEmail = prov.loginEmail || creator.email;
+      tempPassword = prov.tempPassword;
+
+      await db.prepare('UPDATE creators SET ghl_location_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .bind(locationId, creator.id)
+        .run();
+    } else {
+      const subUser = await ghlService.provisionSubAccountUser({
+        name: creator.name,
+        email: creator.email,
+        locationId
+      });
+      userId = subUser.userId;
+      loginEmail = subUser.loginEmail || creator.email;
+      tempPassword = subUser.tempPassword;
+    }
+
+    await saveProvisionedSubAccountUser(db, env, {
+      creatorId: creator.id,
+      locationId,
+      userId,
+      loginEmail,
+      tempPassword
+    });
+
+    const refreshedCreator = await db.prepare('SELECT * FROM creators WHERE id = ?').bind(creator.id).first();
+    const status = await getGhlConnectionStatus(db, env, refreshedCreator);
+    return jsonResponse({
+      success: true,
+      ...status
+    });
+  }
+
+  // 4e. Upsert Fan Contact Strictly Inside Creator's Authorized GHL Sub-Account (locationId)
+  const ghlContactsMatch = path.match(/^\/api\/creators\/([^/]+)\/contacts$/);
+  if (ghlContactsMatch && method === 'POST') {
+    const creatorId = ghlContactsMatch[1];
+    const creator = await loadCreator(db, creatorId);
+    if (!creator || !creator.is_active) {
+      return jsonResponse({ error: 'Creator not found' }, 404);
+    }
+    if (isDemoCreator(creator.id) || isDemoCreator(creator.slug)) {
+      return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
+
+    const ip = clientIp(request);
+    const contactLimit = await hitRateLimit(db, `contact:${ip}:${creator.id}`, 15, 600);
+    if (!contactLimit.allowed) return tooMany(contactLimit.retryAfter);
+
+    const body = await request.json().catch(() => ({}));
+    const { name, email, phone, tags, source } = body;
+    if (!email && !phone) {
+      return jsonResponse({ error: 'Either email or phone is required' }, 400);
+    }
+
+    const creds = await resolveCreatorGhlCredentials(db, env, creator);
+    if (!creds.locationId || String(creds.locationId).startsWith('loc_')) {
+      return jsonResponse({ error: 'Creator has not connected a valid HighLevel Sub-Account yet' }, 400);
+    }
+
+    const result = await ghlService.upsertContact({
+      token: creds.token,
+      locationId: creds.locationId,
+      name,
+      email,
+      phone,
+      tags: Array.isArray(tags) ? tags : ['twwinz-fan'],
+      source: source || 'Twwinz AI Twin Chat'
+    });
+
+    if (!result.success) {
+      return jsonResponse({ error: result.error || 'Failed to sync contact to HighLevel' }, 502);
+    }
+
+    return jsonResponse({
+      success: true,
+      locationId: result.locationId,
+      contactId: result.contactId,
+      authMethod: creds.authMethod
+    }, 201);
+  }
+
   // 5. Get Knowledge Items (RAG Data)
   const knowledgeListMatch = path.match(/^\/api\/creators\/([^/]+)\/knowledge$/);
   if (knowledgeListMatch && method === 'GET') {
@@ -554,15 +1408,15 @@ async function handleApiRoute(url, request, env) {
     const category = url.searchParams.get('category');
     if (isDemoCreator(creatorId)) {
       const results = await queryKnowledge(db, DEMO_CREATOR_ID, category);
-      return jsonResponse(results);
+      return jsonResponse(await signKnowledgeItemsMedia(results, env));
     }
     const owned = await requireOwnedCreator(request, db, creatorId);
     if (owned.response) return owned.response;
     const results = await queryKnowledge(db, owned.creator.id, category);
-    return jsonResponse(results);
+    return jsonResponse(await signKnowledgeItemsMedia(results, env));
   }
 
-  // 6. Add Knowledge Item (with automatic Vector Embedding & Vectorize storage)
+  // 6. Add Knowledge Item (with R2 photo storage, automatic Vector Embedding & Vectorize storage)
   if (knowledgeListMatch && method === 'POST') {
     const creatorId = knowledgeListMatch[1];
     const owned = await requireOwnedCreator(request, db, creatorId);
@@ -579,10 +1433,41 @@ async function handleApiRoute(url, request, env) {
 
     const itemId = `k_${category.substring(0, 3)}_${Date.now()}`;
     const storedCreatorId = owned.creator.id;
-    const metaStr = metadata ? (typeof metadata === 'string' ? metadata : JSON.stringify(metadata)) : null;
+
+    // Never store raw data:image URIs in D1; upload them to Cloudflare R2 and store only the R2 key/URL and metadata
+    let parsedMeta = metadata
+      ? (typeof metadata === 'string' ? parseJsonObject(metadata, {}) : { ...metadata })
+      : null;
+    let cleanContent = content;
+
+    const rawDataUri = (parsedMeta && isDataUriImage(parsedMeta.image_url))
+      ? parsedMeta.image_url
+      : (isDataUriImage(content) ? content : null);
+
+    if (rawDataUri) {
+      const uploaded = await uploadImageToR2(env, {
+        creatorId: storedCreatorId,
+        itemId,
+        dataUri: rawDataUri,
+        fileName: (parsedMeta && parsedMeta.file_name) || `${itemId}.jpg`
+      });
+      parsedMeta = {
+        ...(parsedMeta || {}),
+        r2_key: uploaded.r2_key,
+        image_url: uploaded.image_url,
+        content_type: uploaded.content_type,
+        size_bytes: uploaded.size_bytes,
+        file_name: uploaded.file_name
+      };
+      if (isDataUriImage(cleanContent)) {
+        cleanContent = title;
+      }
+    }
+
+    const metaStr = parsedMeta ? JSON.stringify(parsedMeta) : null;
 
     // Generate 768-dimensional vector embedding
-    const textToEmbed = `${title}: ${content}`;
+    const textToEmbed = `${title}: ${cleanContent}`;
     const vector = await ragEngine.generateEmbedding(textToEmbed);
     const embeddingStr = vector ? JSON.stringify(vector) : null;
 
@@ -590,13 +1475,13 @@ async function handleApiRoute(url, request, env) {
     await db.prepare(`
       INSERT INTO knowledge_items (id, creator_id, category, title, content, metadata, embedding, priority, is_active)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
-    `).bind(itemId, storedCreatorId, category, title, content, metaStr, embeddingStr, priority || 0).run();
+    `).bind(itemId, storedCreatorId, category, title, cleanContent, metaStr, embeddingStr, priority || 0).run();
 
     // 2. Sync to D1 FTS5 full-text search table
     await db.prepare(`
       INSERT INTO knowledge_fts (id, creator_id, title, content)
       VALUES (?, ?, ?, ?)
-    `).bind(itemId, storedCreatorId, title, content).run();
+    `).bind(itemId, storedCreatorId, title, cleanContent).run();
 
     // 3. Sync to Cloudflare Vectorize index
     if (env.VECTORIZE && vector) {
@@ -612,10 +1497,11 @@ async function handleApiRoute(url, request, env) {
     }
 
     const createdItem = await db.prepare('SELECT * FROM knowledge_items WHERE id = ?').bind(itemId).first();
-    return jsonResponse(createdItem, 201);
+    const [signedItem] = await signKnowledgeItemsMedia([createdItem], env);
+    return jsonResponse(signedItem, 201);
   }
 
-  // 7. Delete Knowledge Item (removes from D1, FTS5, and Vectorize)
+  // 7. Delete Knowledge Item (removes from R2, D1, FTS5, and Vectorize)
   const knowledgeDeleteMatch = path.match(/^\/api\/creators\/([^/]+)\/knowledge\/([^/]+)$/);
   if (knowledgeDeleteMatch && method === 'DELETE') {
     const creatorId = knowledgeDeleteMatch[1];
@@ -624,6 +1510,19 @@ async function handleApiRoute(url, request, env) {
     if (owned.response) return owned.response;
     if (isDemoCreator(owned.creator.id) || isDemoCreator(owned.creator.slug)) {
       return jsonResponse({ error: 'Demo creator is read-only' }, 403);
+    }
+
+    const existingItem = await db.prepare('SELECT * FROM knowledge_items WHERE id = ? AND creator_id = ?')
+      .bind(itemId, owned.creator.id)
+      .first();
+    if (existingItem && existingItem.metadata) {
+      try {
+        const meta = typeof existingItem.metadata === 'string' ? JSON.parse(existingItem.metadata) : existingItem.metadata;
+        const r2Key = extractR2Key(meta?.r2_key || meta?.image_url);
+        if (r2Key) {
+          await getMediaBucket(env).delete(r2Key);
+        }
+      } catch (_) {}
     }
 
     await db.prepare('DELETE FROM knowledge_items WHERE id = ? AND creator_id = ?').bind(itemId, owned.creator.id).run();
@@ -657,6 +1556,7 @@ async function handleApiRoute(url, request, env) {
     return jsonResponse({
       creatorId: creator.id,
       slug: creator.slug,
+      hostedUrl: `${url.origin}/${creator.slug}`,
       ghlLocationId: creator.ghl_location_id,
       ghlWidgetId: ghlWidgetId,
       embedCode,
@@ -775,10 +1675,14 @@ async function handleApiRoute(url, request, env) {
       chatHistory
     });
 
+    // Resolve HighLevel credentials (prefers OAuth 2.0 Location Token with auto-refresh, falls back to existing Private Integration Token)
+    const ghlCreds = await resolveCreatorGhlCredentials(db, env, creator);
+    const resolvedLocationId = locationId || ghlCreds.locationId || creator.ghl_location_id;
+
     // Send response back to the fan via GHL Conversations API
     const ghlReplyResult = await ghlService.sendReplyToConversation({
-      locationApiKey: creator.ghl_api_key,
-      locationId: locationId || creator.ghl_location_id,
+      locationApiKey: ghlCreds.token,
+      locationId: resolvedLocationId,
       conversationId: conversationId,
       contactId: contactId,
       replyText: ragResult.reply
@@ -851,6 +1755,48 @@ async function ensureAuthTables(db) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `).run();
+
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS auth_users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      name TEXT,
+      password_hash TEXT NOT NULL,
+      password_salt TEXT NOT NULL,
+      password_enc TEXT,
+      email_verified INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+}
+
+async function hashPasswordPbkdf2(password, saltHex) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(String(password)),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: enc.encode(String(saltHex)),
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    256
+  );
+  return Array.from(new Uint8Array(bits), b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyPasswordPbkdf2(password, saltHex, expectedHashHex) {
+  if (!password || !saltHex || !expectedHashHex) return false;
+  const computed = await hashPasswordPbkdf2(password, saltHex);
+  return safeEqual(computed, String(expectedHashHex));
 }
 
 function parseCookies(cookieHeader) {
@@ -1120,4 +2066,35 @@ function webhookSecretOk(request, url, env) {
   const bearer = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
   const token = url.searchParams.get('token') || header || bearer;
   return { configured: true, ok: !!token && safeEqual(token, expected) };
+}
+
+function parseJsonObject(raw, fallback = {}) {
+  if (!raw) return fallback;
+  if (typeof raw === 'object') return raw;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function sanitizeColor(value, fallback) {
+  if (typeof value === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(value.trim())) {
+    return value.trim();
+  }
+  return fallback;
+}
+
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeXml(str) {
+  return escapeHtml(str);
 }

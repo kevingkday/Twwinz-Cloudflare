@@ -4,7 +4,21 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Creator Onboarding | Twwinz.com</title>
+    <meta name="description" content="Set up your official AI Twin in minutes. Add your convention appearances, signed merch discount codes, booking info, podcast episodes, and fan FAQs — works on your website or your hosted Twwinz page." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://twwinz.com/onboard.html" />
+    <!-- Open Graph / Twitter Card Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Launch Your Official AI Twin | Twwinz.com" />
+    <meta property="og:description" content="Super simple AI Twin setup for convention guests, local hosts, regional athletes, authors, and musicians. Use your own website or your hosted twwinz.com page." />
+    <meta property="og:url" content="https://twwinz.com/onboard.html" />
+    <meta property="og:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Launch Your Official AI Twin | Twwinz.com" />
+    <meta name="twitter:description" content="Super simple AI Twin setup for convention guests, local hosts, regional athletes, authors, and musicians." />
+    <meta name="twitter:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="/pricing-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
     <style>
@@ -32,18 +46,13 @@
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="index.html" class="text-xl font-bold tracking-tight text-blue-400 font-headline">Twwinz.com</a>
             <div class="flex items-center gap-4 text-sm">
-                <a href="dashboard.html" class="text-slate-400 hover:text-white transition-colors">Demo Dashboard</a>
                 <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
-                <div id="nav-auth-container">
-                    <a href="/api/auth/google?redirect=/onboard.html" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
-                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
-                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
-                            <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
-                            <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
-                        </svg>
-                        <span>Sign in with Google</span>
-                    </a>
+                <div id="nav-auth-container" class="flex items-center gap-2">
+                    <span class="text-xs text-slate-400 hidden sm:inline">Already have an account?</span>
+                    <button type="button" onclick="toggleEmailLoginBox()" class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 border border-white/10 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all">
+                        <span class="material-symbols-outlined text-sm">login</span>
+                        <span>Sign In</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -53,14 +62,47 @@
     <main class="max-w-4xl mx-auto px-6 py-12">
         <div class="text-center mb-10">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium tracking-wide uppercase mb-3">
-                <span class="material-symbols-outlined text-sm">bolt</span> Automated Setup via GoHighLevel & Cloudflare D1
+                <span class="material-symbols-outlined text-sm">bolt</span> Super Simple Setup • Works on Your Site or Ours
             </div>
             <h1 class="text-3xl sm:text-5xl font-bold tracking-tight font-headline text-white mb-4">
-                Launch Your Official AI Twin
+                Create Your Account &amp; Launch Your AI Twin
             </h1>
             <p class="text-slate-400 text-base max-w-xl mx-auto">
-                Give your fans a 24/7 digital representative grounded in your unindexed tour dates, VIP perks, and authentic personality.
+                Give your fans a 24/7 digital representative that answers from your convention appearances, signed merch offers, local events, podcast episodes, and FAQs.
             </p>
+        </div>
+
+        <!-- Returning User Sign-In Drawer (only shown if user clicks "Sign In" in top navbar) -->
+        <div id="email-login-drawer" class="hidden glass-card rounded-2xl p-6 mb-6 border border-blue-500/30 shadow-xl">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                <div class="text-sm font-bold text-white font-headline flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-400 text-base">login</span>
+                    <span>Sign In to an Existing Twwinz Account</span>
+                </div>
+                <button type="button" onclick="toggleEmailLoginBox()" class="text-slate-400 hover:text-white text-xs">Close ✕</button>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <a href="/api/auth/google?redirect=/dashboard.html" class="justify-center bg-white text-slate-900 hover:bg-slate-100 font-semibold px-4 py-2.5 rounded-xl text-xs inline-flex items-center gap-2 transition-all shadow-sm whitespace-nowrap">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                        <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+                        <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
+                    </svg>
+                    <span>Sign In with Google</span>
+                </a>
+                <span class="text-xs text-slate-500 text-center">or</span>
+                <input type="email" id="login-email-input" placeholder="Email address"
+                    class="flex-1 bg-[#111111] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500" />
+                <input type="password" id="login-password-input" placeholder="Password"
+                    class="flex-1 bg-[#111111] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();signInWithEmailNow();}" />
+                <button type="button" onclick="signInWithEmailNow()" id="btn-email-login"
+                    class="bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs whitespace-nowrap transition-all">
+                    Sign In
+                </button>
+            </div>
+            <div id="email-login-error" class="hidden text-xs text-red-400 mt-2"></div>
         </div>
 
         <!-- Multi-Step Card -->
@@ -73,17 +115,17 @@
             </div>
 
             <form id="onboard-form" onsubmit="return false;">
-                <!-- STEP 1: Basic Identity -->
+                <!-- STEP 1: Create Account & Basic Identity -->
                 <div id="step-1" class="space-y-6">
                     <div class="border-b border-white/5 pb-4 mb-6">
                         <h2 class="text-xl font-bold text-white font-headline flex items-center gap-2">
                             <span class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 text-sm flex items-center justify-center font-bold">1</span>
-                            Creator Identity
+                            Create Your Account &amp; Creator Profile
                         </h2>
-                        <p class="text-sm text-slate-400 mt-1">Tell us who you are and how your fans know you.</p>
+                        <p class="text-sm text-slate-400 mt-1">Sign up in 1 click with Google, or create your account below with your email and password.</p>
                     </div>
 
-                    <!-- Google Quick Sign-In Banner -->
+                    <!-- Option A: Sign Up with Google -->
                     <div id="google-auth-box" class="bg-[#171717] border border-white/10 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
@@ -95,8 +137,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-white">Fast-Track with Google</div>
-                                <div class="text-xs text-slate-400">Connect your Google account to auto-fill your profile & link your Creator Dashboard.</div>
+                                <div class="text-sm font-semibold text-white">Option A: Sign Up with Google (1-Click)</div>
+                                <div class="text-xs text-slate-400">Auto-fills your name, email &amp; photo so you don't need a separate password.</div>
                             </div>
                         </div>
                         <a href="/api/auth/google?redirect=/onboard.html" class="w-full sm:w-auto justify-center bg-white text-slate-900 hover:bg-slate-100 font-semibold px-4 py-2.5 rounded-xl text-xs inline-flex items-center gap-2 transition-all shadow-sm whitespace-nowrap">
@@ -106,8 +148,14 @@
                                 <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
                                 <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.9 7.4 24 12 24z"/>
                             </svg>
-                            <span>Continue with Google</span>
+                            <span>Sign Up with Google</span>
                         </a>
+                    </div>
+
+                    <div id="email-signup-divider" class="relative flex items-center py-1">
+                        <div class="flex-grow border-t border-white/10"></div>
+                        <span class="flex-shrink mx-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Or Option B: Create Account with Email &amp; Password</span>
+                        <div class="flex-grow border-t border-white/10"></div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -117,15 +165,21 @@
                                 class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Contact Email *</label>
-                            <input type="email" id="creator-email" required placeholder="e.g. jaxson@creator.com" 
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Account Login Email *</label>
+                            <input type="email" id="creator-email" required placeholder="e.g. you@mobilizedentertainment.com" 
                                 class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
                         </div>
                     </div>
 
+                    <div id="password-field-container">
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Create Account Password * <span class="text-slate-500 font-normal normal-case">(8+ chars — also used for your GoHighLevel sub-account login)</span></label>
+                        <input type="password" id="creator-password" placeholder="Create a password (min 8 characters)"
+                            class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
+                    </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Headline / Role</label>
-                        <input type="text" id="creator-headline" placeholder="e.g. Lead Singer of Electric Horizon & Sci-Fi Voice Actor" 
+                        <input type="text" id="creator-headline" placeholder="e.g. Sci-Fi Actor, GalaxyCon Guest &amp; Podcast Host" 
                             class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm" />
                     </div>
 
@@ -137,7 +191,7 @@
 
                     <div class="flex justify-end pt-4">
                         <button type="button" onclick="goToStep(2)" class="primary-gradient text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
-                            Next: Website Integration <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            Next: Website or Hosted Page <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </button>
                     </div>
                 </div>
@@ -147,9 +201,9 @@
                     <div class="border-b border-white/5 pb-4 mb-6">
                         <h2 class="text-xl font-bold text-white font-headline flex items-center gap-2">
                             <span class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 text-sm flex items-center justify-center font-bold">2</span>
-                            Website & Branding Integration
+                            Where Should Fans Chat With Your Twin?
                         </h2>
-                        <p class="text-sm text-slate-400 mt-1">Connect your existing site or let us spin one up automatically on GoHighLevel.</p>
+                        <p class="text-sm text-slate-400 mt-1">Embed our chat widget on your existing site, or use your free hosted <code class="text-blue-300">twwinz.com/your-name</code> page.</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -160,18 +214,18 @@
                                 <span class="material-symbols-outlined text-blue-400">check_circle</span>
                             </div>
                             <p class="text-xs text-slate-400 leading-relaxed">
-                                We automatically scrape your colors and fonts so your GHL chat widget looks like it was custom built for your site.
+                                We match your website's colors and fonts so your chat widget looks custom-built, plus you still get a hosted <code class="text-blue-300">twwinz.com</code> link.
                             </p>
                         </label>
 
                         <label class="cursor-pointer border border-white/10 bg-[#171717] hover:border-slate-600 rounded-xl p-5 block transition-all relative" id="opt-ghl-label">
                             <input type="radio" name="website_type" value="ghl_hosted" onchange="handleWebsiteTypeChange()" class="hidden" />
                             <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-white text-base">Build me a site</span>
+                                <span class="font-bold text-white text-base">No website — host my Twin page</span>
                                 <span class="material-symbols-outlined text-slate-500">web</span>
                             </div>
                             <p class="text-xs text-slate-400 leading-relaxed">
-                                We provision a high-converting GoHighLevel creator site snapshot with chat widget pre-installed.
+                                We create a public hosted twin page at <code class="text-blue-300">twwinz.com/your-name</code> with your bio, colors, and chat widget ready for your social bio.
                             </p>
                         </label>
                     </div>
@@ -186,30 +240,16 @@
                                 <div class="flex flex-col sm:flex-row gap-3">
                                     <div class="relative flex-1">
                                         <span class="material-symbols-outlined absolute left-3.5 top-3.5 text-slate-500 text-sm">language</span>
-                                        <input type="text" id="website-url" placeholder="e.g. taylorswift.com or https://yourbrand.com" 
+                                        <input type="text" id="website-url" placeholder="e.g. yourname.com or https://yourpodcast.com" 
                                             class="w-full bg-[#121212] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-mono transition-colors"
                                             onkeydown="if(event.key === 'Enter') { event.preventDefault(); scrapeStylesNow(); }" />
                                     </div>
                                     <button type="button" onclick="scrapeStylesNow()" id="btn-scrape" 
                                         class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl text-xs flex items-center justify-center gap-2 border border-blue-400/30 transition-all shadow-lg shadow-blue-500/20 active:scale-95 whitespace-nowrap">
                                         <span class="material-symbols-outlined text-sm">palette</span>
-                                        <span>Analyze Brand & Blend Widget</span>
+                                        <span>Match Colors &amp; Preview Widget</span>
                                     </button>
                                 </div>
-                            </div>
-
-                            <!-- Quick Preset Samples for instant demo -->
-                            <div class="flex items-center gap-2 flex-wrap pt-1">
-                                <span class="text-[11px] text-slate-400">Quick Test:</span>
-                                <button type="button" onclick="setPresetUrl('taylorswift.com')" class="text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-lg border border-white/5 transition-colors">
-                                    🎵 Taylor Swift (Crimson & Coral)
-                                </button>
-                                <button type="button" onclick="setPresetUrl('news.ycombinator.com')" class="text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-lg border border-white/5 transition-colors">
-                                    🔶 Hacker News (Orange & Tech)
-                                </button>
-                                <button type="button" onclick="setPresetUrl('vercel.com')" class="text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-lg border border-white/5 transition-colors">
-                                    ▲ Vercel (Minimalist Clean)
-                                </button>
                             </div>
                         </div>
 
@@ -217,12 +257,12 @@
                         <div id="brand-preview" class="border border-white/10 rounded-2xl p-5 bg-[#171717] space-y-4">
                             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
                                 <div class="flex items-center gap-2.5">
-                                    <img id="scraped-favicon" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-5 h-5 rounded-md object-contain bg-white/10 p-0.5" alt="Favicon" />
+                                    <img id="scraped-favicon" src="/favicon.svg" class="w-5 h-5 rounded-md object-contain bg-white/10 p-0.5" alt="Favicon" />
                                     <div>
                                         <div class="text-xs font-bold text-white flex items-center gap-2" id="scraped-site-title">
-                                            Creator Website
+                                            Creator Brand Preview
                                         </div>
-                                        <div class="text-[10px] text-slate-400" id="scraped-site-url">https://yourwebsite.com</div>
+                                        <div class="text-[10px] text-slate-400" id="scraped-site-url">https://twwinz.com/jaxson-reed</div>
                                     </div>
                                 </div>
                                 <span id="brand-status" class="text-xs text-emerald-400 flex items-center gap-1.5 font-medium bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
@@ -253,7 +293,7 @@
                                         </div>
                                         <span id="preview-accent-hex" class="text-xs font-mono font-semibold text-white">#f59e0b</span>
                                     </div>
-                                    <div class="text-[9px] text-slate-500 mt-1">Grounded badges, online dot</div>
+                                    <div class="text-[9px] text-slate-500 mt-1">Verified badges, online dot</div>
                                 </div>
 
                                 <div class="bg-[#111111] p-3 rounded-xl border border-white/5">
@@ -270,7 +310,7 @@
                             </div>
                         </div>
 
-                        <!-- LIVE BLENDED WIDGET SIMULATOR -->
+                        <!-- LIVE BLENDED WIDGET SIMULATOR (Jaxson Reed Convention & Merch Demo) -->
                         <div class="border border-white/10 rounded-2xl overflow-hidden bg-[#0d1117] shadow-2xl">
                             <div class="bg-[#161b22] px-4 py-2.5 border-b border-white/10 flex items-center justify-between text-xs">
                                 <div class="flex items-center gap-2">
@@ -281,11 +321,11 @@
                                     </div>
                                     <span class="font-semibold text-slate-300 text-xs ml-2 flex items-center gap-1.5">
                                         <span class="material-symbols-outlined text-xs text-emerald-400">lock</span>
-                                        <span id="sim-url-bar">https://yourwebsite.com</span>
+                                        <span id="sim-url-bar">https://twwinz.com/jaxson-reed</span>
                                     </span>
                                 </div>
                                 <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                                    Live Website Blend Simulator
+                                    Live Twin Simulator
                                 </span>
                             </div>
 
@@ -295,13 +335,13 @@
                                 <div class="space-y-4 max-w-lg opacity-85">
                                     <div class="flex items-center gap-2 text-xs font-bold text-white" id="sim-site-name">
                                         <span class="w-3 h-3 rounded-sm bg-blue-500 inline-block"></span>
-                                        <span>CREATOR OFFICIAL SITE</span>
+                                        <span>JAXSON REED • OFFICIAL FAN HUB</span>
                                     </div>
                                     <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" id="sim-hero-heading" style="font-family: 'Space Grotesk', sans-serif;">
-                                        Official Tour Dates & Exclusive Fan Hub
+                                        Convention Appearances, Signed Merch &amp; Bookings
                                     </h3>
                                     <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
-                                        Welcome to the official portal. Notice how the chat widget in the corner dynamically harmonizes with your site's aesthetic.
+                                        Preview how your AI Twin answers fan questions about convention booths, signed posters, local events, and podcast appearances.
                                     </p>
                                 </div>
 
@@ -334,24 +374,24 @@
                                         <!-- Twin Welcome -->
                                         <div class="flex gap-2 items-start">
                                             <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed" id="live-widget-welcome-msg">
-                                                Hey there! I am the official digital representative. Ask me anything about tour dates, VIP perks, or behind-the-scenes projects!
+                                                Hey there! Ask me about upcoming convention appearances, signed merch discount codes, podcast episodes, or booking requests!
                                             </div>
                                         </div>
 
                                         <!-- Fan Question Bubble -->
                                         <div class="flex justify-end">
                                             <div id="live-widget-fan-bubble" class="text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%] leading-relaxed transition-colors shadow-sm" style="background-color: #3b82f6;">
-                                                Are there any VIP passes left for the Vancouver tour date?
+                                                Which booth are you at for GalaxyCon Raleigh, and do you have signed posters?
                                             </div>
                                         </div>
 
                                         <!-- Grounded Twin Reply -->
                                         <div class="flex gap-2 items-start">
                                             <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed">
-                                                <span>Yes! 3 VIP meet-and-greet passes remain for Vancouver on Nov 12th. Use secret code <strong>TWINZVIP</strong> at checkout.</span>
+                                                <span>I'll be at Booth #412 in Exhibit Hall B on Saturday &amp; Sunday! You can also grab signed posters online with code <strong>GALAXY20</strong> for 20% off.</span>
                                                 <div id="live-widget-source-tag" class="mt-2 text-[10px] font-semibold flex items-center gap-1 transition-colors" style="color: #f59e0b;">
                                                     <span class="material-symbols-outlined text-xs">verified</span>
-                                                    <span>Grounded via Verified Tour Schedule</span>
+                                                    <span>Verified from Convention &amp; Merch Info</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -359,7 +399,7 @@
 
                                     <!-- Widget Interactive Test Inputs -->
                                     <div class="p-3 border-t border-white/10 bg-[#111827] flex gap-2 items-center">
-                                        <input type="text" id="live-test-input" placeholder="Type a test fan question..." 
+                                        <input type="text" id="live-test-input" placeholder="Ask about conventions, merch, or bookings..." 
                                             class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none transition-colors"
                                             onkeydown="if(event.key === 'Enter') sendLiveTestMessage()" />
                                         <button type="button" onclick="sendLiveTestMessage()" id="live-widget-send-btn" 
@@ -371,25 +411,20 @@
                                     <!-- Quick Interactive Prompt Chips -->
                                     <div class="px-3 pb-3 bg-[#111827] flex items-center gap-1.5 flex-wrap">
                                         <span class="text-[10px] text-slate-500">Test prompts:</span>
-                                        <button type="button" onclick="triggerTestPrompt('What are your next concert dates?')" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 px-2 py-0.5 rounded border border-white/5 transition-colors">
-                                            Concert Dates
+                                        <button type="button" onclick="triggerTestPrompt('Where is your next convention appearance?')" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 px-2 py-0.5 rounded border border-white/5 transition-colors">
+                                            Convention Booth
                                         </button>
-                                        <button type="button" onclick="triggerTestPrompt('Do you have any secret merch discount codes?')" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 px-2 py-0.5 rounded border border-white/5 transition-colors">
-                                            Merch Code
+                                        <button type="button" onclick="triggerTestPrompt('Do you have a discount code for signed merch?')" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 px-2 py-0.5 rounded border border-white/5 transition-colors">
+                                            Signed Merch Code
+                                        </button>
+                                        <button type="button" onclick="triggerTestPrompt('How do I book you for a podcast or local event?')" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 px-2 py-0.5 rounded border border-white/5 transition-colors">
+                                            Booking Request
                                         </button>
                                         <button type="button" onclick="resetLiveWidgetChat()" class="text-[10px] text-slate-500 hover:text-slate-300 ml-auto transition-colors">
                                             Reset
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Confirmation message -->
-                        <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex gap-3 items-center">
-                            <span class="material-symbols-outlined text-emerald-400 text-base">check_circle</span>
-                            <div class="text-xs text-slate-300">
-                                <strong class="text-white">Seamless Blend Confirmed:</strong> These extracted brand colors and typography will automatically be applied to both your GoHighLevel native chat widget and the embeddable script.
                             </div>
                         </div>
                     </div>
@@ -404,34 +439,34 @@
                     </div>
                 </div>
 
-                <!-- STEP 3: Persona & RAG Guidelines -->
+                <!-- STEP 3: Persona & Content Guidelines -->
                 <div id="step-3" class="space-y-6 hidden">
                     <div class="border-b border-white/5 pb-4 mb-6">
                         <h2 class="text-xl font-bold text-white font-headline flex items-center gap-2">
                             <span class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 text-sm flex items-center justify-center font-bold">3</span>
-                            Persona Guidelines & Tone
+                            Persona Guidelines &amp; Tone
                         </h2>
-                        <p class="text-sm text-slate-400 mt-1">Define how your AI Twin represents you when interacting with fans.</p>
+                        <p class="text-sm text-slate-400 mt-1">Define how your AI Twin speaks when answering fans.</p>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Voice & Tone Instructions</label>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Voice &amp; Tone Instructions</label>
                         <textarea id="creator-persona" rows="4" 
                             class="w-full bg-[#171717] border border-white/10 rounded-xl p-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm leading-relaxed"
-                            placeholder="Speak warmly and conversationally with genuine enthusiasm for indie art. Keep responses under 3 sentences unless asked for tour dates. Always mention upcoming verified appearances or Cameo booking link when relevant. Never make up unconfirmed film sequels."></textarea>
+                            placeholder="Speak warmly and conversationally. Keep responses under 3 sentences unless asked for convention schedules or stories. Mention upcoming convention appearances, signed merch discount codes, or podcast booking links when relevant. Never guess unconfirmed dates."></textarea>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Welcome Greeting Message</label>
                         <input type="text" id="creator-welcome" 
                             class="w-full bg-[#171717] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm"
-                            value="Hey there! I am the official digital representative. Ask me anything about upcoming tour dates, VIP perks, or behind-the-scenes projects!" />
+                            value="Hey there! Ask me anything about upcoming convention appearances, signed merch, local events, podcast episodes, or booking inquiries!" />
                     </div>
 
                     <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex gap-3 items-start">
                         <span class="material-symbols-outlined text-blue-400 text-lg mt-0.5">verified</span>
                         <div class="text-xs text-slate-300 leading-relaxed">
-                            <strong class="text-white">Next in your dashboard:</strong> You will be able to input private tour dates, unindexed discount codes, booking rates, and upload PDFs into your D1 database to ground your twin's knowledge.
+                            <strong class="text-white">Next in your dashboard:</strong> Add your convention appearances, signed merch promo codes, booking instructions, FAQs, and photos — and copy your public <code class="text-blue-300">twwinz.com/your-name</code> link or website embed code.
                         </div>
                     </div>
 
@@ -441,7 +476,7 @@
                         </button>
                         <button type="button" onclick="submitOnboarding()" id="btn-submit" class="primary-gradient text-slate-950 font-bold px-8 py-3.5 rounded-xl text-sm flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-blue-500/20">
                             <span class="material-symbols-outlined text-sm">rocket_launch</span>
-                            <span>Provision AI Twin & Go to Dashboard</span>
+                            <span>Create AI Twin &amp; Open Dashboard</span>
                         </button>
                     </div>
                 </div>
@@ -454,16 +489,79 @@
         let detectedColors = { primary: '#3b82f6', accent: '#f59e0b', background: '#0f172a', surface: '#111827', text: '#ffffff' };
         let detectedFonts = { heading: 'Space Grotesk', body: 'Inter' };
         let scrapedFavicon = null;
+        let isAuthenticatedSession = false;
+
+        function toggleEmailLoginBox() {
+            const drawer = document.getElementById('email-login-drawer');
+            if (drawer) drawer.classList.toggle('hidden');
+        }
+
+        async function signInWithEmailNow() {
+            const email = document.getElementById('login-email-input').value.trim();
+            const password = document.getElementById('login-password-input').value;
+            const errBox = document.getElementById('email-login-error');
+            const btn = document.getElementById('btn-email-login');
+
+            if (!email || !password) {
+                if (errBox) {
+                    errBox.textContent = 'Please enter both your email and password.';
+                    errBox.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (errBox) errBox.classList.add('hidden');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Signing in...';
+            }
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (res.ok && data.authenticated) {
+                    if (data.creator && data.creator.id) {
+                        window.location.href = `dashboard.html?id=${encodeURIComponent(data.creator.id)}`;
+                        return;
+                    }
+                    await checkGoogleSession();
+                } else {
+                    if (errBox) {
+                        errBox.textContent = data.error || 'Invalid email or password.';
+                        errBox.classList.remove('hidden');
+                    }
+                }
+            } catch (e) {
+                if (errBox) {
+                    errBox.textContent = 'Connection error: ' + e.message;
+                    errBox.classList.remove('hidden');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Sign In to Dashboard';
+                }
+            }
+        }
 
         function goToStep(step) {
             if (step === 2) {
                 const name = document.getElementById('creator-name').value.trim();
                 const email = document.getElementById('creator-email').value.trim();
+                const passwordEl = document.getElementById('creator-password');
+                const password = passwordEl ? passwordEl.value : '';
                 if (!name || !email) {
                     alert('Please enter your name and contact email.');
                     return;
                 }
-                // Sync name to live preview
+                if (!isAuthenticatedSession && password.length < 8) {
+                    alert('Please create a password of at least 8 characters (or click Continue with Google).');
+                    return;
+                }
                 const widgetTitle = document.getElementById('live-widget-title');
                 if (widgetTitle) widgetTitle.textContent = `${name}'s AI Twin`;
                 const avatarInput = document.getElementById('creator-avatar').value.trim();
@@ -478,7 +576,6 @@
             document.getElementById('step-2').classList.toggle('hidden', step !== 2);
             document.getElementById('step-3').classList.toggle('hidden', step !== 3);
 
-            // Update step bar indicators
             document.getElementById('step-bar-1').className = `h-1.5 rounded-full ${step >= 1 ? 'bg-blue-500' : 'bg-slate-700'} transition-all`;
             document.getElementById('step-bar-2').className = `h-1.5 rounded-full ${step >= 2 ? 'bg-blue-500' : 'bg-slate-700'} transition-all`;
             document.getElementById('step-bar-3').className = `h-1.5 rounded-full ${step >= 3 ? 'bg-blue-500' : 'bg-slate-700'} transition-all`;
@@ -518,11 +615,6 @@
             document.head.appendChild(link);
         }
 
-        function setPresetUrl(url) {
-            document.getElementById('website-url').value = url;
-            scrapeStylesNow();
-        }
-
         function handleManualColorChange(colorType, val) {
             if (colorType === 'primary') {
                 detectedColors.primary = val;
@@ -544,11 +636,9 @@
             const headingFont = detectedFonts.heading || 'Space Grotesk';
             const bodyFont = detectedFonts.body || 'Inter';
 
-            // Load Google fonts dynamically
             loadGoogleFont(headingFont);
             loadGoogleFont(bodyFont);
 
-            // Update live widget card styling
             const widgetCard = document.getElementById('live-widget-card');
             if (widgetCard) widgetCard.style.backgroundColor = surface;
 
@@ -594,7 +684,7 @@
             const statusEl = document.getElementById('brand-status');
             btn.disabled = true;
             btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">sync</span> Analyzing Brand...`;
-            statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Scraping colors & fonts...`;
+            statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Reading colors &amp; fonts...`;
 
             try {
                 const res = await fetch('/api/utils/scrape-styles', {
@@ -614,7 +704,6 @@
                     detectedFonts = data.fonts;
                     if (data.favicon) scrapedFavicon = data.favicon;
 
-                    // Update UI Labels & Controls
                     document.getElementById('preview-primary-swatch').style.backgroundColor = detectedColors.primary;
                     document.getElementById('preview-primary-hex').textContent = detectedColors.primary;
                     document.getElementById('picker-primary').value = detectedColors.primary;
@@ -639,24 +728,21 @@
                     }
                     if (data.favicon) {
                         document.getElementById('scraped-favicon').src = data.favicon;
-                        // If creator avatar isn't explicitly set, use the website's favicon
                         const avatarInput = document.getElementById('creator-avatar');
                         if (!avatarInput.value.trim()) {
                             document.getElementById('live-widget-avatar').src = data.favicon;
                         }
                     }
 
-                    // Apply the new theme to the live widget simulator
                     applyLiveWidgetTheme();
-
-                    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Blended & Synced`;
+                    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Blended &amp; Synced`;
                 }
             } catch (err) {
                 console.warn(err);
                 statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> Using Defaults`;
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span class="material-symbols-outlined text-sm">palette</span><span>Analyze Brand & Blend Widget</span>`;
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">palette</span><span>Match Colors &amp; Preview Widget</span>`;
             }
         }
 
@@ -668,17 +754,20 @@
             input.value = '';
             appendLiveMessage('fan', query);
 
-            // Simulate twin grounded response
             setTimeout(() => {
-                const creatorName = document.getElementById('creator-name').value.trim() || 'the creator';
-                const answers = [
-                    `Thanks for asking! As ${creatorName}'s official digital representative, verified schedule dates and access codes are confirmed directly through memory.`,
-                    `Great question! All official VIP tour packages include early soundcheck access and verified digital credentials.`,
-                    `Checked verified knowledge: Behind-the-scenes content and exclusive rehearsal recordings drop every Thursday!`
-                ];
-                const reply = answers[Math.floor(Math.random() * answers.length)];
-                appendLiveMessage('twin', reply, 'Verified Knowledge Item #24');
-            }, 500);
+                const creatorName = document.getElementById('creator-name').value.trim() || 'Jaxson Reed';
+                const qLower = query.toLowerCase();
+                let reply = `Thanks for asking! ${creatorName} will be at Booth #412 during GalaxyCon Raleigh (Sat 11am-6pm, Sun 12pm-4pm).`;
+                let source = 'Convention Appearance Schedule';
+                if (qLower.includes('merch') || qLower.includes('code') || qLower.includes('poster') || qLower.includes('signed')) {
+                    reply = `You can grab signed 11x17 posters and Cameo video shoutouts right now using code GALAXY20 for 20% off!`;
+                    source = 'Signed Merch & Promo Offers';
+                } else if (qLower.includes('book') || qLower.includes('podcast') || qLower.includes('event')) {
+                    reply = `For podcast interviews, local radio spots, or convention booking requests, leave your email here and ${creatorName} will reply directly!`;
+                    source = 'Booking & Appearance Guidelines';
+                }
+                appendLiveMessage('twin', reply, source);
+            }, 400);
         }
 
         function triggerTestPrompt(promptText) {
@@ -709,7 +798,7 @@
                         ${source ? `
                             <div class="mt-2 text-[10px] font-semibold flex items-center gap-1 transition-colors" style="color: ${accent};">
                                 <span class="material-symbols-outlined text-xs">verified</span>
-                                <span>Grounded via ${escapeHtml(source)}</span>
+                                <span>Verified from ${escapeHtml(source)}</span>
                             </div>
                         ` : ''}
                     </div>
@@ -726,20 +815,20 @@
             messagesBox.innerHTML = `
                 <div class="flex gap-2 items-start">
                     <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed" id="live-widget-welcome-msg">
-                        Hey there! I am the official digital representative. Ask me anything about tour dates, VIP perks, or behind-the-scenes projects!
+                        Hey there! Ask me about upcoming convention appearances, signed merch discount codes, podcast episodes, or booking requests!
                     </div>
                 </div>
                 <div class="flex justify-end">
                     <div id="live-widget-fan-bubble" class="text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%] leading-relaxed transition-colors shadow-sm" style="background-color: ${primary};">
-                        Are there any VIP passes left for the Vancouver tour date?
+                        Which booth are you at for GalaxyCon Raleigh, and do you have signed posters?
                     </div>
                 </div>
                 <div class="flex gap-2 items-start">
                     <div class="bg-white/10 text-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[85%] border border-white/5 leading-relaxed">
-                        <span>Yes! 3 VIP meet-and-greet passes remain for Vancouver on Nov 12th. Use secret code <strong>TWINZVIP</strong> at checkout.</span>
+                        <span>I'll be at Booth #412 in Exhibit Hall B on Saturday &amp; Sunday! You can also grab signed posters online with code <strong>GALAXY20</strong> for 20% off.</span>
                         <div id="live-widget-source-tag" class="mt-2 text-[10px] font-semibold flex items-center gap-1 transition-colors" style="color: ${accent};">
                             <span class="material-symbols-outlined text-xs">verified</span>
-                            <span>Grounded via Verified Tour Schedule</span>
+                            <span>Verified from Convention &amp; Merch Info</span>
                         </div>
                     </div>
                 </div>
@@ -753,12 +842,18 @@
         async function submitOnboarding() {
             const btn = document.getElementById('btn-submit');
             btn.disabled = true;
-            btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">refresh</span> Provisioning via GHL & D1...`;
+            btn.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">refresh</span> Setting up your AI Twin...`;
 
             const websiteType = document.querySelector('input[name="website_type"]:checked').value;
+            const nameVal = document.getElementById('creator-name').value.trim();
+            const emailVal = document.getElementById('creator-email').value.trim();
+            const passwordEl = document.getElementById('creator-password');
+            const passwordVal = passwordEl ? passwordEl.value : '';
+
             const payload = {
-                name: document.getElementById('creator-name').value.trim(),
-                email: document.getElementById('creator-email').value.trim(),
+                name: nameVal,
+                email: emailVal,
+                password: passwordVal || undefined,
                 headline: document.getElementById('creator-headline').value.trim(),
                 avatarUrl: document.getElementById('creator-avatar').value.trim() || scrapedFavicon || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
                 websiteType: websiteType,
@@ -770,6 +865,37 @@
             };
 
             try {
+                if (!isAuthenticatedSession) {
+                    if (!passwordVal || passwordVal.length < 8) {
+                        alert('Please enter a password of at least 8 characters in Step 1.');
+                        goToStep(1);
+                        btn.disabled = false;
+                        btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Create AI Twin &amp; Open Dashboard</span>`;
+                        return;
+                    }
+
+                    let authRes = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: nameVal, email: emailVal, password: passwordVal })
+                    });
+                    if (authRes.status === 409) {
+                        authRes = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: emailVal, password: passwordVal })
+                        });
+                    }
+                    const authData = await authRes.json();
+                    if (!authRes.ok) {
+                        alert('Authentication error: ' + (authData.error || 'Could not create account'));
+                        btn.disabled = false;
+                        btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Create AI Twin &amp; Open Dashboard</span>`;
+                        return;
+                    }
+                    isAuthenticatedSession = true;
+                }
+
                 const res = await fetch('/api/creators/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -778,17 +904,16 @@
 
                 const data = await res.json();
                 if (res.ok && data.creator) {
-                    // Redirect to dashboard with the new creator ID
                     window.location.href = `dashboard.html?id=${encodeURIComponent(data.creator.id)}`;
                 } else {
                     alert('Error creating account: ' + (data.error || 'Unknown error'));
                     btn.disabled = false;
-                    btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Provision AI Twin & Go to Dashboard</span>`;
+                    btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Create AI Twin &amp; Open Dashboard</span>`;
                 }
             } catch (err) {
                 alert('Connection error: ' + err.message);
                 btn.disabled = false;
-                btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Provision AI Twin & Go to Dashboard</span>`;
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">rocket_launch</span><span>Create AI Twin &amp; Open Dashboard</span>`;
             }
         }
 
@@ -799,7 +924,12 @@
                 const data = await res.json();
                 if (!data.authenticated || !data.user) return;
 
-                // Each user can only set up one Digital Twin — redirect straight to their dashboard if already created
+                isAuthenticatedSession = true;
+                const passContainer = document.getElementById('password-field-container');
+                if (passContainer) passContainer.classList.add('hidden');
+                const dividerEl = document.getElementById('email-signup-divider');
+                if (dividerEl) dividerEl.classList.add('hidden');
+
                 if (data.creator && data.creator.id) {
                     window.location.href = `dashboard.html?id=${encodeURIComponent(data.creator.id)}`;
                     return;
@@ -839,19 +969,8 @@
                                 <div class="text-xs text-slate-300">Connected as <strong>${escapeHtml(user.email)}</strong></div>
                             </div>
                         </div>
-                        ${data.creator ? `
-                            <a href="dashboard.html?id=${encodeURIComponent(data.creator.id)}" class="primary-gradient text-slate-950 font-bold px-4 py-2 rounded-xl text-xs inline-flex items-center gap-1.5 whitespace-nowrap">
-                                <span>Open Your Dashboard</span>
-                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            </a>
-                        ` : `
-                            <span class="text-xs text-emerald-400 font-medium">Profile Auto-Filled ✓</span>
-                        `}
+                        <span class="text-xs text-emerald-400 font-medium">Profile Auto-Filled ✓</span>
                     `;
-                }
-
-                if (typeof updateLivePreview === 'function') {
-                    updateLivePreview();
                 }
             } catch (e) {
                 console.warn('Auth check skipped:', e);

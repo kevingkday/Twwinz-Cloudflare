@@ -4,6 +4,8 @@
  * with Cloudflare Vectorize and SQLite FTS5 full-text keyword search.
  */
 
+import { signMediaUrl } from './mediaService.js';
+
 export class RAGEngine {
   constructor(db, env) {
     this.db = db;
@@ -182,18 +184,20 @@ export class RAGEngine {
       // Keyword FTS match bonus
       const ftsScore = ftsMatchedIds.has(item.id) ? 1.0 : 0.0;
 
-      // Extract image_url from metadata if present
+      // Extract R2 key or image_url from metadata if present
       let imageUrl = null;
       if (item.metadata) {
         try {
           const metaObj = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
-          if (metaObj && metaObj.image_url) imageUrl = metaObj.image_url;
+          if (metaObj && (metaObj.r2_key || metaObj.image_url)) {
+            imageUrl = metaObj.r2_key ? `/api/media/${metaObj.r2_key}` : metaObj.image_url;
+          }
         } catch (_) {}
       }
       
       // Category heuristics with word boundaries
-      const isScheduleQuery = /\b(tour|concert|gig|dates?|convention|galaxycon|comic\s*con|appearances?|booths?|venues?)\b/i.test(cleanQuery);
-      const isOfferQuery = /\b(merch|cameo|buy|discounts?|promos?|codes?|posters?|autographs?|prices?|costs?|shops?|shoutouts?)\b/i.test(cleanQuery);
+      const isScheduleQuery = /\b(tour|concert|gig|dates?|convention|galaxycon|comic\s*con|appearances?|booths?|venues?|events?|podcasts?|bookings?)\b/i.test(cleanQuery);
+      const isOfferQuery = /\b(merch|cameo|buy|discounts?|promos?|codes?|posters?|autographs?|prices?|costs?|shops?|shoutouts?|signed)\b/i.test(cleanQuery);
       const isPhotoQuery = /\b(pic|pics|picture|pictures|photo|photos|image|images|show\s+me|see|look\s+like)\b/i.test(cleanQuery);
       let categoryBonus = 0;
       if (isScheduleQuery && item.category === 'schedule') categoryBonus = 0.25;
@@ -234,7 +238,8 @@ export class RAGEngine {
         try {
           const metaObj = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
           const cleanMeta = { ...metaObj };
-          delete cleanMeta.image_url; // Exclude base64 data from prompt tokens
+          delete cleanMeta.image_url;
+          delete cleanMeta.r2_key;
           if (Object.keys(cleanMeta).length > 0) {
             metaStr = ` | Details: ${JSON.stringify(cleanMeta)}`;
           }
@@ -303,7 +308,7 @@ ${formattedContext}
           const reply = data.choices[0]?.message?.content?.trim();
           return {
             reply,
-            ragSources: this.formatSources(knowledgeItems, query),
+            ragSources: await this.formatSources(knowledgeItems, query),
             model: 'gpt-4o-mini'
           };
         }
@@ -326,7 +331,7 @@ ${formattedContext}
         if (aiResponse && aiResponse.response) {
           return {
             reply: aiResponse.response.trim(),
-            ragSources: this.formatSources(knowledgeItems, query),
+            ragSources: await this.formatSources(knowledgeItems, query),
             model: 'llama-3.1-8b-instruct'
           };
         }
@@ -347,24 +352,28 @@ ${formattedContext}
         fallbackReply = `${topFact.content}`;
       }
     } else {
-      fallbackReply = `Hey! Thanks for reaching out. ${creator.name} hasn't uploaded specific details on that yet, but make sure to check out our upcoming tour dates and exclusive merch!`;
+      fallbackReply = `Hey! Thanks for reaching out. ${creator.name} hasn't uploaded specific details on that yet, but feel free to ask about upcoming appearances, signed merch, or booking inquiries!`;
     }
 
     return {
       reply: fallbackReply,
-      ragSources: this.formatSources(knowledgeItems, query),
+      ragSources: await this.formatSources(knowledgeItems, query),
       model: 'twwinz-grounded-fallback'
     };
   }
 
-  formatSources(knowledgeItems, query = '') {
+  async formatSources(knowledgeItems, query = '') {
     const isPhotoQuery = /\b(pic|pics|picture|pictures|photo|photos|image|images|show\s+me|see|look\s+like)\b/i.test(query);
-    return knowledgeItems.map((k, idx) => ({
-      id: k.id,
-      title: k.title,
-      category: k.category,
-      score: k.combinedScore,
-      imageUrl: (k.imageUrl && (idx === 0 || isPhotoQuery || k.combinedScore >= 0.45)) ? k.imageUrl : null
+    return Promise.all(knowledgeItems.map(async (k, idx) => {
+      const shouldIncludeImage = Boolean(k.imageUrl && (idx === 0 || isPhotoQuery || k.combinedScore >= 0.45));
+      const signedImg = shouldIncludeImage ? await signMediaUrl(k.imageUrl, this.env) : null;
+      return {
+        id: k.id,
+        title: k.title,
+        category: k.category,
+        score: k.combinedScore,
+        imageUrl: signedImg
+      };
     }));
   }
 }

@@ -14,14 +14,23 @@
     </script>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta name="description" content="Scale your digital twin without limits using Twwinz.com's interaction-based Usage Fees. A fair, COGS-protected infrastructure model tailored for B-level creators." />
-    <title>Twwinz.com | Usage Fees</title>
+    <meta name="description" content="Start with the Twwinz.com Starter Tier ($0 setup + $79/mo). Includes your hosted twin page at twwinz.com/<slug>, chat widget, and 1,000 fan messages/month." />
+    <title>Twwinz.com | Starter Plan ($79/mo)</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Twwinz" />
+    <meta property="og:title" content="Twwinz.com | Starter Plan ($79/mo)" />
+    <meta property="og:description" content="Self-serve Starter plan for independent personalities: $0 setup, $79/mo, hosted twin page, and up to 1,000 fan chat messages per month." />
+    <meta property="og:url" content="https://twwinz.com/usage-fees.html" />
+    <meta property="og:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Twwinz.com | Starter Plan ($79/mo)" />
+    <meta name="twitter:description" content="Self-serve Starter plan for independent personalities: $0 setup, $79/mo, hosted twin page, and up to 1,000 fan chat messages per month." />
+    <meta name="twitter:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <script src="/pricing-config.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -124,17 +133,16 @@
         <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
             <a href="index.html" class="text-xl font-bold tracking-tighter text-blue-400 font-['Space_Grotesk']">Twwinz.com</a>
             <div class="hidden md:flex items-center space-x-8 font-['Space_Grotesk'] font-medium tracking-tight">
-                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#platform">Platform</a>
-                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#technology">Technology</a>
-                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#security">Security</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#live-demo">Live Demo</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#platform">What Creators Get</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#whats-included">What's Included</a>
                 <a class="text-slate-400 hover:text-white transition-colors" href="index.html#pricing">Pricing</a>
             </div>
             <div class="flex items-center gap-4">
-                <a href="https://assets.cdn.filesafe.space/9TKh7JGFQXrmzx2AB0HI/media/69c208543b3a5825f8195434.pdf" target="_blank" class="hidden lg:block px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">Investor Deck</a>
-                <button
+                <a href="onboard.html"
                     class="primary-gradient text-on-primary px-6 py-2.5 rounded-md font-bold text-sm tracking-tight active:scale-95 transition-transform">
                     Deploy Your Twin
-                </button>
+                </a>
             </div>
         </div>
     </nav>
@@ -145,32 +153,23 @@
     
     <div class="max-w-4xl mx-auto relative z-10">
         <div class="mb-12">
-            <h1 class="font-headline text-[3.5rem] font-bold text-glow mb-4 text-primary leading-tight">Scaling Without Labor</h1>
-            <p class="text-xl text-on-surface-variant leading-relaxed">$0.05–$0.50 per-interaction model: The fairness lever that aligns infrastructure costs with your automated growth.</p>
+            <h1 class="font-headline text-[3.5rem] font-bold text-glow mb-4 text-primary leading-tight">Starter Tier for Independent Creators</h1>
+            <p class="text-xl text-on-surface-variant leading-relaxed"><span data-price-bind="starter.setupDisplay">$0</span> setup fee + <span data-price-bind="starter.monthlyDisplay">$79</span>/mo: Built for convention guests, local hosts, regional athletes, and authors on a budget.</p>
         </div>
         
         <div class="glass-card rounded-2xl p-8 md:p-12 text-on-surface-variant font-body leading-relaxed space-y-6">
             
-            <h2 class="font-headline text-2xl font-bold text-white pt-4">Zero Barrier to Entry</h2>
-            <p class="text-slate-400 mt-2">Start small and only pay as your digital twin’s audience scales globally. It’s the ultimate zero-friction entry point.</p>
+            <h2 class="font-headline text-2xl font-bold text-white pt-4">No Website Needed</h2>
+            <p class="text-slate-400 mt-2">Every Starter account gets a public hosted twin page at <code>twwinz.com/&lt;your-slug&gt;</code> with your avatar, headline, brand colors, and live chat widget ready to drop in your Instagram, TikTok, or X bio.</p>
         
-            <h2 class="font-headline text-2xl font-bold text-white pt-4">COGS Protection</h2>
-            <p class="text-slate-400 mt-2">Every AI query incurs real compute and token costs. Usage fees natively protect platform margins while allowing the creator to pay only for actual value delivered.</p>
+            <h2 class="font-headline text-2xl font-bold text-white pt-4">Simple Self-Serve Knowledge Dashboard</h2>
+            <p class="text-slate-400 mt-2">Type your convention booth numbers, signed merch offers, booking email, and fan FAQs—or drag-and-drop Word docs, PDFs, and photos. Your twin answers strictly from what you approve.</p>
         
-            <h2 class="font-headline text-2xl font-bold text-white pt-4">The Success Tax</h2>
-            <p class="text-slate-400 mt-2">If your twin goes viral and handles 100,000 interactions in a day, the bill scales—but so does your audience relationship and potential revenue.</p>
+            <h2 class="font-headline text-2xl font-bold text-white pt-4">Predictable Monthly Cap</h2>
+            <p class="text-slate-400 mt-2">Starter includes up to <span data-price-bind="starter.messageCapDisplay">1,000 messages / month</span> in text chat, with easy upgrades if a post or appearance goes viral.</p>
         
-            <h2 class="font-headline text-2xl font-bold text-white pt-4">Efficiency Benchmark</h2>
-            <p class="text-slate-400 mt-2">By 2026, automated resolutions are priced between $0.99 and $2.00 in enterprise support. This lower interaction fee for a "B-level" audience is highly competitive.</p>
-        
-            
-    <div class="mt-8 p-6 bg-surface-container-low border-l-4 border-secondary/50 rounded-r-lg">
-        <p class="font-bold text-white mb-1 font-headline">The B-Level Reality Check</p>
-        <p class="text-sm text-slate-400"><strong class="text-white">Celebrity Perception:</strong> "I pay when I win."<br/><strong class="text-white">Business Reality:</strong> Captures upside as the twin scales intelligently, fueling Snowflake-style "Land & Expand" growth.</p>
-    </div>
-    
             <div class="mt-8 pt-8 border-t border-white/10">
-                <a href="index.html" class="text-primary text-sm font-bold inline-flex items-center gap-2 hover:underline"><span class="material-symbols-outlined text-sm">arrow_back</span> Back to Platform</a>
+                <a href="index.html#pricing" class="text-primary text-sm font-bold inline-flex items-center gap-2 hover:underline"><span class="material-symbols-outlined text-sm">arrow_back</span> Back to Pricing</a>
             </div>
         </div>
     </div>
@@ -180,13 +179,13 @@
         <div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-8">
             <div class="flex flex-col items-center md:items-start gap-4">
                 <div class="text-lg font-bold text-white font-['Space_Grotesk'] tracking-tighter">Twwinz.com</div>
-                <p class="font-['Inter'] text-sm text-slate-500 mb-1">© 2026 Twwinz.com. Powered by MCP.</p>
+                <p class="font-['Inter'] text-sm text-slate-500 mb-1">© 2026 Twwinz.com. Built on Creator Consent.</p>
                 <a href="mailto:hello@twwinz.com" class="font-['Inter'] text-sm text-slate-400 hover:text-white transition-colors">hello@twwinz.com</a>
             </div>
             <div class="flex flex-wrap justify-center gap-8">
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="privacy-policy.html">Privacy Policy</a>
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="terms-of-service.html">Terms of Service</a>
-                <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="#">Security Vault</a>
+                <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="sovereignty.html">Consent &amp; Control</a>
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="investor-relations.html">Investor Relations</a>
             </div>
             <div class="flex gap-4">

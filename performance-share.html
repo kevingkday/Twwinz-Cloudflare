@@ -14,14 +14,23 @@
     </script>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta name="description" content="Partner with Twwinz.com through our Performance Share model. Align incentives and capture high-intent leads with GMV commission on twin-driven sales." />
-    <title>Twwinz.com | Performance Share</title>
+    <meta name="description" content="Learn how Twwinz.com's 10% Success Share works. We only earn a commission on sales tracked via twin-generated discount codes or tracked checkout links." />
+    <title>Twwinz.com | 10% Success Share &amp; Attribution</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Twwinz" />
+    <meta property="og:title" content="Twwinz.com | 10% Success Share &amp; Attribution" />
+    <meta property="og:description" content="Learn how Twwinz.com tracks attributed merch and booking sales using twin-generated discount codes and tracked checkout links." />
+    <meta property="og:url" content="https://twwinz.com/performance-share.html" />
+    <meta property="og:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Twwinz.com | 10% Success Share &amp; Attribution" />
+    <meta name="twitter:description" content="Learn how Twwinz.com tracks attributed merch and booking sales using twin-generated discount codes and tracked checkout links." />
+    <meta name="twitter:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <script src="/pricing-config.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -124,17 +133,16 @@
         <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
             <a href="index.html" class="text-xl font-bold tracking-tighter text-blue-400 font-['Space_Grotesk']">Twwinz.com</a>
             <div class="hidden md:flex items-center space-x-8 font-['Space_Grotesk'] font-medium tracking-tight">
-                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#platform">Platform</a>
-                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#technology">Technology</a>
-                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#security">Security</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#live-demo">Live Demo</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#platform">What Creators Get</a>
+                <a class="text-slate-400 hover:text-white transition-colors" href="index.html#whats-included">What's Included</a>
                 <a class="text-slate-400 hover:text-white transition-colors" href="index.html#pricing">Pricing</a>
             </div>
             <div class="flex items-center gap-4">
-                <a href="https://assets.cdn.filesafe.space/9TKh7JGFQXrmzx2AB0HI/media/69c208543b3a5825f8195434.pdf" target="_blank" class="hidden lg:block px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">Investor Deck</a>
-                <button
+                <a href="onboard.html"
                     class="primary-gradient text-on-primary px-6 py-2.5 rounded-md font-bold text-sm tracking-tight active:scale-95 transition-transform">
                     Deploy Your Twin
-                </button>
+                </a>
             </div>
         </div>
     </nav>
@@ -145,29 +153,22 @@
     
     <div class="max-w-4xl mx-auto relative z-10">
         <div class="mb-12">
-            <h1 class="font-headline text-[3.5rem] font-bold text-glow mb-4 text-primary leading-tight">Incentive Alignment</h1>
-            <p class="text-xl text-on-surface-variant leading-relaxed">The "Lower-Funnel" converter that makes us a partner in the celebrity's business, rather than just another vendor.</p>
+            <h1 class="font-headline text-[3.5rem] font-bold text-glow mb-4 text-primary leading-tight"><span data-price-bind="successShare.rateDisplay">10%</span> Success Share</h1>
+            <p class="text-xl text-on-surface-variant leading-relaxed">We only earn a commission when your twin directly closes a sale for you.</p>
         </div>
         
         <div class="glass-card rounded-2xl p-8 md:p-12 text-on-surface-variant font-body leading-relaxed space-y-6">
             
-            <h2 class="font-headline text-2xl font-bold text-white pt-4">Revenue Uplift</h2>
-            <p class="text-slate-400 mt-2">Capturing a percentage of Gross Merchandise Volume (GMV) directly ties the platform's success to the sales the AI twin generates. If the twin drives massive GMV, a fractional percentage is a fair trade.</p>
+            <h2 class="font-headline text-2xl font-bold text-white pt-4">How Attributed Sales Are Tracked</h2>
+            <p class="text-slate-400 mt-2" data-price-bind="successShare.trackingExplanation">Attributed sales are tracked exclusively via twin-generated discount codes (e.g., GALAXY20) or tracked checkout links clicked inside the twin chat.</p>
+            <ul class="list-disc pl-6 space-y-2 text-slate-300">
+                <li><strong>Twin-Only Promo Codes:</strong> Create a dedicated code (such as <code>GALAXY20</code> or <code>TWIN15</code>) in your dashboard so your twin can share it with fans asking about signed posters, books, or jerseys.</li>
+                <li><strong>Tracked Checkout Links:</strong> When your twin shares a product or booking link in chat, it appends attribution parameters (<code>?utm_source=twwinz&amp;utm_medium=twin_chat</code>) so only orders completed from those clicks count.</li>
+                <li><strong>Zero Cut on Organic Sales:</strong> Sales from fans who browse your store directly without using a twin promo code or tracked chat link are 100% yours with zero commission.</li>
+            </ul>
         
-            <h2 class="font-headline text-2xl font-bold text-white pt-4">High-Intent Lead Generation</h2>
-            <p class="text-slate-400 mt-2">For high-intent leads (e.g., booking a consultation or signing up for a premium course), a performance fee perfectly reflects the high ROI your "Digital Mind" provides compared to static web forms.</p>
-        
-            <h2 class="font-headline text-2xl font-bold text-white pt-4">Industry Standard</h2>
-            <p class="text-slate-400 mt-2">The hybrid compensation (Base + 10–15% commission) has become the absolute non-negotiable standard for performance-driven growth in 2026.</p>
-        
-            
-    <div class="mt-8 p-6 bg-surface-container-low border-l-4 border-primary/50 rounded-r-lg">
-        <p class="font-bold text-white mb-1 font-headline">The B-Level Reality Check</p>
-        <p class="text-sm text-slate-400"><strong class="text-white">Celebrity Perception:</strong> "We’re in this together."<br/><strong class="text-white">Business Reality:</strong> Directly ties platform value to sales uplift with unlimited upside anchored on the celebrity's brand power.</p>
-    </div>
-    
             <div class="mt-8 pt-8 border-t border-white/10">
-                <a href="index.html" class="text-primary text-sm font-bold inline-flex items-center gap-2 hover:underline"><span class="material-symbols-outlined text-sm">arrow_back</span> Back to Platform</a>
+                <a href="index.html#pricing" class="text-primary text-sm font-bold inline-flex items-center gap-2 hover:underline"><span class="material-symbols-outlined text-sm">arrow_back</span> Back to Pricing</a>
             </div>
         </div>
     </div>
@@ -177,13 +178,13 @@
         <div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-8">
             <div class="flex flex-col items-center md:items-start gap-4">
                 <div class="text-lg font-bold text-white font-['Space_Grotesk'] tracking-tighter">Twwinz.com</div>
-                <p class="font-['Inter'] text-sm text-slate-500 mb-1">© 2026 Twwinz.com. Powered by MCP.</p>
+                <p class="font-['Inter'] text-sm text-slate-500 mb-1">© 2026 Twwinz.com. Built on Creator Consent.</p>
                 <a href="mailto:hello@twwinz.com" class="font-['Inter'] text-sm text-slate-400 hover:text-white transition-colors">hello@twwinz.com</a>
             </div>
             <div class="flex flex-wrap justify-center gap-8">
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="privacy-policy.html">Privacy Policy</a>
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="terms-of-service.html">Terms of Service</a>
-                <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="#">Security Vault</a>
+                <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="sovereignty.html">Consent &amp; Control</a>
                 <a class="text-slate-500 hover:text-blue-300 transition-colors text-sm" href="investor-relations.html">Investor Relations</a>
             </div>
             <div class="flex gap-4">

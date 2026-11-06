@@ -284,14 +284,14 @@
           <img class="twwinz-widget-avatar" id="twwinz-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Avatar" />
           <div>
             <div class="twwinz-widget-title" id="twwinz-name">Official AI Twin</div>
-            <div class="twwinz-widget-badge">Direct Fan Line • Powered by RAG</div>
+            <div class="twwinz-widget-badge">Direct Fan Line • Verified Info</div>
           </div>
         </div>
         <button class="twwinz-widget-close" id="twwinz-close-btn">&times;</button>
       </div>
       <div class="twwinz-widget-messages" id="twwinz-messages"></div>
       <div class="twwinz-widget-input-box">
-        <input type="text" class="twwinz-widget-input" id="twwinz-input" placeholder="Ask about tour dates, VIP perks, or gear..." />
+        <input type="text" class="twwinz-widget-input" id="twwinz-input" placeholder="Ask about appearances, signed merch, bookings, or FAQs..." />
         <button class="twwinz-widget-send" id="twwinz-send-btn">Send</button>
       </div>
       <div class="twwinz-branding-footer">
@@ -373,7 +373,7 @@
       }
     } catch (err) {
       console.warn('[Twwinz] Failed to load creator data:', err);
-      addMessage('twin', "Hey! I am the official digital representative. Ask me anything about upcoming tour dates, VIP perks, or behind-the-scenes projects!");
+      addMessage('twin', "Hey! I am the official digital representative. Ask me anything about upcoming convention appearances, signed merch, bookings, or fan FAQs!");
     }
   }
 

@@ -4,8 +4,11 @@ node_modules
 package.json
 package-lock.json
 src
+test
+scripts
 schema.sql
 seed.sql
+sitemap.xml
 .wrangler
 .dev.vars
 .env*

@@ -4,6 +4,13 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Widget, Persona &amp; Voice Controls | Twwinz.com</title>
+    <meta name="description" content="Configure your AI Twin's persona, voice controls, hosted twin page, website embed script, and GoHighLevel CRM connection." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Widget, Persona &amp; Voice Controls | Twwinz.com" />
+    <meta property="og:description" content="Customize your AI Twin's voice, brand colors, hosted twin page link, and website embed script." />
+    <meta property="og:image" content="https://twwinz.com/images/chat-widget-mockup.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
@@ -73,7 +80,7 @@
                             Twin Configuration
                         </span>
                     </div>
-                    <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Configure your AI Twin's personality, voice behavior, brand styling, and website embed script.</p>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Configure your AI Twin's personality, voice behavior, brand styling, hosted twin page, and website embed script.</p>
                 </div>
             </div>
 
@@ -115,7 +122,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Opening Welcome Message</label>
                         <p class="text-xs text-slate-400 mb-2">
-                            The first greeting fans see when they open your chat widget.
+                            The first greeting fans see when they open your chat widget or hosted twin page.
                         </p>
                         <textarea id="welcome-message-input" rows="2" 
                             class="w-full bg-[#181818] border border-white/10 rounded-xl p-3.5 text-xs text-white focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
@@ -124,12 +131,12 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Twin Display Name / Moniker</label>
-                            <input type="text" id="twin-name-input" placeholder="e.g. Kevin Day"
+                            <input type="text" id="twin-name-input" placeholder="e.g. Jaxson Reed"
                                 class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Public Headline / Subtitle</label>
-                            <input type="text" id="headline-input" placeholder="e.g. Official AI Twin"
+                            <input type="text" id="headline-input" placeholder="e.g. Sci-Fi Actor &amp; Convention Guest"
                                 class="w-full bg-[#181818] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500" />
                         </div>
                     </div>
@@ -153,12 +160,12 @@
                     <div class="flex items-center justify-between border-b border-white/5 pb-3">
                         <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
                             <span class="material-symbols-outlined text-blue-400 text-lg">graphic_eq</span>
-                            Voice Interaction &amp; Audio Controls
+                            Voice Interaction &amp; Consent Controls
                         </h2>
-                        <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Voice Engine</span>
+                        <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Consent Verified</span>
                     </div>
                     <p class="text-xs text-slate-400 leading-relaxed">
-                        Configure how your AI Twin speaks during voice calls and audio widget responses.
+                        Built on consent: you approve your voice, likeness and every piece of content your twin uses, and can pause or delete it anytime.
                     </p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -181,8 +188,32 @@
 
             </div>
 
-            <!-- RIGHT COLUMN: Website Embed Code, Brand Styling & System Connections (5 cols) -->
+            <!-- RIGHT COLUMN: Hosted Twin Page, Website Embed Code, Brand Styling & System Connections (5 cols) -->
             <div class="lg:col-span-5 space-y-6">
+
+                <!-- 2b. Public Hosted Twin Page Card -->
+                <div class="glass-card p-6 rounded-2xl space-y-3 border border-blue-500/25">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">public</span>
+                            Your Twin Page (No Website Required)
+                        </h2>
+                        <a id="settings-hosted-open-link" href="/jaxson-reed" target="_blank" class="text-xs text-blue-400 hover:underline flex items-center gap-1">
+                            <span>Open Page</span>
+                            <span class="material-symbols-outlined text-xs">open_in_new</span>
+                        </a>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Share this link in your Instagram, TikTok, or X bio so fans can chat with your AI Twin even if you don't have a website.
+                    </p>
+                    <div class="flex items-center gap-2 bg-[#0f0f0f] border border-white/10 rounded-xl p-2.5">
+                        <span id="settings-hosted-url-text" class="flex-1 font-mono text-xs text-blue-300 truncate select-all">https://twwinz.com/jaxson-reed</span>
+                        <button type="button" id="btn-copy-hosted-settings" onclick="copySettingsHostedUrl()" class="bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition">
+                            <span class="material-symbols-outlined text-xs">content_copy</span>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- 3. Website Embed Code Card -->
                 <div class="glass-card p-6 rounded-2xl space-y-4">
@@ -251,51 +282,117 @@
                     </div>
                 </div>
 
-                <!-- 5. GoHighLevel Chat Widget & Webhook Connection -->
+                <!-- 5. GoHighLevel Sub-Account OAuth 2.0 & Widget Connection -->
                 <div class="glass-card p-6 rounded-2xl space-y-4 text-xs">
                     <div class="flex items-center justify-between border-b border-white/5 pb-3">
                         <h2 class="text-base font-bold text-white font-headline flex items-center gap-2">
-                            <span class="material-symbols-outlined text-blue-400 text-lg">webhook</span>
-                            GoHighLevel Chat Widget Connection
+                            <span class="material-symbols-outlined text-blue-400 text-lg">hub</span>
+                            GoHighLevel Sub-Account Connection
                         </h2>
-                        <span id="save-ghl-badge" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ GHL Saved</span>
+                        <div class="flex items-center gap-2">
+                            <span id="ghl-conn-status-pill" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300 border border-white/10">
+                                Checking...
+                            </span>
+                            <span id="save-ghl-badge" class="text-xs text-emerald-400 font-medium opacity-0 transition-opacity">✓ Saved</span>
+                        </div>
                     </div>
 
-                    <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3.5 space-y-2">
-                        <div class="font-semibold text-white flex items-center justify-between">
-                            <span>1. Your GHL Workflow Webhook URL</span>
-                            <button type="button" onclick="copyWebhookUrl()" id="btn-copy-webhook" class="bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 transition-all">
-                                <span class="material-symbols-outlined text-xs">content_copy</span> Copy URL
+                    <div id="ghl-oauth-alert" class="hidden rounded-xl p-3 text-xs font-medium"></div>
+
+                    <!-- Step 1: Provisioned Sub-Account Credentials -->
+                    <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4 space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="font-semibold text-white flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-blue-400 text-sm">account_Box</span>
+                                <span>1. Your Provisioned HighLevel Sub-Account</span>
+                            </div>
+                            <button type="button" onclick="provisionGhlSubAccountNow()" id="btn-provision-ghl" class="bg-white/10 hover:bg-white/15 border border-white/10 text-slate-200 font-semibold px-2.5 py-1 rounded-lg text-[11px] transition-all">
+                                Generate / Sync Login
                             </button>
                         </div>
-                        <div id="ghl-webhook-url-box" class="bg-black/50 border border-white/10 rounded-lg px-3 py-2 font-mono text-[11px] text-blue-300 break-all select-all">
-                            https://twwinz.com/api/chat/ghl-webhook
-                        </div>
-                        <div class="text-[11px] text-slate-300 leading-relaxed pt-1">
-                            <strong>In GoHighLevel:</strong> Go to <em>Automation → Workflows → Create Workflow</em>:
-                            <ol class="list-decimal list-inside mt-1 space-y-0.5 text-slate-400">
-                                <li><strong>Trigger:</strong> <em>Customer Replied</em> (Filter: Reply Channel = <em>Live Chat</em>)</li>
-                                <li><strong>Action:</strong> <em>Webhook</em> (Method: <code class="text-white">POST</code>, URL: paste the URL above)</li>
-                            </ol>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            Your HighLevel sub-account is created automatically at signup. Use these credentials when HighLevel prompts you to sign in during Step 2:
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            <div class="bg-black/40 border border-white/10 rounded-lg px-3 py-2">
+                                <div class="text-[10px] uppercase tracking-wider text-slate-400">Sub-Account Login Email</div>
+                                <div id="ghl-subaccount-email" class="font-mono text-[11px] text-white truncate select-all mt-0.5">—</div>
+                            </div>
+                            <div class="bg-black/40 border border-white/10 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] uppercase tracking-wider text-slate-400">Initial Password</div>
+                                    <div id="ghl-subaccount-password" class="font-mono text-[11px] text-amber-300 truncate select-all mt-0.5">Click "Generate / Sync Login"</div>
+                                </div>
+                                <button type="button" onclick="copySubAccountPassword()" id="btn-copy-subpass" class="hidden shrink-0 bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded text-[10px] font-semibold">
+                                    Copy
+                                </button>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Step 2: 1-Click OAuth 2.0 Authorization -->
+                    <div class="bg-blue-500/10 border border-blue-500/25 rounded-xl p-4 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <div class="font-semibold text-white text-sm flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-blue-400 text-base">verified_user</span>
+                                    <span>2. Authorize HighLevel Sub-Account (OAuth 2.0)</span>
+                                </div>
+                                <p id="ghl-oauth-desc" class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                                    Click <strong>Connect HighLevel</strong>, sign in with your sub-account email &amp; password above, select your sub-account, and click Approve. No manual API keys needed.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" onclick="startGhlOAuth()" id="btn-connect-ghl-oauth" class="bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-lg shadow-blue-500/20">
+                                    <span class="material-symbols-outlined text-sm">link</span>
+                                    <span id="btn-connect-ghl-label">Connect HighLevel</span>
+                                </button>
+                                <button type="button" onclick="disconnectGhlOAuthNow()" id="btn-disconnect-ghl-oauth" class="hidden bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 font-semibold px-3 py-2.5 rounded-xl text-xs transition-all">
+                                    Disconnect
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Native Chat Widget ID & Advanced / Legacy Fallback -->
                     <div class="space-y-3 pt-1">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">GHL Sub-Account Location ID</label>
-                            <input type="text" id="ghl-location-input" placeholder="e.g. ve9EPM428h8vShlRW1KT (auto-detected on first webhook)"
-                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Authorized Location ID</label>
+                                <input type="text" id="ghl-location-input" placeholder="Auto-filled on Connect HighLevel"
+                                    class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">GHL Native Chat Widget ID (Optional)</label>
+                                <input type="text" id="ghl-widget-input" placeholder="e.g. 6aed20b8ce7c96a75a945f06"
+                                    class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">GHL Native Chat Widget ID (Optional)</label>
-                            <input type="text" id="ghl-widget-input" placeholder="e.g. 66f..."
-                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">GHL Sub-Account Private Integration Token (Required for GHL Chat Replies)</label>
-                            <input type="password" id="ghl-apikey-input" placeholder="pit-... (from GHL Settings → Private Integrations)"
-                                class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
-                        </div>
+
+                        <details class="bg-black/30 border border-white/10 rounded-xl p-3">
+                            <summary class="cursor-pointer font-semibold text-slate-300 hover:text-white text-[11px] select-none">
+                                Advanced: Webhook URL &amp; Legacy Private Integration Token Fallback
+                            </summary>
+                            <div class="space-y-3 pt-3 mt-2 border-t border-white/10">
+                                <div>
+                                    <div class="font-semibold text-white flex items-center justify-between mb-1.5">
+                                        <span>GHL Workflow Webhook URL</span>
+                                        <button type="button" onclick="copyWebhookUrl()" id="btn-copy-webhook" class="bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg text-[11px] flex items-center gap-1 transition-all">
+                                            <span class="material-symbols-outlined text-xs">content_copy</span> Copy URL
+                                        </button>
+                                    </div>
+                                    <div id="ghl-webhook-url-box" class="bg-black/50 border border-white/10 rounded-lg px-3 py-2 font-mono text-[11px] text-blue-300 break-all select-all">
+                                        https://twwinz.com/api/chat/ghl-webhook
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Legacy Private Integration Token (Fallback if not using OAuth)</label>
+                                    <input type="password" id="ghl-apikey-input" placeholder="pit-... (optional when connected via OAuth)"
+                                        class="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500" />
+                                </div>
+                            </div>
+                        </details>
+
                         <div class="flex justify-end pt-1">
                             <button type="button" onclick="saveGhlConnection()" id="btn-save-ghl" class="bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all">
                                 Save GHL Settings
@@ -308,11 +405,12 @@
         </div>
     </main>
 
-    <!-- Active Floating Widget Preview -->
-    <script src="widget.js" data-creator="jaxson-reed" data-primary-color="#3b82f6" data-accent-color="#f59e0b" defer></script>
+    <!-- Active Floating Widget Preview (mounted dynamically for signed-in creator) -->
+    <div id="floating-widget-mount"></div>
 
     <script>
         let currentCreatorId = 'clb_jaxson_reed';
+        let currentCreatorSlug = 'jaxson-reed';
         let currentCreator = null;
         let currentSnippets = { twwinz: '', ghl: '' };
         let activeWidgetTab = 'twwinz';
@@ -331,6 +429,26 @@
             if (navSettings) navSettings.href = settingsUrl;
             if (navContent) navContent.href = contentUrl;
             if (backBtn) backBtn.href = contentUrl;
+
+            const openLink = document.getElementById('settings-hosted-open-link');
+            const urlText = document.getElementById('settings-hosted-url-text');
+            if (openLink && currentCreatorSlug) {
+                openLink.href = `/${encodeURIComponent(currentCreatorSlug)}`;
+            }
+            if (urlText && currentCreatorSlug) {
+                urlText.textContent = `${window.location.origin}/${currentCreatorSlug}`;
+            }
+        }
+
+        function copySettingsHostedUrl() {
+            const text = document.getElementById('settings-hosted-url-text').textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('btn-copy-hosted-settings');
+                btn.innerHTML = `<span class="material-symbols-outlined text-xs">check</span><span>Copied!</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = `<span class="material-symbols-outlined text-xs">content_copy</span><span>Copy</span>`;
+                }, 2000);
+            });
         }
 
         document.getElementById('color-primary-picker').addEventListener('input', (e) => {
@@ -387,6 +505,7 @@
 
                 if (data.creator) {
                     currentCreatorId = data.creator.id;
+                    currentCreatorSlug = data.creator.slug || currentCreatorSlug;
                 } else {
                     window.location.href = 'onboard.html';
                 }
@@ -401,6 +520,7 @@
                 if (res.ok) {
                     currentCreator = await res.json();
                     currentCreatorId = currentCreator.id;
+                    currentCreatorSlug = currentCreator.slug || 'jaxson-reed';
                     syncLinksWithCreatorId();
 
                     document.getElementById('creator-name-header').textContent = currentCreator.name;
@@ -443,10 +563,164 @@
                         currentSnippets.ghl = embedData.ghlNativeEmbed || '';
                         selectWidgetType(activeWidgetTab);
                     }
+
+                    mountFloatingWidgetPreview(currentCreator, colors, fonts);
+                    await loadGhlConnectionStatus(currentCreatorId);
                 }
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        async function loadGhlConnectionStatus(creatorId) {
+            const alertBox = document.getElementById('ghl-oauth-alert');
+            const oauthStatusParam = urlParams.get('ghl_oauth');
+            const oauthErrParam = urlParams.get('ghl_oauth_error');
+            if (alertBox) {
+                if (oauthStatusParam === 'connected') {
+                    alertBox.className = 'rounded-xl p-3 text-xs font-medium bg-emerald-500/15 border border-emerald-500/30 text-emerald-300';
+                    alertBox.textContent = '✓ HighLevel Sub-Account authorized via OAuth 2.0! Contacts and Live Chat messages are now connected automatically.';
+                    alertBox.classList.remove('hidden');
+                } else if (oauthErrParam) {
+                    alertBox.className = 'rounded-xl p-3 text-xs font-medium bg-red-500/15 border border-red-500/30 text-red-300';
+                    alertBox.textContent = `HighLevel OAuth Error: ${oauthErrParam}`;
+                    alertBox.classList.remove('hidden');
+                }
+            }
+
+            try {
+                const res = await fetch(`/api/creators/${encodeURIComponent(creatorId)}/ghl-connection`);
+                if (!res.ok) return;
+                const status = await res.json();
+                renderGhlConnectionStatus(status);
+            } catch (err) {
+                console.warn('GHL connection status check skipped:', err);
+            }
+        }
+
+        function renderGhlConnectionStatus(status) {
+            const pill = document.getElementById('ghl-conn-status-pill');
+            const connectLabel = document.getElementById('btn-connect-ghl-label');
+            const disconnectBtn = document.getElementById('btn-disconnect-ghl-oauth');
+            const desc = document.getElementById('ghl-oauth-desc');
+            const emailEl = document.getElementById('ghl-subaccount-email');
+            const passEl = document.getElementById('ghl-subaccount-password');
+            const copyPassBtn = document.getElementById('btn-copy-subpass');
+
+            if (emailEl) {
+                emailEl.textContent = status.subaccountLogin?.email || currentCreator?.email || '—';
+            }
+            if (passEl) {
+                if (status.subaccountLogin?.initialPassword) {
+                    passEl.textContent = status.subaccountLogin.initialPassword;
+                    if (copyPassBtn) copyPassBtn.classList.remove('hidden');
+                } else {
+                    passEl.textContent = 'Click "Generate / Sync Login"';
+                    if (copyPassBtn) copyPassBtn.classList.add('hidden');
+                }
+            }
+
+            if (!pill) return;
+
+            if (status.oauthConnected) {
+                pill.className = 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+                pill.textContent = `● Connected via OAuth (${status.locationId || 'Sub-Account'})`;
+                if (connectLabel) connectLabel.textContent = 'Reconnect HighLevel';
+                if (disconnectBtn) disconnectBtn.classList.remove('hidden');
+                if (desc) {
+                    desc.innerHTML = `Authorized for Sub-Account <code class="text-emerald-300 font-mono">${escapeHtml(status.locationId || '')}</code>. Access tokens auto-refresh automatically.`;
+                }
+            } else if (status.privateTokenConfigured) {
+                pill.className = 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/30';
+                pill.textContent = '● Connected (Private Token)';
+                if (connectLabel) connectLabel.textContent = 'Upgrade to OAuth';
+                if (disconnectBtn) disconnectBtn.classList.add('hidden');
+            } else {
+                pill.className = 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30';
+                pill.textContent = '○ Authorize Sub-Account';
+                if (connectLabel) connectLabel.textContent = 'Connect HighLevel';
+                if (disconnectBtn) disconnectBtn.classList.add('hidden');
+            }
+        }
+
+        function startGhlOAuth() {
+            window.location.href = `/api/oauth/ghl/start?creatorId=${encodeURIComponent(currentCreatorId)}`;
+        }
+
+        async function disconnectGhlOAuthNow() {
+            if (!confirm('Disconnect HighLevel OAuth from this digital twin?')) return;
+            try {
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/ghl-disconnect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderGhlConnectionStatus(data);
+                }
+            } catch (err) {
+                alert('Error disconnecting HighLevel: ' + err.message);
+            }
+        }
+
+        async function provisionGhlSubAccountNow() {
+            const btn = document.getElementById('btn-provision-ghl');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Provisioning...';
+            }
+            try {
+                const res = await fetch(`/api/creators/${encodeURIComponent(currentCreatorId)}/ghl-provision`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    if (data.locationId) {
+                        document.getElementById('ghl-location-input').value = data.locationId;
+                    }
+                    renderGhlConnectionStatus(data);
+                } else {
+                    alert('Error provisioning sub-account login: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Error provisioning sub-account login: ' + err.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Generate / Sync Login';
+                }
+            }
+        }
+
+        function copySubAccountPassword() {
+            const text = document.getElementById('ghl-subaccount-password')?.textContent?.trim();
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('btn-copy-subpass');
+                if (!btn) return;
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+            });
+        }
+
+        function mountFloatingWidgetPreview(creator, colors = {}, fonts = {}) {
+            if (!creator) return;
+            document.querySelectorAll('.twwinz-widget-bubble, .twwinz-widget-window').forEach(el => el.remove());
+            const mount = document.getElementById('floating-widget-mount');
+            if (!mount) return;
+            mount.innerHTML = '';
+
+            const script = document.createElement('script');
+            script.src = 'widget.js';
+            script.setAttribute('data-creator', creator.slug || creator.id);
+            if (creator.ghl_location_id) script.setAttribute('data-ghl-location', creator.ghl_location_id);
+            script.setAttribute('data-primary-color', colors.primary || '#3b82f6');
+            script.setAttribute('data-accent-color', colors.accent || '#f59e0b');
+            if (fonts.heading) script.setAttribute('data-heading-font', fonts.heading);
+            if (fonts.body) script.setAttribute('data-body-font', fonts.body);
+            mount.appendChild(script);
         }
 
         async function savePersonaRules() {
@@ -576,4 +850,3 @@
     </script>
 </body>
 </html>
-

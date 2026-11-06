@@ -15,26 +15,131 @@ export class GHLService {
   }
 
   /**
-   * Provision a new GHL Sub-Account (Location) for a signing-up celebrity.
+   * Generate a strong HighLevel-compliant initial password (12+ chars, upper, lower, digit, symbol).
+   */
+  generateInitialSubAccountPassword() {
+    const bytes = new Uint8Array(6);
+    crypto.getRandomValues(bytes);
+    const token = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    return `Tw!nz${token.slice(0, 6).toUpperCase()}${token.slice(6)}#9`;
+  }
+
+  /**
+   * Ensure a password meets HighLevel's strict policy (12+ chars, upper, lower, digit, symbol).
+   */
+  normalizeGhlPassword(candidate) {
+    if (!candidate) return this.generateInitialSubAccountPassword();
+    const str = String(candidate);
+    const hasUpper = /[A-Z]/.test(str);
+    const hasLower = /[a-z]/.test(str);
+    const hasDigit = /[0-9]/.test(str);
+    const hasSymbol = /[^A-Za-z0-9]/.test(str);
+    if (str.length >= 12 && hasUpper && hasLower && hasDigit && hasSymbol) {
+      return str;
+    }
+    return `${str}Tw!9#aB2cD4e`.slice(0, Math.max(14, str.length + 5));
+  }
+
+  /**
+   * Provision a Sub-Account Admin user (login email + password) scoped strictly to the newly created locationId.
+   * POST https://services.leadconnectorhq.com/users/
+   */
+  async provisionSubAccountUser({ name, email, locationId, password }) {
+    if (!email || !locationId) {
+      return { success: false, error: 'email and locationId are required' };
+    }
+
+    const initialPassword = this.normalizeGhlPassword(password);
+    const parts = String(name || 'Creator Official').trim().split(/\s+/);
+    const firstName = parts[0] || 'Creator';
+    const lastName = parts.slice(1).join(' ') || 'Official';
+
+    if (!this.agencyKey) {
+      return {
+        success: true,
+        isSimulated: true,
+        userId: `usr_sim_${Date.now()}`,
+        loginEmail: email,
+        tempPassword: initialPassword
+      };
+    }
+
+    try {
+      const payload = {
+        companyId: this.env.GHL_COMPANY_ID || undefined,
+        firstName,
+        lastName,
+        email,
+        password: initialPassword,
+        type: 'account',
+        role: 'admin',
+        locationIds: [locationId]
+      };
+
+      const res = await fetch(`${GHL_API_BASE}/users/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.agencyKey}`,
+          'Version': GHL_API_VERSION,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        console.warn('[GHL provisionSubAccountUser Warning]', res.status, data.message || '');
+        return {
+          success: false,
+          error: data.message || `HTTP ${res.status}`,
+          loginEmail: email,
+          tempPassword: initialPassword
+        };
+      }
+
+      return {
+        success: true,
+        isSimulated: false,
+        userId: data.id || data.userId || null,
+        loginEmail: email,
+        tempPassword: initialPassword
+      };
+    } catch (err) {
+      console.warn('[GHL provisionSubAccountUser Error]', err.message);
+      return {
+        success: false,
+        error: err.message,
+        loginEmail: email,
+        tempPassword: initialPassword
+      };
+    }
+  }
+
+  /**
+   * Provision a new GHL Sub-Account (Location) for a signing-up celebrity,
+   * apply the configured Snapshot, and create their Sub-Account Admin login user.
    * Matches the exact contract:
    * POST https://services.leadconnectorhq.com/locations/
    * Version: 2021-07-28
    */
-  async provisionSubAccount({ name, email, websiteType, snapshotId }) {
-    const targetSnapshot = websiteType === 'ghl_hosted' 
-      ? (snapshotId || this.env.GHL_SNAPSHOT_ID || this.defaultSnapshotId) 
-      : null;
+  async provisionSubAccount({ name, email, websiteType, snapshotId, password }) {
+    const targetSnapshot = snapshotId || this.env.GHL_SNAPSHOT_ID || (websiteType === 'ghl_hosted' ? this.defaultSnapshotId : null);
 
     if (!this.agencyKey) {
       // Mock / Sandbox response for local development & testing
       const mockLocationId = `loc_ghl_${Date.now()}`;
       const mockWidgetId = `wgt_${Math.random().toString(36).substring(2, 9)}`;
+      const mockUser = await this.provisionSubAccountUser({ name, email, locationId: mockLocationId, password });
       return {
         success: true,
         isSimulated: true,
         locationId: mockLocationId,
         widgetId: mockWidgetId,
         snapshotApplied: targetSnapshot,
+        userId: mockUser.userId,
+        loginEmail: mockUser.loginEmail,
+        tempPassword: mockUser.tempPassword,
         message: 'Sandbox Sub-Account provisioned successfully (Set GHL_AGENCY_API_KEY for live GHL provisioning).'
       };
     }
@@ -82,12 +187,23 @@ export class GHLService {
         throw new Error(`HTTP ${res.status}: ${data.message || rawText || 'Missing location id in response'}`);
       }
 
+      // Also create a Sub-Account Admin login user so the creator can sign in to HighLevel & authorize OAuth
+      const subUser = await this.provisionSubAccountUser({
+        name,
+        email,
+        locationId: data.id,
+        password
+      });
+
       return {
         success: true,
         isSimulated: false,
         locationId: data.id,
         widgetId: `wgt_${data.id}`,
-        snapshotApplied: targetSnapshot
+        snapshotApplied: targetSnapshot,
+        userId: subUser.userId || null,
+        loginEmail: subUser.loginEmail || email || null,
+        tempPassword: subUser.tempPassword || null
       };
     } catch (err) {
       console.error('[GHL provisionSubAccount Error]', err);
@@ -105,16 +221,17 @@ export class GHLService {
    * Endpoint: GET /chat-widget/list?locationId={locationId}
    * Requires scope: chat-widget.readonly
    */
-  async getChatWidgets(locationId) {
-    if (!this.agencyKey) {
+  async getChatWidgets(locationId, accessToken = null) {
+    const token = accessToken || this.agencyKey;
+    if (!token) {
       return { success: true, isSimulated: true, widgets: [{ id: `wgt_${locationId}` }] };
     }
 
     try {
-      const res = await fetch(`${GHL_API_BASE}/chat-widget/list?locationId=${locationId}`, {
+      const res = await fetch(`${GHL_API_BASE}/chat-widget/list?locationId=${encodeURIComponent(locationId)}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.agencyKey}`,
+          'Authorization': `Bearer ${token}`,
           'Version': GHL_API_VERSION,
           'Accept': 'application/json'
         }
@@ -140,7 +257,8 @@ export class GHLService {
    * Endpoint: PUT /chat-widget/data/{locationId}/{widgetId}
    * Requires scope: chat-widget.write
    */
-  async configureChatWidget({ locationId, widgetId, colors, fonts, avatarUrl, headline, welcomeMessage }) {
+  async configureChatWidget({ locationId, widgetId, colors, fonts, avatarUrl, headline, welcomeMessage, accessToken = null }) {
+    const token = accessToken || this.agencyKey;
     const customConfig = {
       primaryColor: colors.primary || '#3b82f6',
       accentColor: colors.accent || '#f59e0b',
@@ -152,7 +270,7 @@ export class GHLService {
       welcomeMessage: welcomeMessage || 'Hey! Ask me anything about upcoming tour dates, VIP access, or projects!'
     };
 
-    if (!this.agencyKey) {
+    if (!token) {
       return { success: true, isSimulated: true, config: customConfig };
     }
 
@@ -160,7 +278,7 @@ export class GHLService {
       // 1. If widgetId not provided, attempt to look it up from the location
       let targetWidgetId = widgetId;
       if (!targetWidgetId || targetWidgetId.startsWith('wgt_')) {
-        const listRes = await this.getChatWidgets(locationId);
+        const listRes = await this.getChatWidgets(locationId, token);
         if (listRes.success && listRes.widgets && listRes.widgets.length > 0) {
           targetWidgetId = listRes.widgets[0].id || listRes.widgets[0]._id;
         }
@@ -187,7 +305,7 @@ export class GHLService {
       const res = await fetch(`${GHL_API_BASE}/chat-widget/data/${locationId}/${targetWidgetId}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${this.agencyKey}`,
+          'Authorization': `Bearer ${token}`,
           'Version': GHL_API_VERSION,
           'Content-Type': 'application/json',
           'Accept': 'application/json'
@@ -222,6 +340,75 @@ export class GHLService {
   data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
   data-widget-id="${widgetId}">
 </script>`;
+  }
+
+  /**
+   * Upsert a fan contact strictly inside the authorized GHL Sub-Account (locationId).
+   * POST https://services.leadconnectorhq.com/contacts/upsert
+   * Requires scope: contacts.write
+   */
+  async upsertContact({ token, locationId, name, email, phone, tags = ['twwinz-fan'], source = 'Twwinz AI Twin Chat' }) {
+    if (!locationId || String(locationId).startsWith('loc_')) {
+      return {
+        success: false,
+        error: 'Valid HighLevel Sub-Account locationId is required to create or update contacts'
+      };
+    }
+
+    if (!email && !phone) {
+      return {
+        success: false,
+        error: 'Either email or phone is required to upsert a HighLevel contact'
+      };
+    }
+
+    const authBearer = token || this.agencyKey;
+    if (!authBearer) {
+      return {
+        success: true,
+        isSimulated: true,
+        locationId,
+        contactId: `cnt_sim_${Date.now()}`
+      };
+    }
+
+    try {
+      const payload = {
+        locationId,
+        name: name || undefined,
+        email: email || undefined,
+        phone: phone || undefined,
+        source,
+        tags
+      };
+
+      const res = await fetch(`${GHL_API_BASE}/contacts/upsert`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authBearer}`,
+          'Version': GHL_API_VERSION,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(() => ({}));
+      const contactObj = data.contact || data;
+      return {
+        success: res.ok,
+        status: res.status,
+        locationId,
+        contactId: contactObj?.id || null,
+        data
+      };
+    } catch (err) {
+      console.error('[GHL upsertContact Error]', err.message);
+      return {
+        success: false,
+        error: err.message
+      };
+    }
   }
 
   /**
