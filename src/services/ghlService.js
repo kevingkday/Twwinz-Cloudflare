@@ -462,6 +462,98 @@ export class GHLService {
   }
 
   /**
+   * Ensure a GHL Conversation exists for a Contact and log the Fan + AI Twin chat exchange.
+   * Uses scopes: conversations.readonly, conversations.write, conversations/message.write
+   */
+  async logChatExchangeToGhl({ token, locationId, contactId, fanMessage, twinReply }) {
+    const authBearer = token || this.agencyKey;
+    if (!authBearer || !locationId || !contactId) {
+      return { success: false, error: 'Missing token, locationId, or contactId' };
+    }
+    if (String(locationId).startsWith('loc_') || String(contactId).startsWith('cnt_sim_')) {
+      return {
+        success: true,
+        isSimulated: true,
+        conversationId: `cnv_sim_${contactId}`
+      };
+    }
+
+    const headers = {
+      'Authorization': `Bearer ${authBearer}`,
+      'Version': GHL_API_VERSION,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+
+    let conversationId = null;
+
+    // 1. Find existing conversation or create a new one for this contact
+    try {
+      const searchRes = await fetch(
+        `${GHL_API_BASE}/conversations/search?locationId=${encodeURIComponent(locationId)}&contactId=${encodeURIComponent(contactId)}`,
+        { method: 'GET', headers }
+      );
+      if (searchRes.ok) {
+        const searchData = await searchRes.json().catch(() => ({}));
+        const firstConv = searchData?.conversations?.[0];
+        if (firstConv?.id) {
+          conversationId = firstConv.id;
+        }
+      }
+    } catch (_) {}
+
+    if (!conversationId) {
+      try {
+        const createRes = await fetch(`${GHL_API_BASE}/conversations/`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ locationId, contactId })
+        });
+        const createData = await createRes.json().catch(() => ({}));
+        conversationId = createData?.conversation?.id || createData?.id || null;
+      } catch (_) {}
+    }
+
+    // 2. Try logging inbound fan message first, then outbound twin reply
+    let inboundLogged = false;
+    if (conversationId && fanMessage) {
+      try {
+        const inRes = await fetch(`${GHL_API_BASE}/conversations/messages/inbound`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            type: 'Live_Chat',
+            conversationId,
+            message: fanMessage
+          })
+        });
+        inboundLogged = inRes.ok;
+      } catch (_) {}
+    }
+
+    // 3. Log the AI Twin reply (or combined Fan + Twin transcript if /inbound requires a custom provider ID)
+    const outboundText = inboundLogged
+      ? twinReply
+      : `Fan: ${fanMessage}\n\nAI Twin: ${twinReply}`;
+
+    const replyRes = await this.sendReplyToConversation({
+      locationApiKey: authBearer,
+      locationId,
+      conversationId,
+      contactId,
+      replyText: outboundText,
+      messageType: 'Live_Chat'
+    });
+
+    return {
+      success: replyRes.success,
+      conversationId: conversationId || replyRes.data?.conversationId || null,
+      inboundLogged,
+      replyStatus: replyRes.status
+    };
+  }
+
+  /**
    * Generates the custom embed code snippet ready for the celebrity to paste
    * into their WordPress, Squarespace, Wix, or Shopify site.
    */

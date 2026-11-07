@@ -1615,15 +1615,23 @@ async function handleApiRoute(url, request, env) {
       chatHistory
     });
 
-    // Automatically extract fan email / phone from chat message (if provided) and sync to creator's GHL Sub-Account
+    // Automatically extract fan email / phone from current query or chatHistory, upsert Contact in GHL, and log Conversation
     try {
-      const emailMatch = query.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-      const phoneMatch = query.match(/(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
-      const nameMatch = query.match(/(?:my\s+name\s+is|i\s*am|i'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+      const allFanText = [
+        ...chatHistory.filter(m => m.sender === 'fan').map(m => m.message),
+        query
+      ].join('\n');
+
+      const emailMatch = allFanText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const phoneMatch = allFanText.match(/(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+      const nameMatch = allFanText.match(/(?:my\s+name\s+is|i\s*am|i'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
 
       const detectedEmail = body?.fanEmail || (emailMatch ? emailMatch[0].toLowerCase() : null);
       const detectedPhone = body?.fanPhone || (phoneMatch ? phoneMatch[0] : null);
       const detectedName = body?.fanName || (nameMatch ? nameMatch[1].trim() : null);
+
+      let ghlContactId = null;
+      let ghlConversationId = null;
 
       if ((detectedEmail || detectedPhone) && !isDemoCreator(creator.id) && !isDemoCreator(creator.slug)) {
         const creds = await resolveCreatorGhlCredentials(db, env, creator);
@@ -1637,14 +1645,61 @@ async function handleApiRoute(url, request, env) {
             tags: ['twwinz-fan', 'chat-lead'],
             source: 'Twwinz AI Twin Chat'
           });
-          if (contactRes.success) {
+
+          if (contactRes.success && contactRes.contactId) {
+            ghlContactId = contactRes.contactId;
             result.ghlContactSynced = true;
-            result.ghlContactId = contactRes.contactId;
+            result.ghlContactId = ghlContactId;
+
+            const convRes = await ghlService.logChatExchangeToGhl({
+              token: creds.token,
+              locationId: creds.locationId,
+              contactId: ghlContactId,
+              fanMessage: query,
+              twinReply: result.reply
+            });
+
+            if (convRes.conversationId) {
+              ghlConversationId = convRes.conversationId;
+              result.ghlConversationId = ghlConversationId;
+            }
+            result.ghlConversationLogged = Boolean(convRes.success);
           }
         }
       }
+
+      // Log chat session & messages in D1 for creator analytics & history
+      const sessionKey = detectedEmail || detectedPhone || ip || 'anon';
+      const d1SessionId = `web_${creator.id}_${sessionKey.replace(/[^a-zA-Z0-9]/g, '').slice(0, 32)}`;
+      await db.prepare(`
+        INSERT OR REPLACE INTO chat_sessions (id, creator_id, ghl_contact_id, ghl_conversation_id, fan_name, fan_email, fan_phone, channel, last_message_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'twwinz_widget', CURRENT_TIMESTAMP)
+      `).bind(
+        d1SessionId,
+        creator.id,
+        ghlContactId,
+        ghlConversationId,
+        detectedName || 'Website Visitor',
+        detectedEmail,
+        detectedPhone
+      ).run();
+
+      await db.prepare(`
+        INSERT INTO chat_messages (id, session_id, creator_id, sender, message, rag_sources)
+        VALUES (?, ?, ?, 'fan', ?, NULL), (?, ?, ?, 'twin', ?, ?)
+      `).bind(
+        `msg_f_${Date.now()}`,
+        d1SessionId,
+        creator.id,
+        query,
+        `msg_t_${Date.now() + 1}`,
+        d1SessionId,
+        creator.id,
+        result.reply || '',
+        JSON.stringify((result.ragSources || []).map(s => s.id))
+      ).run();
     } catch (syncErr) {
-      console.warn('[Auto GHL Contact Sync Warning]', syncErr.message);
+      console.warn('[Auto GHL Contact & Conversation Sync Warning]', syncErr.message);
     }
 
     return jsonResponse(result);
