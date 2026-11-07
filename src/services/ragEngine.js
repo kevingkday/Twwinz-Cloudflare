@@ -333,9 +333,9 @@ ${formattedContext}
       ];
 
       const candidateModels = [
-        '@cf/mistral/mistral-7b-instruct-v0.1',
+        '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
         '@cf/meta/llama-3.1-8b-instruct',
-        '@cf/meta/llama-3-8b-instruct'
+        '@cf/mistral/mistral-7b-instruct-v0.1'
       ];
 
       for (const modelName of candidateModels) {
@@ -359,7 +359,11 @@ ${formattedContext}
             }
           }
 
-          const textReply = aiResponse?.response?.trim();
+          const rawReply =
+            (typeof aiResponse?.response === 'string' && aiResponse.response) ||
+            aiResponse?.choices?.[0]?.message?.content ||
+            '';
+          const textReply = String(rawReply).trim();
           if (textReply) {
             return {
               reply: textReply,
